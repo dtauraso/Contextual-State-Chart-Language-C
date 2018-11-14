@@ -1144,6 +1144,7 @@ void visitNodes()
 {
 	// https://github.com/protobuf-c/protobuf-c
 	// need dummy\n for parser to work
+	// count_temp is setting count_2 to the size from findGapSize of the previous string found(is equal to the number of tabs before the current word)
 	char* line = "dummy\n\tstring_1\n\t\tstring_2\n\t\t\tstring_3\n\t\t\t\tChildren\n\t\t\t\t\tstring_4\n\t\t\t\t\t\tstring_5\n\t\t\t\t\t\t\tstring_6\n\t\t\t\tNext\n\t\t\t\t\tstring_1 string_2 string_3\n\t\t\t\t\tstring_1_1 string_2_1 string_3_1\n\t\t\t\t\tstring_1_2 string_2_2 string_3_2\n\t\t\t\t\tstring_1_3 string_2_3 string_3_3\n\t\t\t\tParents\n\t\t\t\t\tnull\n\t\t\t\tFunctions\n\t\t\t\t\tstring_7\n\t\t\t\t\tstring_8";
 	int size = strlen(line);
 	int i = 0;
@@ -1508,6 +1509,7 @@ void visitNodes()
 							state_tracker->prev->name = malloc(sizeof(char*) * name_size);
 							//printf("state tracker size %i %i\n", sizeof(state_tracker->prev->name)/sizeof(char*), name_size);
 							state_tracker->prev->name_size = name_size;
+							state_tracker->prev->ith_name = name_size - 1;
 
 						}
 
@@ -1551,13 +1553,14 @@ void visitNodes()
 					printf("\n");
 					// grap the first item and set it to the end of the name array
 					// array size ++
-					state_tracker->prev->ith_name++;
+
 					printf("ith name %i\n", state_tracker->prev->ith_name);
 					state_tracker->prev->name[state_tracker->prev->ith_name] = malloc(sizeof(char) * strlen(tracker->prev->word));
 
 					memcpy(state_tracker->prev->name[state_tracker->prev->ith_name],
 						tracker->prev->word,
 						sizeof(char) * strlen(tracker->prev->word));
+					state_tracker->prev->ith_name--;
 					printStateStack(state_tracker);
 					printf("\n");
 
