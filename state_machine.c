@@ -1505,6 +1505,8 @@ void visitNodes()
 							printf("\n");
 							printStateStack(state_tracker);
 						    printf("\n");
+							// have to travel up the word stack untill hit a category name(children) or a null sized string
+							// otherwize this version only works for 1 nested states(n level nesting will not work)
 							int name_size = tracker->prev->indent - state_tracker->prev->indent;
 							state_tracker->prev->name = malloc(sizeof(char*) * name_size);
 							//printf("state tracker size %i %i\n", sizeof(state_tracker->prev->name)/sizeof(char*), name_size);
