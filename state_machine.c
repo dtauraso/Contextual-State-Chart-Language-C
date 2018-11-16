@@ -871,6 +871,12 @@ for each indent found that has a = b
  */
  void postorder(struct State* state_tracker)
  {
+
+	printf("indent %i\n", state_tracker->indent);
+	for(int i = 0;  i < state_tracker->children_size; i++)
+ 	{
+ 		postorder(state_tracker->children[i]);
+ 	}
 	if(state_tracker->indent == 0)
 	{
 
@@ -888,10 +894,7 @@ for each indent found that has a = b
 		printf("|%s|\n", state_tracker->name[i]);
 	}
 	printf("done printing data from state\n");
-	for(int i = 0; i < state_tracker->children_size; i++)
-	{
-		postorder(state_tracker->children[i]);
-	}
+
 }
 void printStateStack(struct State* state_tracker)
 {
@@ -904,6 +907,7 @@ void printStateStack(struct State* state_tracker)
 	//printf("|%i| ", stack_tracker->indent);
 	int indents = 0;
 	// 					indent_string = makeIndents(count_temp);
+	//postorder(stack_tracker);
 
 	while(stack_tracker != NULL)
 	{
@@ -1145,7 +1149,7 @@ void visitNodes()
 	// https://github.com/protobuf-c/protobuf-c
 	// need dummy\n for parser to work
 	// count_temp is setting count_2 to the size from findGapSize of the previous string found(is equal to the number of tabs before the current word)
-	char* line = "dummy\n\tstring_1\n\t\tstring_2\n\t\t\tstring_3\n\t\t\t\tChildren\n\t\t\t\t\tstring_4\n\t\t\t\t\t\tstring_5\n\t\t\t\t\t\t\tstring_6\n\t\t\t\tNext\n\t\t\t\t\tstring_1 string_2 string_3\n\t\t\t\t\tstring_1_1 string_2_1 string_3_1\n\t\t\t\t\tstring_1_2 string_2_2 string_3_2\n\t\t\t\t\tstring_1_3 string_2_3 string_3_3\n\t\t\t\tParents\n\t\t\t\t\tnull\n\t\t\t\tFunctions\n\t\t\t\t\tstring_7\n\t\t\t\t\tstring_8";
+	char* line = "dummy\n\tstring_1\n\t\tstring_2\n\t\t\tstring_3\n\t\t\t\tChildren\n\t\t\t\t\tstring_4\n\t\t\t\t\t\tstring_5\n\t\t\t\t\t\t\tstring_6\n\t\t\t\t\t\t\t\tChildren\n\t\t\t\t\t\t\t\t\tstring_9\n\t\t\t\t\t\t\t\t\t\tstring_10\n\t\t\t\t\t\t\t\t\t\t\tstring_11\n\t\t\t\tNext\n\t\t\t\t\tstring_1 string_2 string_3\n\t\t\t\t\tstring_1_1 string_2_1 string_3_1\n\t\t\t\t\tstring_1_2 string_2_2 string_3_2\n\t\t\t\t\tstring_1_3 string_2_3 string_3_3\n\t\t\t\tParents\n\t\t\t\t\tnull\n\t\t\t\tFunctions\n\t\t\t\t\tstring_7\n\t\t\t\t\tstring_8";
 	int size = strlen(line);
 	int i = 0;
 
@@ -1168,6 +1172,8 @@ void visitNodes()
 	state_root->name = NULL;
 	state_root->prev = NULL;
 	state_root->next = NULL;
+	state_root->children = malloc(sizeof(struct State*) * 10);
+	state_root->children_size = 0;
 	state_root->indent = 0;
 
 
@@ -1215,7 +1221,7 @@ void visitNodes()
 
 	while(!isEmpty(next_states))
 	{
-		if(count == 26)
+		if(count == 34)
 		{
 			exit(1);
 		}
@@ -1436,11 +1442,32 @@ void visitNodes()
 
 
 
+						/*
 
+						struct State
+					    {
+					   	 char** name;
+					   	 int name_size;
+					   	 int ith_name;
+					   	 struct State** children;
+					   	 int children_size;
+					   	 char** next;
+					   	 int next_size;
+					   	 char** parents;
+					   	 int parents_size;
+					   	 char** functions;
+					   	 int functions_size;
+					   	 int indent;
+					   	 struct State* prev;
+					    };
+						*/
 						struct State* next_state = malloc(sizeof(struct State));
 						next_state->indent = count_2;
 						next_state->prev = state_tracker->prev;
-						next_state->children = malloc(sizeof(struct State*));
+
+						// assume children starts with 10 uninitialized slots
+						next_state->children = malloc(sizeof(struct State*) * 10);
+						next_state->children_size = 0;
 						next_state->next = NULL;//malloc(sizeof(char*));
 						next_state->name = NULL;
 						next_state->ith_name = -1;
@@ -1505,9 +1532,19 @@ void visitNodes()
 							printf("\n");
 							printStateStack(state_tracker);
 						    printf("\n");
+							struct StackNode* stack_tracker = malloc(sizeof(struct StackNode));
+							stack_tracker->prev = tracker->prev;
+							int name_size = 0;
+							//printf("first wohhhhhhhhrd is %s\n", stack_tracker->prev->word);
 							// have to travel up the word stack untill hit a category name(children) or a null sized string
-							// otherwize this version only works for 1 nested states(n level nesting will not work)
-							int name_size = tracker->prev->indent - state_tracker->prev->indent;
+							while(!wordIsCategory(stack_tracker->prev->word) || (strlen(stack_tracker->prev->word) == 0))
+							{
+								//printf("counting %s\n", stack_tracker->prev->word);
+								stack_tracker = stack_tracker->prev;
+								name_size++;
+							}
+							//tracker->prev->indent - state_tracker->prev->indent;
+							//printf("size = %i\n", size);
 							state_tracker->prev->name = malloc(sizeof(char*) * name_size);
 							//printf("state tracker size %i %i\n", sizeof(state_tracker->prev->name)/sizeof(char*), name_size);
 							state_tracker->prev->name_size = name_size;
@@ -1650,8 +1687,23 @@ void visitNodes()
 				}
 				case indent_stays_same:
 				{
+					// indent staying the same is supposed to be related to the indent level at 'Next' in the input
+					int top_of_state_stack = state_tracker->prev->indent;
+					int top_of_word_stack = tracker->prev->indent;
+					printf("before %i %i\n", top_of_state_stack, top_of_word_stack);
 
-					state_changed = true;
+					//(*i_ptr) += (count_temp) + peek_size;
+					//int c_1 = count_2;
+					// -1 because count_temp counts newline
+					//int c_2 = count_temp-1;
+
+					//printf("after %i %i\n", c_1, c_2);
+					if(top_of_state_stack == top_of_word_stack)
+					{
+							//printf("%i still needs to decrease\n", top_of_word_stack);
+							state_changed = true;
+					}
+					//state_changed = true;
 
 
 					break;
@@ -1666,10 +1718,36 @@ void visitNodes()
 					peek_size = peekAtNode(line, i, count_temp);
 					char* word = getValue(line, i + (count_temp), peek_size);
 					// -1 because count_temp takes newline into account
-					printf("word next? %s %i\n", word, count_temp - 1);
-
+					printf("word next? %s %i\n\n", word, count_temp - 1);
+					printStateStack(state_tracker);
+					printf("\n\n\n");
 					// are done with all states having an indent >= next(below next in the tree)
 					// have top state be the first child of the second from top state(do for all states having a >= indent value than next)
+					struct State* top_of_state_stack = malloc(sizeof(struct State));
+					top_of_state_stack->prev = state_tracker->prev;
+
+					// not making the links correctly
+					// assume this (loop) will be run lots of times to represent the branches of state objects in the level below the state whose next we are at in the input
+					while(top_of_state_stack->prev->indent >= tracker->prev->indent)
+					{
+						printf("%s\n", top_of_state_stack->prev->name[0]);
+						printf("%i\n", top_of_state_stack->prev->prev->indent);
+						// the size can be used as an index because it hasn't been incremented yet
+						top_of_state_stack->prev->prev->children[top_of_state_stack->prev->prev->children_size] = top_of_state_stack->prev;
+						top_of_state_stack->prev->prev->children_size++;
+						//printf("%i\n", top_of_state_stack->prev->prev->children_size);
+
+
+
+						printf("\n");
+						top_of_state_stack = top_of_state_stack->prev;
+						printf("value of conditon %i\n", top_of_state_stack->prev->indent >= tracker->prev->indent);
+					}
+					printf("\n\n\n");
+					//postorder(state_tracker->prev);
+					postorder(state_tracker->prev->prev);
+					printf("\n\n\n");
+
 					state_changed = true;
 
 
