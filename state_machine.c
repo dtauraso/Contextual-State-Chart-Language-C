@@ -1,12 +1,8 @@
 // this program parses a custom file of context sensitive states
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <string.h>
-#include <math.h>
-#include "hash_table.c"
 
+#include "hash_table.h"
+#include "forward_declarators.h"
 // function to jump to the start of the ith group of 4 next states
 // f(state_case) -> int
 
@@ -1565,11 +1561,7 @@ bool Next(struct StateMachineVars* main_state_recorder_tree)
 	return true;
 }
 
-struct Names {
 
-	char** strings;
-	int strings_size;
-};
 // use oop too
 struct Data {
 
@@ -1584,7 +1576,11 @@ struct Data {
 	int string_p_size;
 
 	float* _float_p;
+
+	// only for the compiler to use
+	struct SparseMatrix* levels;
 };
+
 // each ContextState is a state
 struct ContextState {
 	struct Names* name;
@@ -1612,27 +1608,7 @@ struct ContextState {
 
 	struct Data* var;
 };
-struct Names* makeName2(char* name_1, char* name_2)
-{
-	//int size_1 = strlen(name_1);
-	//int size_2 = strlen(name_2);
 
-	char** name = malloc(sizeof(char*) * 2);
-	name[0] = name_1;
-	name[1] = name_2;
-	//memcpy(name[0], name_1, sizeof(char) * size_1);
-	//printf("here\n");
-
-	struct Names* names = malloc(sizeof(struct Names));
-	names->strings = malloc(sizeof(char*) * 2);
-	//printf("here 1.2\n");
-	memcpy(names->strings, name, sizeof(char*) * 2);
-	names->strings_size = 2;
-	//int name_size = 2;
-	//memcpy(name[1], name_2, sizeof(char) * size_1);
-	//printf("%s, %s\n", names->name[0], names->name[0]);
-	return names;
-}
 enum attributes {_StartChildren, _Parents, _Children, _Nexts};
 struct ContextState* makeState(struct Names* names)
 {
@@ -1698,7 +1674,9 @@ struct Names** makeNew(struct Names** handle, int* handle_size, struct Names* ad
 	//printf("%i\n", *handle_size);
 	return handle;
 }
-struct ContextState* addNode(struct ContextState* node, int attribute_name, struct Names* add_node)
+struct ContextState* addNode(struct ContextState* node,
+							 int attribute_name,
+							 struct Names* add_node)
 {
 	switch(attribute_name)
 	{
@@ -1755,6 +1733,59 @@ struct SparseMatrix {
 
 const int max_levels = 3;
 struct SparseMatrix* levels;//[max_levels];
+void printAttribute(int node_size, struct Names** container)
+{
+
+	for(int i = 0; i < node_size; i++)
+	{
+		for(int j = 0; j < container[i]->strings_size; j++)
+		{
+			printf("  %s", container[i]->strings[j]);
+
+		}
+		printf("\n");
+
+	}
+}
+void print(struct ContextState* node, level_id_state_id* point)
+{
+	printf("node %i, %i\n", point->level_id, point->state_id);
+	printf("name:\n");
+	printAttribute(1, &levels[point->level_id].state_list[point->state_id]->name);
+	printf("\n");
+	if(levels[point->level_id].state_list[point->state_id]->start_children_size > 0)
+	{
+		printf("start children:\n");
+
+		printAttribute(levels[point->level_id].state_list[point->state_id]->start_children_size, levels[point->level_id].state_list[point->state_id]->start_children);
+	}
+
+
+	if(levels[point->level_id].state_list[point->state_id]->parents_size > 0)
+	{
+		printf("parents:\n");
+		printAttribute(levels[point->level_id].state_list[point->state_id]->parents_size, levels[point->level_id].state_list[point->state_id]->parents);
+
+	}
+
+	if(levels[point->level_id].state_list[point->state_id]->children_size > 0)
+	{
+		printf("children:\n");
+
+		printAttribute(levels[point->level_id].state_list[point->state_id]->children_size, levels[point->level_id].state_list[point->state_id]->children);
+
+	}
+
+	if(levels[point->level_id].state_list[point->state_id]->nexts_size > 0)
+	{
+		printf("nexts:\n");
+
+		printAttribute(levels[point->level_id].state_list[point->state_id]->nexts_size, levels[point->level_id].state_list[point->state_id]->nexts);
+
+	}
+
+}
+
 void makeTree()
 {
 	/*
@@ -1766,57 +1797,557 @@ void makeTree()
 	{
 		levels[i].state_list = malloc(sizeof(struct ContextState*) * max_states);
 	}
+	//printf("ddd\n");
+	/*
+	stack = [(level_id, last_state_enumerated, indent level)] have to compare the indent that is too large in indent_decrease to the
+	// deepest level's indent value
+	*/
 	//printf("here1\n");
+	state_x_y_hash_table* state_x_y_table =  ht_new2();
 	//levels[0].state_list[0] = malloc(sizeof(struct Names*));
 	levels[0].state_list[0] = makeState(makeName2("states", "state"));
 	//printf("%s|%s %i\n", levels[0].state_list[0]->name->strings[0], levels[0].state_list[0]->name->strings[1], levels[0].state_list[0]->name->strings_size);
-	levels[0].state_list[0] = addNode(levels[0].state_list[0],
-									  _StartChildren,
-									  makeName2("names", "0"));
+	levels[0].state_list[0] = addNode(levels[0].state_list[0], _StartChildren, 	makeName2("names", "0"));
+	levels[0].state_list[0] = addNode(levels[0].state_list[0], _Parents, 		makeName2("root", "0"));
+	levels[0].state_list[0] = addNode(levels[0].state_list[0], _Children, 		makeName2("start_children", "0"));
 
-	printf("%s|%s %i\n", levels[0].state_list[0]->name->strings[0], levels[0].state_list[0]->name->strings[1], levels[0].state_list[0]->name->strings_size);
-	printf("start children\n");
-	for(int i = 0; i < levels[0].state_list[0]->start_children_size; i++)
-		printf("%s ", levels[0].state_list[0]->start_children[i]->strings[0]);
-
-	printf("%i \n", levels[0].state_list[0]->start_children_size);
-	ht_hash_table* ht = ht_new();
-	ht_insert(ht, "states", "state");
-	printf("%i\n", ht->count);
-	printf("%s states\n", ht_search(ht, "states"));
-	// ht_insert(ht, makeName2("states", "state"), grid(0, 0))
-	// ([string], (x, y))
-
-	/*for(int i = 0; i < ht->count; i++)
+	/*for(int i = 0; i < levels[0].state_list[0]->name->strings_size; i++)
 	{
-		printf("%s|%s", ht->items[i]->key, ht->items[i]->value);
+		printf("%s \n", levels[0].state_list[0]->name->strings[i]);
+
 	}*/
-	// add stuff to hash table
-	ht_del_hash_table(ht);
+	ht_insert2(state_x_y_table, levels[0].state_list[0]->name, newPoint(0, 0));
+	print(levels[0].state_list[0], ht_search2(state_x_y_table, levels[0].state_list[0]->name));
+	printf("\n\n");
 
-	// tableAdd(makeName2("states", "state"), 0, 0)
-	// add in all details of the state
-	// add state to hash table(state_name, (level#, state#))
-	// when going down levels level_id++, state_id = population++
-	// when on the same level, state_id++, population++
-	//levels[1].state_list[0] = makeState(makeName2("names", "0"), 2);
-	//levels[1].state_list[1] = makeState(makeName2("start_children", "0"), 2);
 
-	//getValue(levels[1].state_list[1]).int
-	/*
-	levels[0].state_list[0] = addNode(levels[0].state_list[0],
-									  _StartChildren,
-									  levels[1].state_list[0]);
+		levels[1].state_list[0] = makeState(makeName2("names", "0"));
+		levels[1].state_list[0] = addNode(levels[1].state_list[0], _StartChildren, 	makeName2("name", "0"));
+		levels[1].state_list[0] = addNode(levels[1].state_list[0], _Parents, 		makeName2("states", "state"));
+		levels[1].state_list[0] = addNode(levels[1].state_list[0], _Nexts, 			makeName2("start_children", "0"));
 
-	levels[0].state_list[0] = addNode(levels[0].state_list[0],
-									  _Children,
-									  levels[1].state_list[1]);
-	*/
-	//printf("%s|%s\n", levels[0].state_list[0]->name[0], levels[0].state_list[0]->name[1]);
-	exit(0);
+		ht_insert2(state_x_y_table, levels[1].state_list[0]->name, newPoint(1, 0));
+		print(levels[1].state_list[0], ht_search2(state_x_y_table, levels[1].state_list[0]->name));
+		printf("\n\n");
+
+			levels[2].state_list[0] = makeState(makeName2("name", "0"));
+			levels[2].state_list[0] = addNode(levels[2].state_list[0], _Nexts, 	makeName2("indent_increase", "0"));
+			levels[2].state_list[0] = addNode(levels[2].state_list[0], _Nexts, 	makeName2("indent_decrease", "0"));
+
+			ht_insert2(state_x_y_table, levels[2].state_list[0]->name, newPoint(2, 0));
+			print(levels[2].state_list[0], ht_search2(state_x_y_table, levels[2].state_list[0]->name));
+			printf("\n\n");
+
+			levels[2].state_list[1] = makeState(makeName2("indent_increase", "0"));
+			levels[2].state_list[1] = addNode(levels[2].state_list[1], _Nexts, 	makeName2("name", "0"));
+			levels[2].state_list[1] = addNode(levels[2].state_list[1], _Nexts, 	makeName2("\"Start Children\"", "0"));
+
+			ht_insert2(state_x_y_table, levels[2].state_list[1]->name, newPoint(2, 1));
+			print(levels[2].state_list[1], ht_search2(state_x_y_table, levels[2].state_list[1]->name));
+			printf("\n\n");
+
+			levels[2].state_list[2] = makeState(makeName2("indent_increase", "1"));
+			levels[2].state_list[2] = addNode(levels[2].state_list[2], _Nexts, 	makeName2("states", "substates"));
+
+			ht_insert2(state_x_y_table, levels[2].state_list[2]->name, newPoint(2, 2));
+			print(levels[2].state_list[2], ht_search2(state_x_y_table, levels[2].state_list[2]->name));
+			printf("\n\n");
+
+			// the recursion will be detected by the positive level difference between the current state and the Start Children State
+			levels[2].state_list[3] = makeState(makeName2("indent_increase", "2"));
+			levels[2].state_list[3] = addNode(levels[2].state_list[3], _StartChildren, 	makeName2("names", "0"));
+			levels[2].state_list[3] = addNode(levels[2].state_list[3], _Nexts, 	makeName2("indent_decrease", "1"));
+
+			ht_insert2(state_x_y_table, levels[2].state_list[3]->name, newPoint(2, 3));
+			print(levels[2].state_list[3], ht_search2(state_x_y_table, levels[2].state_list[3]->name));
+			printf("\n\n");
+
+
+			levels[2].state_list[4] = makeState(makeName2("\"Start Children\"", "0"));
+			levels[2].state_list[4] = addNode(levels[2].state_list[4], _StartChildren, 	makeName2("names", "0"));
+
+			ht_insert2(state_x_y_table, levels[2].state_list[4]->name, newPoint(2, 4));
+			print(levels[2].state_list[4], ht_search2(state_x_y_table, levels[2].state_list[4]->name));
+			printf("\n\n");
+
+
+
+			levels[2].state_list[5] = makeState(makeName2("indent_decrease", "0"));
+
+			ht_insert2(state_x_y_table, levels[2].state_list[5]->name, newPoint(2, 5));
+			print(levels[2].state_list[5], ht_search2(state_x_y_table, levels[2].state_list[5]->name));
+			printf("\n\n");
+
+			levels[2].state_list[6] = makeState(makeName2("indent_decrease", "1"));
+
+			ht_insert2(state_x_y_table, levels[2].state_list[6]->name, newPoint(2, 6));
+			print(levels[2].state_list[6], ht_search2(state_x_y_table, levels[2].state_list[6]->name));
+			printf("\n\n");
+
+		// can't define a second state with the same name
+
+		//start_children
+			//0
+
+		exit(0);
+}
+/*
+def doesNextStatesExist(next_states):
+
+	return len(next_states) > 0 and len(next_states[0]) > 0
+
+
+def isParent(children):
+
+	return children != od()
+
+
+
+def hasParent(graph, state, case_):
+	return len(graph['parents'][state][case_].keys()) > 0
+
+class ChildParent():
+	def __init__(self, child, parent):
+		self.child = child
+		self.parent = parent
+
+
+def getIndents(count):
+
+	indent = ''
+
+	while (count > 0):
+
+		indent += '    '
+		count -= 1
+
+	return indent
+
+
+def printStack(bottom):
+
+	tracker = bottom[0]
+	stack = []
+	print('start stack')
+	while (tracker != None):
+
+		stack.append(tracker.child)
+		tracker = tracker.parent
+
+	for i, item in enumerate(stack):
+
+		print(stack[i])
+	print('end stack')
+
+
+
+def isBottomAtTheParentOfCurrentState(parent_cases, bottom_state, bottom_case):
+
+	for p, parent_case in enumerate(parent_cases):
+
+		parent = parent_cases[p][0]
+
+		parent_case = parent_cases[p][1]
+
+		if(bottom_state == parent and bottom_case == parent_case):
+
+			return True
+
+
+	return False
+
+def getNextStates(tracker, continuing_next_states, indents, graph):
+
+
+	#print(tracker.parent, tracker.child)
+	state1 = tracker.child[0]
+	case1 = tracker.child[1]
+
+	# todo: need to delete the bottom of the list as we ascend it, not ignore it
+	# for python tracker.parent is to what javascript is to tracker
+	while (tracker.parent != None and len(continuing_next_states) == 0):
+
+		indents -= 1
+		tracker = tracker.parent
+		state1 = tracker.child[0]
+		case1 = tracker.child[1]
+		# need to exit the main loop
+		if (state1 == 'root'):
+
+			return [tracker, [], indents]
+
+
+		continuing_next_states = [list(a) for a in graph['node_graph2'][state1]['next'][case1].items()]
+
+
+	return [tracker, continuing_next_states, indents]
+
+
+def makeNextStates(next_states):
+	new_next_states = []
+
+	next_states = [list(a) for a in next_states]
+
+	for n, next_state in enumerate(next_states):
+
+		new_next_states.append([next_states[n][0], next_states[n][1]])
+
+
+
+
+	return new_next_states
+
+def printLevel(graph, state, case_, indents, m, chosen_level):
+
+	if (indents == chosen_level):
+
+		print(getIndents(indents), '|'+ state + '|', case_, 'passed', 'i', '|' + graph['input'][m] + '|', m)
+
+
+
+
+def printLevels(graph, state, case_, indents, m, chosen_level):
+
+	if (indents >= chosen_level):
+
+		print(getIndents(indents), '|'+ state + '|', case_, 'passed', 'i', '|' + graph['input'][m] + '|', m)
+
+
+
+
+
+def printLevelsBounds(graph, state, case_, indents, m, input_length, chosen_start_level, chosen_end_level):
+
+
+	print(getIndents(indents), '('+  '\'' + state + '\'' + ',' , case_ + ',', 'f=' + graph['node_graph2'][state]['functions'][case_].__name__ + ',', str(indents) + ')')#, '|' + graph['input'][m] + '|'/*,'i ='*///, //m/*, input_length*/)
+	//	#console.log()
+
+
+
+
+/*
+def printVarStore(graph):
+
+	m = graph['input']
+	return '|' + graph['input'][m] + '|'
+
+*/
+def isParent(children):
+
+	return children != od()
+
+bool isBottomAtTheParentOfCurrentState(struct Names** 			parents,
+									   int 						num_parents,
+									   struct Names* 			bottom_state,
+									   state_x_y_hash_table* 	state_x_y_table)
+{
+
+	for(int i = 0; i < num_parents; i++)
+	{
+		level_id_state_id* ith_parent_point = 	ht_search2(state_x_y_table, parents[i]);
+		level_id_state_id* bottom_state 	= 	ht_search2(state_x_y_table, bottom_state);
+		if(ith_parent_point->level_id == bottom_state->level_id &&
+		   ith_parent_point->state_id == bottom_state->level_id)
+		{
+			return true;
+		}
+	}
+	return false;
+
+}
+
+bool hasParent(struct SparseMatrix* levels, level_id_state_id* point)
+{
+	levels[point->level_id].state_list[point->state_id].parents_size > 0;
+	//return len(graph['parents'][state][case_].keys()) > 0
+
 }
 
 
+
+struct ChildParent
+{
+	struct Names* child;
+	struct ChildParent* parent;
+};
+
+
+void visit(struct SparseMatrix* levels,
+		   struct ContextState* start_node,
+		   state_x_y_hash_table* state_x_y_table)
+{
+
+	// test by making each function do nothing but return true or false
+	struct Names** next_states = malloc(sizeof(struct Names*));
+	next_states[0] = start_node->name;
+	int next_states_size = 1;
+
+	struct ChildParent* bottom = malloc(sizeof(struct ChildParent));
+	//parent = ChildParent(['root', 0], None)
+	bottom->child = malloc(sizeof(struct Names));  // make root
+	bottom->child->strings = malloc(sizeof(char*));
+	bottom->child->strings[0] = "root";
+	bottom->child->string_size = 1;
+
+	bottom->parent = NULL;
+	int ii = 0;
+	int indents = 0;
+	while(next_states_size > 0)
+	{
+		if(ii == 1)
+			exit(1);
+
+		struct Names* current_state_name;
+
+		int j = 0;
+		while(j < next_states_size)
+		{
+			current_state_name = next_states[j];
+			struct Names* maybe_parent;
+			// get point of current_state_name
+			level_id_state_id* point = ht_search2(state_x_y_table, current_state_name);
+
+			maybe_parent = levels[point->level_id].state_list[point->state_id].name;
+
+			//maybe_parent = graph['node_graph2'][ state ]['children'][ case_ ]
+			bool did_function_pass = levels[point->level_id].state_list[point->state_id].function(current_state, levels);
+			if(did_function_pass)
+			{
+				// did_function_pass = graph['node_graph2'][state]['functions'][case_]([state, case_], graph)
+				if(hasParent(levels, point))
+				{
+					/*
+					bottom_state = bottom[0].child[0]
+					bottom_case = bottom[0].child[1]
+					*/
+					struct Names* bottom_state = bottom->child;
+					// struct Names** all_parents = parents of current state
+					struct Names** parents = levels[point->level_id].state_list[point->state_id].parents;
+					int num_parents = levels[point->level_id].state_list[point->state_id].parents_size;
+
+					//parent_cases = [list(a) for a in graph['parents'][state][case_].items()]
+					//if (isBottomAtTheParentOfCurrentState(parent_cases, bottom_state, bottom_case)):
+					if(isBottomAtTheParentOfCurrentState(parents,
+														 num_parents,
+														 bottom_state,
+														 state_x_y_table))
+					 {
+						struct ChildParent* new_parent = malloc(sizeof(struct ChildParent));
+						//parent = ChildParent(['root', 0], None)
+						//bottom->child = ;  // make root
+						new_parent->child = malloc(sizeof(struct Names));  // make root
+						new_parent->child->strings = malloc(sizeof(char*));
+						new_parent->child->strings[0] = current_state_name;
+						new_parent->child->string_size = 1;
+						new_parent->parent = bottom;
+						indents++;
+						/*new_parent = ChildParent([state, case_], bottom[0])
+						# link passing state to its parent on bottom of stack, extending the stack by 1, vertically
+						bottom[0] = new_parent
+						indents += 1
+						*/
+					 }
+
+				}
+				if(isParent(maybe_parent))
+				{
+
+				}
+
+			}
+		}
+	}
+}
+/*
+def visit(node, graph, indents, debug):
+	# assume graph is nested lists
+	# does depth first tranversal for each subgraph(each subgraph is a state name that has children)
+	# does breath first traversal for within each subgraph
+	#print("got here")
+	graph['node_graph2'] = od([ makedTupleOfOrderedDicts(a) for a in graph['node_graph2']])
+	x = node[0]
+	y = node[1]
+	next_states = [node]
+	action = {}
+	bottom = []
+	# assumes [state, case_] actually runs
+	parent = ChildParent(['root', 0], None)
+	bottom.append(parent)
+	ii = 0
+	#console.log(getIndents(indents), 'start state', node)
+	while(len(next_states) != 0):
+
+		#print(ii)
+
+		if(ii == 200):
+			#exit(1)
+			pass
+
+
+		#print(getIndents(indents), 'next_states', next_states)
+
+		state = ''
+		case_ = 0
+		state_changed = False
+
+		# machine will stop running if all have failed(there must be more than 0 states for this to be possible) or error state runs
+		# loop ends after the first state passes
+		j = 0
+		while(j < len(next_states)):
+
+			#print('next_states', next_states)
+			state = next_states[j][0]
+			case_ = next_states[j][1]
+			#print(cases)
+			# for same next state at multiple cases
+			#for case__ in cases:
+			#	case_ = case__
+			#print('|' + state + '|', case_)
+
+			maybe_parent = graph['node_graph2'][ state ]['children'][ case_ ]
+			did_function_pass = graph['node_graph2'][state]['functions'][case_]([state, case_], graph)
+			#print(did_function_pass)
+			if (did_function_pass):
+				#print('next states', graph['node_graph2'][state]['next'][case_])
+				#print(maybe_parent)
+
+				#if (state == 'error'):
+
+				#	print('you have invalid input')
+				#	exit()
+
+				# this case is for getting the children from the parent
+				# needs to always check before the isParent
+				if (hasParent(graph, state, case_)):
+					# x = (lowest_bottom, indent_number)
+					# push the state to the bottom if bottom happens to be one of state's parents
+					# only checks the state and not the case
+					bottom_state = bottom[0].child[0]
+					bottom_case = bottom[0].child[1]
+
+					parent_cases = [list(a) for a in graph['parents'][state][case_].items()]
+					#print('next_states', parent_cases)
+					parent_cases = makeNextStates(parent_cases)
+					if (isBottomAtTheParentOfCurrentState(parent_cases, bottom_state, bottom_case)):
+
+						new_parent = ChildParent([state, case_], bottom[0])
+						# link passing state to its parent on bottom of stack, extending the stack by 1, vertically
+						bottom[0] = new_parent
+						indents += 1
+						#print('indent increasing', indents)
+
+
+
+				#print('maybe_parent', maybe_parent, isParent(maybe_parent))
+
+				# for when passing the current state(it is in the current next states) has a child(called next states)
+				if (isParent(maybe_parent)):
+					# x = (lowest_bottom, next_states)
+					#print('here')
+					# add passing state horizontally
+					bottom[0].child = [state, case_]
+
+					# getting the children
+					children = [list(a) for a in graph['node_graph2'][state]['children'][case_].items()]
+					#print('next_states', children)
+					children = makeNextStates(children)
+					next_states = []
+					for i, child in enumerate(children):
+
+						next_states.append(children[i])
+
+					if debug:
+
+						m = graph['i']
+						printLevelsBounds(graph, state, case_, indents, m, len(graph['input']), 0, -1)
+
+
+
+
+				# for when passing the current state(it is in the current next states) does not have a child but has neighbor states(called next states)
+				else:
+					# x = (next_states)
+					# x_total = (lowest_bottom, next_states, indent_number)
+					# there is a problem with how dict_items is being used
+
+					#print(graph['node_graph2'][state]['next'])
+					next_states = [list(a) for a in graph['node_graph2'][state]['next'][case_].items()]
+
+
+					next_states = makeNextStates(next_states)
+					#print('next_states', next_states)
+					if debug:
+						m = graph['i']
+						printLevelsBounds(graph, state, case_, indents, m, len(graph['input']), 0, -1)
+					# add passing state horizontally
+					bottom[0].child = [state, case_]
+
+
+
+				state_changed = True
+
+				break
+
+
+			j += 1
+			#if state_changed:
+			#	break
+
+		#printStack(bottom)
+		# if a child fails and
+		#print(next_states, state_changed)
+		# hit end state at any level below top level
+		if (len(next_states) == 0):
+
+			# x_total = (lowest_bottom, next_states, indent_number)
+
+			# have linked list representing the stack
+			# first item is in bottom[0]
+
+			# travel up stack untill either hits root or hits neighbors of a prev visited level
+			tracker_continuing_next_states_indents = getNextStates(bottom[0], next_states, indents, graph)
+			#print(tracker_continuing_next_states_indents)
+			tracker = tracker_continuing_next_states_indents[0]
+			continuing_next_states = tracker_continuing_next_states_indents[1]
+			indents = tracker_continuing_next_states_indents[2]
+
+
+			bottom[0] = tracker
+			next_states = continuing_next_states
+			#print('next_states 5', next_states)
+
+			state_changed = True
+			# might not actually be true ever
+			'''
+			/*
+			if (tracker == null)
+				console.log('done runing machine')
+			*/
+			//'''
+
+
+		/*#print( )
+		# if all fail then all will be rerun unless this condition is here
+		if(not state_changed and len(next_states) > 0):
+			# all next_states failed so this level cannot be finished
+			# travel up like before but choose the next child after the tracker
+
+			print('error at ')
+			print(getIndents(indents), next_states, 'on')
+			print(getIndents(indents), '('+  '\'' + state + '\'' + ',' , case_ + ',', 'f=' + graph['node_graph2'][state]['functions'][case_].__name__ + ',', str(indents) + ')')
+			break
+
+			#print(next_states, 'have failed so your state machine is incomplete')
+			#exit()
+		#if(not state_changed):
+		#	print("we are screwed", len(next_states))
+		ii += 1
+
+
+	#print(getIndents(indents), '1state machine is finished', '|'+ state + '|', case_)
+	#print(getIndents(indents), 'exit visit', node)
+	#print(graph)
+*/
 /*
 ContextState
 	char* name
@@ -1840,7 +2371,7 @@ save the partial data in the same control flow table under different contexts
 names, start children, parent, children, next, functions
 levels\states
 -------------------------------------
-0 	| (root, 0), (tracking, level_state), (tracking, tree)
+0 	| (root, 0), (tracking, level_state), (tracking, tree), (sparse_matrix, 0)
 1	| (states, state), (level_number, 0), (state_id, 0), (indent_1, 0), (indent_2, 0)
 2	| (names, 0), (start_children, 0)
 3	| (name, 0) , (indent_increase, 0) (indent_increase, 1), (indent_increase, 2) (start_children, 0), (indent_decrease, 0)
@@ -1862,7 +2393,7 @@ states
 									name 0, "Start Children" 0
 							1  (order = 5, level = 3)
 								Next
-									state, substates
+									states substates
 							2
 								Start Children
 									names 0
@@ -1881,7 +2412,7 @@ states
 							1  (order = 13(wrong), level = 3)
 
 					Parent
-						state 0
+						states state
 					Next
 						start_children 0
 		Children
