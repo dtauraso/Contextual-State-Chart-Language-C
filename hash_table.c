@@ -242,6 +242,9 @@ void ht_delete(ht_hash_table* ht, const char* key)
  }
 struct Names* makeName(char* name)
 {
+	char** name = malloc(sizeof(char*));
+	name[0] = name;
+	
 	struct Names* names = malloc(sizeof(struct Names));
 	names->strings = malloc(sizeof(char*));
 	memcpy(names->strings, name, sizeof(char*));

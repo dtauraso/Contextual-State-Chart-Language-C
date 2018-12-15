@@ -1580,6 +1580,7 @@ struct Data {
 	// only for the compiler to use
 	struct SparseMatrix* levels;
 };
+//typedef bool* (*function_pointer)(struct Names* , struct SparseMatrix* );
 
 // each ContextState is a state
 struct ContextState {
@@ -1604,10 +1605,19 @@ struct ContextState {
 	struct Names** nexts;
 	int nexts_size;
 
-	void* function;
+	bool (*function_pointer)(struct Names* a, struct SparseMatrix* b);
+	char* function_pointer_name;
 
 	struct Data* var;
 };
+struct ContextState* addFunction(struct ContextState* node,
+								bool (*function_pointer)(struct Names* , struct SparseMatrix* ),
+							 	 char* function_pointer_name)
+{
+ 	node->function_pointer = function_pointer;
+	node->function_pointer_name = function_pointer_name;
+	return node;
+}
 
 enum attributes {_StartChildren, _Parents, _Children, _Nexts};
 struct ContextState* makeState(struct Names* names)
@@ -1733,164 +1743,6 @@ struct SparseMatrix {
 
 const int max_levels = 3;
 struct SparseMatrix* levels;//[max_levels];
-void printAttribute(int node_size, struct Names** container)
-{
-
-	for(int i = 0; i < node_size; i++)
-	{
-		for(int j = 0; j < container[i]->strings_size; j++)
-		{
-			printf("  %s", container[i]->strings[j]);
-
-		}
-		printf("\n");
-
-	}
-}
-void print(struct ContextState* node, level_id_state_id* point)
-{
-	printf("node %i, %i\n", point->level_id, point->state_id);
-	printf("name:\n");
-	printAttribute(1, &levels[point->level_id].state_list[point->state_id]->name);
-	printf("\n");
-	if(levels[point->level_id].state_list[point->state_id]->start_children_size > 0)
-	{
-		printf("start children:\n");
-
-		printAttribute(levels[point->level_id].state_list[point->state_id]->start_children_size, levels[point->level_id].state_list[point->state_id]->start_children);
-	}
-
-
-	if(levels[point->level_id].state_list[point->state_id]->parents_size > 0)
-	{
-		printf("parents:\n");
-		printAttribute(levels[point->level_id].state_list[point->state_id]->parents_size, levels[point->level_id].state_list[point->state_id]->parents);
-
-	}
-
-	if(levels[point->level_id].state_list[point->state_id]->children_size > 0)
-	{
-		printf("children:\n");
-
-		printAttribute(levels[point->level_id].state_list[point->state_id]->children_size, levels[point->level_id].state_list[point->state_id]->children);
-
-	}
-
-	if(levels[point->level_id].state_list[point->state_id]->nexts_size > 0)
-	{
-		printf("nexts:\n");
-
-		printAttribute(levels[point->level_id].state_list[point->state_id]->nexts_size, levels[point->level_id].state_list[point->state_id]->nexts);
-
-	}
-
-}
-
-void makeTree()
-{
-	/*
-	define 1 pyramid here
-	*/
-	levels = malloc(sizeof(struct SparseMatrix) * max_levels);
-
-	for(int i = 0; i < max_levels; i++)
-	{
-		levels[i].state_list = malloc(sizeof(struct ContextState*) * max_states);
-	}
-	//printf("ddd\n");
-	/*
-	stack = [(level_id, last_state_enumerated, indent level)] have to compare the indent that is too large in indent_decrease to the
-	// deepest level's indent value
-	*/
-	//printf("here1\n");
-	state_x_y_hash_table* state_x_y_table =  ht_new2();
-	//levels[0].state_list[0] = malloc(sizeof(struct Names*));
-	levels[0].state_list[0] = makeState(makeName2("states", "state"));
-	//printf("%s|%s %i\n", levels[0].state_list[0]->name->strings[0], levels[0].state_list[0]->name->strings[1], levels[0].state_list[0]->name->strings_size);
-	levels[0].state_list[0] = addNode(levels[0].state_list[0], _StartChildren, 	makeName2("names", "0"));
-	levels[0].state_list[0] = addNode(levels[0].state_list[0], _Parents, 		makeName2("root", "0"));
-	levels[0].state_list[0] = addNode(levels[0].state_list[0], _Children, 		makeName2("start_children", "0"));
-
-	/*for(int i = 0; i < levels[0].state_list[0]->name->strings_size; i++)
-	{
-		printf("%s \n", levels[0].state_list[0]->name->strings[i]);
-
-	}*/
-	ht_insert2(state_x_y_table, levels[0].state_list[0]->name, newPoint(0, 0));
-	print(levels[0].state_list[0], ht_search2(state_x_y_table, levels[0].state_list[0]->name));
-	printf("\n\n");
-
-
-		levels[1].state_list[0] = makeState(makeName2("names", "0"));
-		levels[1].state_list[0] = addNode(levels[1].state_list[0], _StartChildren, 	makeName2("name", "0"));
-		levels[1].state_list[0] = addNode(levels[1].state_list[0], _Parents, 		makeName2("states", "state"));
-		levels[1].state_list[0] = addNode(levels[1].state_list[0], _Nexts, 			makeName2("start_children", "0"));
-
-		ht_insert2(state_x_y_table, levels[1].state_list[0]->name, newPoint(1, 0));
-		print(levels[1].state_list[0], ht_search2(state_x_y_table, levels[1].state_list[0]->name));
-		printf("\n\n");
-
-			levels[2].state_list[0] = makeState(makeName2("name", "0"));
-			levels[2].state_list[0] = addNode(levels[2].state_list[0], _Nexts, 	makeName2("indent_increase", "0"));
-			levels[2].state_list[0] = addNode(levels[2].state_list[0], _Nexts, 	makeName2("indent_decrease", "0"));
-
-			ht_insert2(state_x_y_table, levels[2].state_list[0]->name, newPoint(2, 0));
-			print(levels[2].state_list[0], ht_search2(state_x_y_table, levels[2].state_list[0]->name));
-			printf("\n\n");
-
-			levels[2].state_list[1] = makeState(makeName2("indent_increase", "0"));
-			levels[2].state_list[1] = addNode(levels[2].state_list[1], _Nexts, 	makeName2("name", "0"));
-			levels[2].state_list[1] = addNode(levels[2].state_list[1], _Nexts, 	makeName2("\"Start Children\"", "0"));
-
-			ht_insert2(state_x_y_table, levels[2].state_list[1]->name, newPoint(2, 1));
-			print(levels[2].state_list[1], ht_search2(state_x_y_table, levels[2].state_list[1]->name));
-			printf("\n\n");
-
-			levels[2].state_list[2] = makeState(makeName2("indent_increase", "1"));
-			levels[2].state_list[2] = addNode(levels[2].state_list[2], _Nexts, 	makeName2("states", "substates"));
-
-			ht_insert2(state_x_y_table, levels[2].state_list[2]->name, newPoint(2, 2));
-			print(levels[2].state_list[2], ht_search2(state_x_y_table, levels[2].state_list[2]->name));
-			printf("\n\n");
-
-			// the recursion will be detected by the positive level difference between the current state and the Start Children State
-			levels[2].state_list[3] = makeState(makeName2("indent_increase", "2"));
-			levels[2].state_list[3] = addNode(levels[2].state_list[3], _StartChildren, 	makeName2("names", "0"));
-			levels[2].state_list[3] = addNode(levels[2].state_list[3], _Nexts, 	makeName2("indent_decrease", "1"));
-
-			ht_insert2(state_x_y_table, levels[2].state_list[3]->name, newPoint(2, 3));
-			print(levels[2].state_list[3], ht_search2(state_x_y_table, levels[2].state_list[3]->name));
-			printf("\n\n");
-
-
-			levels[2].state_list[4] = makeState(makeName2("\"Start Children\"", "0"));
-			levels[2].state_list[4] = addNode(levels[2].state_list[4], _StartChildren, 	makeName2("names", "0"));
-
-			ht_insert2(state_x_y_table, levels[2].state_list[4]->name, newPoint(2, 4));
-			print(levels[2].state_list[4], ht_search2(state_x_y_table, levels[2].state_list[4]->name));
-			printf("\n\n");
-
-
-
-			levels[2].state_list[5] = makeState(makeName2("indent_decrease", "0"));
-
-			ht_insert2(state_x_y_table, levels[2].state_list[5]->name, newPoint(2, 5));
-			print(levels[2].state_list[5], ht_search2(state_x_y_table, levels[2].state_list[5]->name));
-			printf("\n\n");
-
-			levels[2].state_list[6] = makeState(makeName2("indent_decrease", "1"));
-
-			ht_insert2(state_x_y_table, levels[2].state_list[6]->name, newPoint(2, 6));
-			print(levels[2].state_list[6], ht_search2(state_x_y_table, levels[2].state_list[6]->name));
-			printf("\n\n");
-
-		// can't define a second state with the same name
-
-		//start_children
-			//0
-
-		exit(0);
-}
 /*
 def doesNextStatesExist(next_states):
 
@@ -2019,7 +1871,7 @@ def printLevels(graph, state, case_, indents, m, chosen_level):
 def printLevelsBounds(graph, state, case_, indents, m, input_length, chosen_start_level, chosen_end_level):
 
 
-	print(getIndents(indents), '('+  '\'' + state + '\'' + ',' , case_ + ',', 'f=' + graph['node_graph2'][state]['functions'][case_].__name__ + ',', str(indents) + ')')#, '|' + graph['input'][m] + '|'/*,'i ='*///, //m/*, input_length*/)
+	print(getIndents(indents), '('+  '\'' + state + '\'' + ',' , case_ + ',', 'f=' + graph['node_graph2'][state]['functions'][case_].__name__ + ',', str(indents) + ')')#, '|' + graph['input'][m] + '|','i ='*///, //m, input_length*/)
 	//	#console.log()
 
 
@@ -2032,45 +1884,161 @@ def printVarStore(graph):
 	return '|' + graph['input'][m] + '|'
 
 */
-def isParent(children):
-
-	return children != od()
-
-bool isBottomAtTheParentOfCurrentState(struct Names** 			parents,
-									   int 						num_parents,
-									   struct Names* 			bottom_state,
-									   state_x_y_hash_table* 	state_x_y_table)
-{
-
-	for(int i = 0; i < num_parents; i++)
-	{
-		level_id_state_id* ith_parent_point = 	ht_search2(state_x_y_table, parents[i]);
-		level_id_state_id* bottom_state 	= 	ht_search2(state_x_y_table, bottom_state);
-		if(ith_parent_point->level_id == bottom_state->level_id &&
-		   ith_parent_point->state_id == bottom_state->level_id)
-		{
-			return true;
-		}
-	}
-	return false;
-
-}
-
-bool hasParent(struct SparseMatrix* levels, level_id_state_id* point)
-{
-	levels[point->level_id].state_list[point->state_id].parents_size > 0;
-	//return len(graph['parents'][state][case_].keys()) > 0
-
-}
-
-
-
 struct ChildParent
 {
 	struct Names* child;
 	struct ChildParent* parent;
 };
 
+struct NextStatesPackage
+{
+	struct ChildParent* bottom_of_shortened_stack;
+	struct Names** next_states;
+	int indents;
+
+	int next_states_size;
+};
+
+
+struct NextStatesPackage* getNextStates(struct ChildParent* tracker,
+										struct Names** continuing_next_states,
+										int size_of_continuing_next_states,
+										int indents,
+										struct SparseMatrix* graph,
+										state_x_y_hash_table* 	state_x_y_table)
+{
+
+	// bottom[0], next_states, indents, graph
+	// bottom of stack,
+	//print(tracker.parent, tracker.child)
+	struct NextStatesPackage* return_package = malloc(sizeof(struct NextStatesPackage));
+	return_package->bottom_of_shortened_stack = tracker;
+	return_package->next_states = continuing_next_states;
+	return_package->next_states_size = size_of_continuing_next_states;
+	return_package->indents = indents;
+	struct Names* state = return_package->bottom_of_shortened_stack->child;
+	//state1 = tracker.child[0]
+	//case1 = tracker.child[1]
+
+	// todo: need to delete the bottom of the list as we ascend it, not ignore it
+	// for python tracker.parent is to what javascript is to tracker
+	// not at root of stack and current level of the machine has been finished
+	while (return_package->bottom_of_shortened_stack->parent != NULL && return_package->next_states_size == 0)
+	{
+		indents -= 1;
+		return_package->bottom_of_shortened_stack = return_package->bottom_of_shortened_stack->parent;
+		state = return_package->bottom_of_shortened_stack->child;
+		//state1 = tracker.child[0]
+		//case1 = tracker.child[1]
+		// need to exit the main loop
+		if(strcmp(state->strings[0], "root") == 0  && strcmp(state->strings[1], "0") == 0)
+		{
+			return_package->next_states = NULL;
+			return_package->next_states_size = 0;
+			return return_package;
+			//return [tracker, [], indents]
+
+		}
+
+		// get point of state
+		level_id_state_id* state_location = ht_search2(state_x_y_table, state);
+
+		return_package->next_states = levels[state_location->level_id].state_list[state_location->state_id]->nexts;
+
+		//continuing_next_states = [list(a) for a in graph['node_graph2'][state1]['next'][case1].items()]
+
+	}
+
+
+	return return_package;
+	//return [tracker, continuing_next_states, indents]
+}
+
+bool isParent(int maybe_parent)
+{
+	//printf("entering isParent\n");
+	// does this node contain any children names?
+	return maybe_parent > 0;
+}
+
+bool isBottomAtTheParentOfCurrentState(struct Names** 			parents,
+									   int 						num_parents,
+									   struct Names* 			bottom_state,
+									   state_x_y_hash_table* 	state_x_y_table)
+{
+	//printf("entered isBottomAtTheParentOfCurrentState\n");
+	for(int i = 0; i < num_parents; i++)
+	{
+		level_id_state_id* ith_parent_point 	= 	ht_search2(state_x_y_table, parents[i]);
+		level_id_state_id* bottom_state_point 	= 	ht_search2(state_x_y_table, bottom_state);
+		//printf("got here\n");
+		//printf("%s, %s\n", parents[i]->strings[0], parents[i]->strings[1]);
+		//printf("%s, %s\n", bottom_state->strings[0],  bottom_state->strings[1]);
+
+		//printf("%i, %i\n", ith_parent_point->level_id, ith_parent_point->state_id);
+		//printf("%i, %i\n", bottom_state_point->level_id, bottom_state_point->state_id);
+
+		if(ith_parent_point->level_id == bottom_state_point->level_id &&
+		   ith_parent_point->state_id == bottom_state_point->state_id)
+		{
+			//printf("true exiting isBottomAtTheParentOfCurrentState\n");
+			return true;
+		}
+	}
+	//printf("false exiting isBottomAtTheParentOfCurrentState\n");
+	return false;
+
+}
+
+bool hasParent(struct SparseMatrix* levels, level_id_state_id* point)
+{
+	//printf("entered hasParent\n");
+	return levels[point->level_id].state_list[point->state_id]->parents_size > 0;
+	//return len(graph['parents'][state][case_].keys()) > 0
+
+}
+
+void printStack2(struct ChildParent* bottom_tracker)
+{
+	printf("stack\n");
+	struct ChildParent* bottom_tracker2 = bottom_tracker;
+	// supposed to show the root but it's okay
+	while(bottom_tracker2->parent != NULL)
+	{
+		for(int i = 0; i < bottom_tracker2->child->strings_size; i++)
+		{
+			printf("%s ", bottom_tracker2->child->strings[i]);
+		}
+		printf("|");
+		bottom_tracker2 = bottom_tracker2->parent;
+	}
+	for(int i = 0; i < bottom_tracker2->child->strings_size; i++)
+	{
+		printf("%s ", bottom_tracker2->child->strings[i]);
+	}
+	printf("|\n");
+}
+void printNextStates(struct Names** next_states, int next_states_size)
+{
+	printf("next states\n");
+	for(int i = 0; i < next_states_size; i++)
+	{
+		for(int j = 0; j < next_states[i]->strings_size; j++)
+		{
+			printf("%s ", next_states[i]->strings[j]);
+		}
+		printf("\n");
+	}
+}
+void printCurrentState(struct Names* current_state_name)
+{
+	printf("\n\ncurrent state:\n");
+	for(int i = 0; i < current_state_name->strings_size; i++)
+	{
+		printf("%s ", current_state_name->strings[i]);
+	}
+	printf("\n");
+}
 
 void visit(struct SparseMatrix* levels,
 		   struct ContextState* start_node,
@@ -2081,49 +2049,74 @@ void visit(struct SparseMatrix* levels,
 	struct Names** next_states = malloc(sizeof(struct Names*));
 	next_states[0] = start_node->name;
 	int next_states_size = 1;
+	struct Names* current_state_name = start_node->name;
 
 	struct ChildParent* bottom = malloc(sizeof(struct ChildParent));
 	//parent = ChildParent(['root', 0], None)
 	bottom->child = malloc(sizeof(struct Names));  // make root
 	bottom->child->strings = malloc(sizeof(char*));
 	bottom->child->strings[0] = "root";
-	bottom->child->string_size = 1;
-
+	bottom->child->strings[1] = "0";
+	bottom->child->strings_size = 2;
 	bottom->parent = NULL;
+	struct ChildParent* bottom_tracker = bottom;
+	// have to add to table
+	//struct ContextState {
+	//	struct Names* name;
+	// so the root can be found in state_x_y_table in isBottomAtTheParentOfCurrentState
+	struct ContextState* dummy_node = malloc(sizeof(struct ContextState));
+	dummy_node->name = malloc(sizeof(struct Names));
+	dummy_node->name->strings = malloc(sizeof(char*));
+	dummy_node->name->strings[0] = "root";
+	dummy_node->name->strings[1] = "0";
+	dummy_node->name->strings_size = 2;
+	ht_insert2(state_x_y_table, dummy_node->name, newPoint(-1, -1));
+
+	// the stack is not getting hooked up properly
 	int ii = 0;
 	int indents = 0;
+
 	while(next_states_size > 0)
 	{
-		if(ii == 1)
+		if(ii == 5)
+		{
+			printf("too many states run\n");
 			exit(1);
 
-		struct Names* current_state_name;
+		}
+
+		bool state_changed = false;
 
 		int j = 0;
 		while(j < next_states_size)
 		{
+			printCurrentState(current_state_name);
 			current_state_name = next_states[j];
-			struct Names* maybe_parent;
+
 			// get point of current_state_name
 			level_id_state_id* point = ht_search2(state_x_y_table, current_state_name);
-
-			maybe_parent = levels[point->level_id].state_list[point->state_id].name;
-
+			int maybe_parent = levels[point->level_id].state_list[point->state_id]->start_children_size;
+			//printf("maybe_parent = %i", maybe_parent)
 			//maybe_parent = graph['node_graph2'][ state ]['children'][ case_ ]
-			bool did_function_pass = levels[point->level_id].state_list[point->state_id].function(current_state, levels);
+			bool did_function_pass = levels[point->level_id].state_list[point->state_id]->function_pointer(current_state_name, levels);
+
 			if(did_function_pass)
 			{
+
+				//printf("function passed\n");
+				// what happens if it has a parent but has a child too?
 				// did_function_pass = graph['node_graph2'][state]['functions'][case_]([state, case_], graph)
 				if(hasParent(levels, point))
 				{
+					//printf("hasParent is true\n");
 					/*
 					bottom_state = bottom[0].child[0]
 					bottom_case = bottom[0].child[1]
 					*/
-					struct Names* bottom_state = bottom->child;
+					struct Names* bottom_state = bottom_tracker->child;
 					// struct Names** all_parents = parents of current state
-					struct Names** parents = levels[point->level_id].state_list[point->state_id].parents;
-					int num_parents = levels[point->level_id].state_list[point->state_id].parents_size;
+					struct Names** parents = levels[point->level_id].state_list[point->state_id]->parents;
+					int num_parents = levels[point->level_id].state_list[point->state_id]->parents_size;
 
 					//parent_cases = [list(a) for a in graph['parents'][state][case_].items()]
 					//if (isBottomAtTheParentOfCurrentState(parent_cases, bottom_state, bottom_case)):
@@ -2134,30 +2127,363 @@ void visit(struct SparseMatrix* levels,
 					 {
 						struct ChildParent* new_parent = malloc(sizeof(struct ChildParent));
 						//parent = ChildParent(['root', 0], None)
-						//bottom->child = ;  // make root
-						new_parent->child = malloc(sizeof(struct Names));  // make root
-						new_parent->child->strings = malloc(sizeof(char*));
-						new_parent->child->strings[0] = current_state_name;
-						new_parent->child->string_size = 1;
-						new_parent->parent = bottom;
+
+						new_parent->child = malloc(sizeof(struct Names));
+						//new_parent->child->strings_size = 1;
+						new_parent->child = current_state_name;
+						new_parent->parent = bottom_tracker;   // now new_parent is behind bottom_tracker
+						bottom_tracker = new_parent;
+						//struct ChildParent* bottom_tracker2 = bottom_tracker;
+						// supposed to show the root but it's okay
+
+						//exit(1);
 						indents++;
 						/*new_parent = ChildParent([state, case_], bottom[0])
 						# link passing state to its parent on bottom of stack, extending the stack by 1, vertically
 						bottom[0] = new_parent
 						indents += 1
 						*/
+						printCurrentState(current_state_name);
+
 					 }
 
 				}
 				if(isParent(maybe_parent))
 				{
+					/*
+					# add passing state horizontally
+					bottom[0].child = [state, case_]
+
+					# getting the children
+					children = [list(a) for a in graph['node_graph2'][state]['children'][case_].items()]
+					#print('next_states', children)
+					children = makeNextStates(children)
+					next_states = []
+					for i, child in enumerate(children):
+
+						next_states.append(children[i])
+					*/
+
+					//printf("isParent is true\n");
+
+
+					bottom_tracker->child = current_state_name;
+					struct Names** start_children = levels[point->level_id].state_list[point->state_id]->start_children;
+					int start_children_size = levels[point->level_id].state_list[point->state_id]->start_children_size;
+					// reset next_states and fill it with children
+					next_states_size = start_children_size;
+					free(next_states);
+					next_states = malloc(sizeof(struct Names*) * start_children_size);
+					for(int i = 0; i < start_children_size; i++)
+					{
+						next_states[i] = start_children[i];
+					}
+
+				}
+				else
+				{
+					//printf("isParent is false\n");
+
+					// x = (next_states)
+					// x_total = (lowest_bottom, next_states, indent_number)
+					// there is a problem with how dict_items is being used
+
+					//print(graph['node_graph2'][state]['next'])
+					//next_states = [list(a) for a in graph['node_graph2'][state]['next'][case_].items()]
+					struct Names** nexts = levels[point->level_id].state_list[point->state_id]->nexts;
+					int nexts_size = levels[point->level_id].state_list[point->state_id]->nexts_size;
+					// reset next_states and fill it with children
+					next_states_size = nexts_size;
+					free(next_states);
+					next_states = malloc(sizeof(struct Names*) * nexts_size);
+					for(int i = 0; i < next_states_size; i++)
+					{
+						next_states[i] = nexts[i];
+					}
+
+					//next_states = makeNextStates(next_states)
+					//print('next_states', next_states)
+					//if debug:
+					//	m = graph['i']
+					//	printLevelsBounds(graph, state, case_, indents, m, len(graph['input']), 0, -1)
+					// add passing state horizontally
+					//bottom[0].child = [state, case_]
+					bottom_tracker->child = current_state_name;
+
 
 				}
 
+				state_changed = true;
+				break;
 			}
+
 		}
+
+		// print stack
+		printf("state changed? %i", state_changed);
+		printStack2(bottom_tracker);
+
+		printNextStates(next_states, next_states_size);
+
+		if (next_states_size == 0)
+		{
+			// x_total = (lowest_bottom, next_states, indent_number)
+
+			// have linked list representing the stack
+			// first item is in bottom[0]
+			printf("time to shorten stack\n");
+			struct NextStatesPackage* tracker_continuing_next_states_indents = getNextStates(
+				/*struct ChildParent**/ 	bottom,
+				/*struct Names***/ 			next_states,
+				/*int*/ 					next_states_size,
+				/*int*/ 					indents,
+				/*struct SparseMatrix**/ 	levels,
+				/*state_x_y_hash_table**/ 	state_x_y_table);
+
+			next_states = tracker_continuing_next_states_indents->next_states;
+			indents = tracker_continuing_next_states_indents->indents;
+			bottom = tracker_continuing_next_states_indents->bottom_of_shortened_stack;
+			bottom_tracker = bottom;
+			// travel up stack untill either hits root or hits neighbors of a prev visited level
+			//tracker_continuing_next_states_indents = getNextStates(bottom[0], next_states, indents, graph)
+			//print(tracker_continuing_next_states_indents)
+
+			/*tracker = tracker_continuing_next_states_indents[0]
+			continuing_next_states = tracker_continuing_next_states_indents[1]
+			indents = tracker_continuing_next_states_indents[2]
+
+
+			bottom[0] = tracker
+			next_states = continuing_next_states
+			*/
+			//print('next_states 5', next_states)
+
+			/*state_changed = True*/
+			// might not actually be true ever
+			//'''
+			/*
+			if (tracker == null)
+				console.log('done runing machine')
+			*/
+			//'''
+
+			printStack2(bottom_tracker);
+			printNextStates(next_states, next_states_size);
+
+		}
+
+		// if all fail then all will be rerun unless this condition is here
+		if(!state_changed && next_states_size > 0)
+		{
+			// all next_states failed so this level cannot be finished
+			// travel up like before but choose the next child after the tracker
+
+			printf("error at ");
+			//printf(getIndents(indents), next_states, "on");
+			level_id_state_id* point = ht_search2(state_x_y_table, current_state_name);
+
+			//printf(getIndents(indents), '('+  '\'' + current_state_name + '\'' + ',' , case_ + ',', "f=" +
+			//	   levels[point->level_id].state_list[point->state_id]->function_name + ',', str(indents) + ')');
+			break;
+
+			//print(next_states, 'have failed so your state machine is incomplete')
+			//exit()
+		}
+
+		//if(not state_changed):
+		//	print("we are screwed", len(next_states))
+		ii += 1;
+
+
+	}
+	printf("state machine is done\n");
+}
+void printAttribute(int node_size, struct Names** container)
+{
+
+	for(int i = 0; i < node_size; i++)
+	{
+		for(int j = 0; j < container[i]->strings_size; j++)
+		{
+			printf("  %s", container[i]->strings[j]);
+
+		}
+		printf("\n");
+
 	}
 }
+void print(struct ContextState* node, level_id_state_id* point)
+{
+	printf("node %i, %i\n", point->level_id, point->state_id);
+	printf("name:\n");
+	printAttribute(1, &levels[point->level_id].state_list[point->state_id]->name);
+	printf("\n");
+	if(levels[point->level_id].state_list[point->state_id]->start_children_size > 0)
+	{
+		printf("start children:\n");
+
+		printAttribute(levels[point->level_id].state_list[point->state_id]->start_children_size, levels[point->level_id].state_list[point->state_id]->start_children);
+	}
+
+
+	if(levels[point->level_id].state_list[point->state_id]->parents_size > 0)
+	{
+		printf("parents:\n");
+		printAttribute(levels[point->level_id].state_list[point->state_id]->parents_size, levels[point->level_id].state_list[point->state_id]->parents);
+
+	}
+
+	if(levels[point->level_id].state_list[point->state_id]->children_size > 0)
+	{
+		printf("children:\n");
+
+		printAttribute(levels[point->level_id].state_list[point->state_id]->children_size, levels[point->level_id].state_list[point->state_id]->children);
+
+	}
+
+	if(levels[point->level_id].state_list[point->state_id]->nexts_size > 0)
+	{
+		printf("nexts:\n");
+
+		printAttribute(levels[point->level_id].state_list[point->state_id]->nexts_size, levels[point->level_id].state_list[point->state_id]->nexts);
+
+	}
+
+	printf("f=%s", levels[point->level_id].state_list[point->state_id]->function_pointer_name);
+
+}
+
+bool returnTrue(struct Names* current_state, struct SparseMatrix* levels)
+{
+	printf("got here.  We have entered returnTrue\n\n");
+	return true;
+}
+bool returnFalse(struct Names* current_state, struct SparseMatrix* levels)
+{
+	return false;
+}
+
+void makeTree()
+{
+	/*
+	define 1 pyramid here
+	*/
+	levels = malloc(sizeof(struct SparseMatrix) * max_levels);
+
+	for(int i = 0; i < max_levels; i++)
+	{
+		levels[i].state_list = malloc(sizeof(struct ContextState*) * max_states);
+	}
+	//printf("ddd\n");
+	/*
+	stack = [(level_id, last_state_enumerated, indent level)] have to compare the indent that is too large in indent_decrease to the
+	// deepest level's indent value
+	*/
+	//printf("here1\n");
+	state_x_y_hash_table* state_x_y_table =  ht_new2();
+	//levels[0].state_list[0] = malloc(sizeof(struct Names*));
+	levels[0].state_list[0] = makeState(makeName2("states", "state"));
+	//printf("%s|%s %i\n", levels[0].state_list[0]->name->strings[0], levels[0].state_list[0]->name->strings[1], levels[0].state_list[0]->name->strings_size);
+	levels[0].state_list[0] = addNode(levels[0].state_list[0], _StartChildren, 	makeName2("names", "0"));
+	levels[0].state_list[0] = addNode(levels[0].state_list[0], _Parents, 		makeName2("root", "0"));
+	levels[0].state_list[0] = addNode(levels[0].state_list[0], _Children, 		makeName2("start_children", "0"));
+	levels[0].state_list[0] = addFunction(levels[0].state_list[0], returnTrue, "returnTrue");
+	//levels[0].state_list[0]->function(levels[0].state_list[0]->name, levels);
+	/*struct ContextState* addFunction(struct ContextState* node,
+									bool* (*function)(struct Names* , struct SparseMatrix* ),
+								 	 char* function_name)
+	 */
+	/*for(int i = 0; i < levels[0].state_list[0]->name->strings_size; i++)
+	{
+		printf("%s \n", levels[0].state_list[0]->name->strings[i]);
+
+	}*/
+	// (root, 0), (tracking, level_state), (tracking, tree), (sparse_matrix, 0)
+	// int my_var = getVar(makeNames2("a", "b"), levels)->_int
+	ht_insert2(state_x_y_table, levels[0].state_list[0]->name, newPoint(0, 0));
+	print(levels[0].state_list[0], ht_search2(state_x_y_table, levels[0].state_list[0]->name));
+	printf("\n\n");
+
+
+		levels[1].state_list[0] = makeState(makeName2("names", "0"));
+		levels[1].state_list[0] = addNode(levels[1].state_list[0], _StartChildren, 	makeName2("name", "0"));
+		levels[1].state_list[0] = addNode(levels[1].state_list[0], _Parents, 		makeName2("states", "state"));
+		levels[1].state_list[0] = addNode(levels[1].state_list[0], _Nexts, 			makeName2("start_children", "0"));
+		levels[1].state_list[0] = addFunction(levels[1].state_list[0], returnTrue, "returnTrue");
+
+		ht_insert2(state_x_y_table, levels[1].state_list[0]->name, newPoint(1, 0));
+		print(levels[1].state_list[0], ht_search2(state_x_y_table, levels[1].state_list[0]->name));
+		printf("\n\n");
+
+			levels[2].state_list[0] = makeState(makeName2("name", "0"));
+			levels[2].state_list[0] = addNode(levels[2].state_list[0], _Parents, makeName2("names", "0"));
+			levels[2].state_list[0] = addNode(levels[2].state_list[0], _Nexts, 	makeName2("indent_increase", "0"));
+			levels[2].state_list[0] = addNode(levels[2].state_list[0], _Nexts, 	makeName2("indent_decrease", "0"));
+			levels[2].state_list[0] = addFunction(levels[2].state_list[0], returnTrue, "returnTrue");
+
+			ht_insert2(state_x_y_table, levels[2].state_list[0]->name, newPoint(2, 0));
+			print(levels[2].state_list[0], ht_search2(state_x_y_table, levels[2].state_list[0]->name));
+			printf("\n\n");
+
+			levels[2].state_list[1] = makeState(makeName2("indent_increase", "0"));
+			//levels[2].state_list[1] = addNode(levels[2].state_list[1], _Nexts, 	makeName2("name", "0"));
+			levels[2].state_list[1] = addNode(levels[2].state_list[1], _Nexts, 	makeName2("\"Start Children\"", "0"));
+			levels[2].state_list[1] = addFunction(levels[2].state_list[1], returnTrue, "returnTrue");
+
+
+			ht_insert2(state_x_y_table, levels[2].state_list[1]->name, newPoint(2, 1));
+			print(levels[2].state_list[1], ht_search2(state_x_y_table, levels[2].state_list[1]->name));
+			printf("\n\n");
+
+			levels[2].state_list[2] = makeState(makeName2("indent_increase", "1"));
+			levels[2].state_list[2] = addNode(levels[2].state_list[2], _Nexts, 	makeName2("states", "substates"));
+
+			ht_insert2(state_x_y_table, levels[2].state_list[2]->name, newPoint(2, 2));
+			print(levels[2].state_list[2], ht_search2(state_x_y_table, levels[2].state_list[2]->name));
+			printf("\n\n");
+
+			// the recursion will be detected by the positive level difference between the current state and the Start Children State
+			levels[2].state_list[3] = makeState(makeName2("indent_increase", "2"));
+			levels[2].state_list[3] = addNode(levels[2].state_list[3], _StartChildren, 	makeName2("names", "0"));
+			levels[2].state_list[3] = addNode(levels[2].state_list[3], _Nexts, 	makeName2("indent_decrease", "1"));
+
+			ht_insert2(state_x_y_table, levels[2].state_list[3]->name, newPoint(2, 3));
+			print(levels[2].state_list[3], ht_search2(state_x_y_table, levels[2].state_list[3]->name));
+			printf("\n\n");
+
+
+			levels[2].state_list[4] = makeState(makeName2("\"Start Children\"", "0"));
+			//levels[2].state_list[4] = addNode(levels[2].state_list[4], _StartChildren, 	makeName2("names", "0"));
+			levels[2].state_list[4] = addFunction(levels[2].state_list[4], returnTrue, "returnTrue");
+			// has no neighbors the stack should shrink after this state runs
+			ht_insert2(state_x_y_table, levels[2].state_list[4]->name, newPoint(2, 4));
+			print(levels[2].state_list[4], ht_search2(state_x_y_table, levels[2].state_list[4]->name));
+			printf("\n\n");
+
+
+
+			levels[2].state_list[5] = makeState(makeName2("indent_decrease", "0"));
+			levels[2].state_list[5] = addFunction(levels[2].state_list[5], returnFalse, "returnFalse");
+
+			ht_insert2(state_x_y_table, levels[2].state_list[5]->name, newPoint(2, 5));
+			print(levels[2].state_list[5], ht_search2(state_x_y_table, levels[2].state_list[5]->name));
+			printf("\n\n");
+
+			levels[2].state_list[6] = makeState(makeName2("indent_decrease", "1"));
+
+			ht_insert2(state_x_y_table, levels[2].state_list[6]->name, newPoint(2, 6));
+			print(levels[2].state_list[6], ht_search2(state_x_y_table, levels[2].state_list[6]->name));
+			printf("\n\n");
+
+		// can't define a second state with the same name
+
+		//start_children
+			//0
+		visit(levels, levels[0].state_list[0], state_x_y_table);
+
+		exit(0);
+}
+
 /*
 def visit(node, graph, indents, debug):
 	# assume graph is nested lists
@@ -2319,7 +2645,7 @@ def visit(node, graph, indents, debug):
 			state_changed = True
 			# might not actually be true ever
 			'''
-			/*
+
 			if (tracker == null)
 				console.log('done runing machine')
 			*/
