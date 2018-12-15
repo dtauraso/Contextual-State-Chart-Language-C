@@ -1566,21 +1566,30 @@ bool Next(struct StateMachineVars* main_state_recorder_tree)
 struct Data {
 
 	int _int;
+	bool _is_int;
+
 	char* _string;
+	bool _is_string;
+
 	int string_size;
+
 	float _float;
+	bool _is_float;
 
 	int* _int_p;
+	bool _is_int_p;
 
 	char** _string_p;
+	bool _is_string_p;
+
 	int string_p_size;
 
 	float* _float_p;
-
+	bool _is_float_p;
 	// only for the compiler to use
 	struct SparseMatrix* levels;
+	bool is_levels;
 };
-//typedef bool* (*function_pointer)(struct Names* , struct SparseMatrix* );
 
 // each ContextState is a state
 struct ContextState {
@@ -1619,7 +1628,105 @@ struct ContextState* addFunction(struct ContextState* node,
 	return node;
 }
 
-enum attributes {_StartChildren, _Parents, _Children, _Nexts};
+enum attributes {_StartChildren, _Parents, _Children, _Nexts, _int, _string, string_size, _float, _int_p, _string_p, string_p_size, _float_p, sparse_matrix_levels};
+struct Data* addInt(int var)
+{
+	struct Data* variable = malloc(sizeof(struct Data));
+	variable->_int = var;
+	variable->_is_int = true;
+	variable->_is_string = false;
+	variable->_is_float = false;
+	variable->_is_int_p = false;
+	variable->_is_string_p = false;
+	variable->_is_float_p = false;
+	variable->is_levels = false;
+
+	return variable;
+}
+struct Data* addString(char* var)
+{
+	struct Data* variable = malloc(sizeof(struct Data));
+	variable->_string = var;
+	variable->_is_int = false;
+	variable->_is_string = true;
+	variable->_is_float = false;
+	variable->_is_int_p = false;
+	variable->_is_string_p = false;
+	variable->_is_float_p = false;
+	variable->is_levels = false;
+
+	return variable;
+}
+struct Data* addFloat(float var)
+{
+	struct Data* variable = malloc(sizeof(struct Data));
+	variable->_float = var;
+	variable->_is_int = false;
+	variable->_is_string = false;
+	variable->_is_float = true;
+	variable->_is_int_p = false;
+	variable->_is_string_p = false;
+	variable->_is_float_p = false;
+	variable->is_levels = false;
+	return variable;
+}
+
+struct Data* addIntPointer(int* var)
+{
+	struct Data* variable = malloc(sizeof(struct Data));
+	variable->_int_p = var;
+	variable->_is_int = false;
+	variable->_is_string = false;
+	variable->_is_float = false;
+	variable->_is_int_p = true;
+	variable->_is_string_p = false;
+	variable->_is_float_p = false;
+	variable->is_levels = false;
+	return variable;
+}
+
+struct Data* addStringPointer(char** var)
+{
+	struct Data* variable = malloc(sizeof(struct Data));
+	variable->_string_p = var;
+	variable->_is_int = false;
+	variable->_is_string = false;
+	variable->_is_float = false;
+	variable->_is_int_p = false;
+	variable->_is_string_p = true;
+	variable->_is_float_p = false;
+	variable->is_levels = false;
+	return variable;
+}
+
+struct Data* addFloatPointer(float* var)
+{
+	struct Data* variable = malloc(sizeof(struct Data));
+	variable->_float_p = var;
+	variable->_is_int = false;
+	variable->_is_string = false;
+	variable->_is_float = false;
+	variable->_is_int_p = false;
+	variable->_is_string_p = false;
+	variable->_is_float_p = true;
+	variable->is_levels = false;
+	return variable;
+}
+
+struct Data* addSparseMatrixLevels(struct SparseMatrix* var)
+{
+	struct Data* variable = malloc(sizeof(struct Data));
+	variable->levels = var;
+	variable->_is_int = false;
+	variable->_is_string = false;
+	variable->_is_float = false;
+	variable->_is_int_p = false;
+	variable->_is_string_p = false;
+	variable->_is_float_p = false;
+	variable->is_levels = true;
+	return variable;
+}
+
 struct ContextState* makeState(struct Names* names)
 {
 
@@ -1635,6 +1742,24 @@ struct ContextState* makeState(struct Names* names)
 	state->parents_size = 0;
 	state->children_size = 0;
 	state->nexts_size = 0;
+
+	state->var = malloc(sizeof(struct Data));
+	state->var->_int = 0;
+	state->var->_string = NULL;
+	state->var->_float = 0.0;
+	state->var->_int_p = NULL;
+	state->var->_string_p = NULL;
+	state->var->_float_p = NULL;
+	state->var->levels = NULL;
+
+
+	state->var->_is_int = false;
+	state->var->_is_string = false;
+	state->var->_is_float = false;
+	state->var->_is_int_p = false;
+	state->var->_is_string_p = false;
+	state->var->_is_float_p = false;
+	state->var->is_levels = false;
 	return state;
 
 }
@@ -2301,6 +2426,7 @@ void visit(struct SparseMatrix* levels,
 void printAttribute(int node_size, struct Names** container)
 {
 
+
 	for(int i = 0; i < node_size; i++)
 	{
 		for(int j = 0; j < container[i]->strings_size; j++)
@@ -2312,45 +2438,110 @@ void printAttribute(int node_size, struct Names** container)
 
 	}
 }
-void print(struct ContextState* node, level_id_state_id* point)
+void print(level_id_state_id* point, struct SparseMatrix* levels, state_x_y_hash_table* state_x_y_table)
 {
 	printf("node %i, %i\n", point->level_id, point->state_id);
 	printf("name:\n");
 	printAttribute(1, &levels[point->level_id].state_list[point->state_id]->name);
 	printf("\n");
-	if(levels[point->level_id].state_list[point->state_id]->start_children_size > 0)
+
+	struct ContextState* node = levels[point->level_id].state_list[point->state_id];
+	if(node->start_children_size > 0)
 	{
 		printf("start children:\n");
 
-		printAttribute(levels[point->level_id].state_list[point->state_id]->start_children_size, levels[point->level_id].state_list[point->state_id]->start_children);
+		printAttribute(node->start_children_size, node->start_children);
 	}
 
 
-	if(levels[point->level_id].state_list[point->state_id]->parents_size > 0)
+	if(node->parents_size > 0)
 	{
 		printf("parents:\n");
-		printAttribute(levels[point->level_id].state_list[point->state_id]->parents_size, levels[point->level_id].state_list[point->state_id]->parents);
+		printAttribute(node->parents_size, node->parents);
 
 	}
 
-	if(levels[point->level_id].state_list[point->state_id]->children_size > 0)
+	if(node->children_size > 0)
 	{
 		printf("children:\n");
 
-		printAttribute(levels[point->level_id].state_list[point->state_id]->children_size, levels[point->level_id].state_list[point->state_id]->children);
+		printAttribute(node->children_size, node->children);
 
 	}
 
-	if(levels[point->level_id].state_list[point->state_id]->nexts_size > 0)
+	if(node->nexts_size > 0)
 	{
 		printf("nexts:\n");
 
-		printAttribute(levels[point->level_id].state_list[point->state_id]->nexts_size, levels[point->level_id].state_list[point->state_id]->nexts);
+		printAttribute(node->nexts_size, node->nexts);
 
 	}
 
-	printf("f=%s", levels[point->level_id].state_list[point->state_id]->function_pointer_name);
+	printf("f=%s\n", node->function_pointer_name);
 
+	struct Data* var = node->var;
+	if(var->_is_int)
+	{
+		printf("%i\n", var->_int);
+	}
+	else if(var->_is_string)
+	{
+		printf("%s\n", var->_string);
+
+	}
+	else if(var->_is_float)
+	{
+		printf("%f\n", var->_float);
+
+	}
+	else if(var->_is_int_p)
+	{
+		printf("%p\n", (void*) var->_int_p);
+
+	}
+	else if(var->_is_string_p)
+	{
+		printf("%p\n", (void*) var->_string_p);
+
+	}
+	else if(var->_is_float_p)
+	{
+		printf("%p\n", (void*) var->_float_p);
+
+	}
+	// will not overflow, because the addDataType functions will set this to false
+	else if(var->is_levels)
+	{
+		/*
+		const int max_states = 20;
+		struct SparseMatrix {
+			struct ContextState** state_list;//[max_states];
+			int state_population;   // needed so when visiting the level for the nth time, not resetting the state_id back to 0(as there are now states in this level)
+		};
+
+		const int max_levels = 3;
+		struct SparseMatrix* levels;//[max_levels];
+		*/
+
+		for(int i = 0; i < 3; i++)
+		{
+			for(int j = 0; j < levels->state_population; j++)
+			{
+				level_id_state_id* point_ = ht_search2(state_x_y_table, levels[i].state_list[j]->name);
+				print(point_, levels, state_x_y_table);
+				printf("|");
+			}
+			printf("\n");
+		}
+		printf("\n");
+
+		//printf("%x", var->_float_p);
+
+	}
+
+	// only for the compiler to use
+	//struct SparseMatrix* levels;
+	//bool is_levels;
 }
 
 bool returnTrue(struct Names* current_state, struct SparseMatrix* levels)
@@ -2366,7 +2557,13 @@ bool returnFalse(struct Names* current_state, struct SparseMatrix* levels)
 void makeTree()
 {
 	/*
-	define 1 pyramid here
+	This makes a sparse matrix to organize the states acording to the level they are at
+	there is a hash table that maps state names to coordinates in the matrix
+
+	Here is how the code is laid out.
+	Think of each tree from the top level node to the leaves as 1 pyramid
+	define 1 pyramid at a time
+
 	*/
 	levels = malloc(sizeof(struct SparseMatrix) * max_levels);
 
@@ -2388,6 +2585,9 @@ void makeTree()
 	levels[0].state_list[0] = addNode(levels[0].state_list[0], _Parents, 		makeName2("root", "0"));
 	levels[0].state_list[0] = addNode(levels[0].state_list[0], _Children, 		makeName2("start_children", "0"));
 	levels[0].state_list[0] = addFunction(levels[0].state_list[0], returnTrue, "returnTrue");
+
+
+
 	//levels[0].state_list[0]->function(levels[0].state_list[0]->name, levels);
 	/*struct ContextState* addFunction(struct ContextState* node,
 									bool* (*function)(struct Names* , struct SparseMatrix* ),
@@ -2401,7 +2601,54 @@ void makeTree()
 	// (root, 0), (tracking, level_state), (tracking, tree), (sparse_matrix, 0)
 	// int my_var = getVar(makeNames2("a", "b"), levels)->_int
 	ht_insert2(state_x_y_table, levels[0].state_list[0]->name, newPoint(0, 0));
-	print(levels[0].state_list[0], ht_search2(state_x_y_table, levels[0].state_list[0]->name));
+	print(ht_search2(state_x_y_table, levels[0].state_list[0]->name), levels, state_x_y_table);
+
+	levels[0].state_list[1] = makeState(makeName("level_number"));
+	levels[0].state_list[1]->var = addInt(0);
+	ht_insert2(state_x_y_table, levels[0].state_list[1]->name, newPoint(0, 1));
+	print(ht_search2(state_x_y_table, levels[0].state_list[1]->name), levels, state_x_y_table);
+
+
+	levels[0].state_list[2] = makeState(makeName("state_id"));
+	levels[0].state_list[2]->var = addInt(0);
+	ht_insert2(state_x_y_table, levels[0].state_list[2]->name, newPoint(0, 2));
+	print(ht_search2(state_x_y_table, levels[0].state_list[2]->name), levels, state_x_y_table);
+
+
+
+	levels[0].state_list[3] = makeState(makeName("indent_1"));
+	levels[0].state_list[3]->var = addInt(0);
+	ht_insert2(state_x_y_table, levels[0].state_list[3]->name, newPoint(0, 3));
+	print(ht_search2(state_x_y_table, levels[0].state_list[3]->name), levels, state_x_y_table);
+
+
+	levels[0].state_list[4] = makeState(makeName("indent_2"));
+	levels[0].state_list[4]->var = addInt(0);
+	ht_insert2(state_x_y_table, levels[0].state_list[4]->name, newPoint(0, 4));
+	print(ht_search2(state_x_y_table, levels[0].state_list[4]->name), levels, state_x_y_table);
+
+	levels[0].state_list[5] = makeState(makeName2("tracking", "level_state"));
+	levels[0].state_list[5]->var = addInt(0);
+	ht_insert2(state_x_y_table, levels[0].state_list[5]->name, newPoint(0, 5));
+	print(ht_search2(state_x_y_table, levels[0].state_list[5]->name), levels, state_x_y_table);
+
+	levels[0].state_list[6] = makeState(makeName2("tracking", "tree"));
+	levels[0].state_list[6]->var = addInt(0);
+	ht_insert2(state_x_y_table, levels[0].state_list[6]->name, newPoint(0, 6));
+	print(ht_search2(state_x_y_table, levels[0].state_list[6]->name), levels, state_x_y_table);
+
+
+	levels[0].state_list[7] = makeState(makeName("sparse_matrix"));
+	struct SparseMatrix* sparse_matrix = malloc(sizeof(struct SparseMatrix) * max_levels);
+	for(int i = 0; i < max_levels; i++)
+	{
+		sparse_matrix[i].state_list = malloc(sizeof(struct ContextState*) * max_states);
+	}
+	levels[0].state_list[7]->var = addSparseMatrixLevels(sparse_matrix);
+	ht_insert2(state_x_y_table, levels[0].state_list[7]->name, newPoint(0, 7));
+	print(ht_search2(state_x_y_table, levels[0].state_list[7]->name), levels, state_x_y_table);
+
+
 	printf("\n\n");
 
 
@@ -2412,7 +2659,7 @@ void makeTree()
 		levels[1].state_list[0] = addFunction(levels[1].state_list[0], returnTrue, "returnTrue");
 
 		ht_insert2(state_x_y_table, levels[1].state_list[0]->name, newPoint(1, 0));
-		print(levels[1].state_list[0], ht_search2(state_x_y_table, levels[1].state_list[0]->name));
+		print(ht_search2(state_x_y_table, levels[1].state_list[0]->name), levels, state_x_y_table);
 		printf("\n\n");
 
 			levels[2].state_list[0] = makeState(makeName2("name", "0"));
@@ -2422,7 +2669,7 @@ void makeTree()
 			levels[2].state_list[0] = addFunction(levels[2].state_list[0], returnTrue, "returnTrue");
 
 			ht_insert2(state_x_y_table, levels[2].state_list[0]->name, newPoint(2, 0));
-			print(levels[2].state_list[0], ht_search2(state_x_y_table, levels[2].state_list[0]->name));
+			print(ht_search2(state_x_y_table, levels[2].state_list[0]->name), levels, state_x_y_table);
 			printf("\n\n");
 
 			levels[2].state_list[1] = makeState(makeName2("indent_increase", "0"));
@@ -2432,14 +2679,14 @@ void makeTree()
 
 
 			ht_insert2(state_x_y_table, levels[2].state_list[1]->name, newPoint(2, 1));
-			print(levels[2].state_list[1], ht_search2(state_x_y_table, levels[2].state_list[1]->name));
+			print(ht_search2(state_x_y_table, levels[2].state_list[1]->name), levels, state_x_y_table);
 			printf("\n\n");
 
 			levels[2].state_list[2] = makeState(makeName2("indent_increase", "1"));
 			levels[2].state_list[2] = addNode(levels[2].state_list[2], _Nexts, 	makeName2("states", "substates"));
 
 			ht_insert2(state_x_y_table, levels[2].state_list[2]->name, newPoint(2, 2));
-			print(levels[2].state_list[2], ht_search2(state_x_y_table, levels[2].state_list[2]->name));
+			print(ht_search2(state_x_y_table, levels[2].state_list[2]->name), levels, state_x_y_table);
 			printf("\n\n");
 
 			// the recursion will be detected by the positive level difference between the current state and the Start Children State
@@ -2448,7 +2695,7 @@ void makeTree()
 			levels[2].state_list[3] = addNode(levels[2].state_list[3], _Nexts, 	makeName2("indent_decrease", "1"));
 
 			ht_insert2(state_x_y_table, levels[2].state_list[3]->name, newPoint(2, 3));
-			print(levels[2].state_list[3], ht_search2(state_x_y_table, levels[2].state_list[3]->name));
+			print(ht_search2(state_x_y_table, levels[2].state_list[3]->name), levels, state_x_y_table);
 			printf("\n\n");
 
 
@@ -2457,7 +2704,7 @@ void makeTree()
 			levels[2].state_list[4] = addFunction(levels[2].state_list[4], returnTrue, "returnTrue");
 			// has no neighbors the stack should shrink after this state runs
 			ht_insert2(state_x_y_table, levels[2].state_list[4]->name, newPoint(2, 4));
-			print(levels[2].state_list[4], ht_search2(state_x_y_table, levels[2].state_list[4]->name));
+			print(ht_search2(state_x_y_table, levels[2].state_list[4]->name), levels, state_x_y_table);
 			printf("\n\n");
 
 
@@ -2466,19 +2713,20 @@ void makeTree()
 			levels[2].state_list[5] = addFunction(levels[2].state_list[5], returnFalse, "returnFalse");
 
 			ht_insert2(state_x_y_table, levels[2].state_list[5]->name, newPoint(2, 5));
-			print(levels[2].state_list[5], ht_search2(state_x_y_table, levels[2].state_list[5]->name));
+			print(ht_search2(state_x_y_table, levels[2].state_list[5]->name), levels, state_x_y_table);
 			printf("\n\n");
 
 			levels[2].state_list[6] = makeState(makeName2("indent_decrease", "1"));
 
 			ht_insert2(state_x_y_table, levels[2].state_list[6]->name, newPoint(2, 6));
-			print(levels[2].state_list[6], ht_search2(state_x_y_table, levels[2].state_list[6]->name));
+			print(ht_search2(state_x_y_table, levels[2].state_list[6]->name), levels, state_x_y_table);
 			printf("\n\n");
 
 		// can't define a second state with the same name
 
 		//start_children
 			//0
+		// https://stackoverflow.com/questions/4823177/reading-a-file-character-by-character-in-c
 		visit(levels, levels[0].state_list[0], state_x_y_table);
 
 		exit(0);
@@ -2697,8 +2945,8 @@ save the partial data in the same control flow table under different contexts
 names, start children, parent, children, next, functions
 levels\states
 -------------------------------------
-0 	| (root, 0), (tracking, level_state), (tracking, tree), (sparse_matrix, 0)
-1	| (states, state), (level_number, 0), (state_id, 0), (indent_1, 0), (indent_2, 0)
+0 	| (root, 0)
+1	| (states, state), (level_number), (state_id), (indent_1), (indent_2), (tracking, level_state), (tracking, tree), (sparse_matrix)
 2	| (names, 0), (start_children, 0)
 3	| (name, 0) , (indent_increase, 0) (indent_increase, 1), (indent_increase, 2) (start_children, 0), (indent_decrease, 0)
 (indent_decrease, 1)
