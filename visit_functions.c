@@ -358,6 +358,7 @@ void visit(struct SparseMatrix* levels,
 				state_changed = true;
 				break;
 			}
+			j++;
 
 		}
 
