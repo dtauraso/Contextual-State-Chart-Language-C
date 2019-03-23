@@ -24,8 +24,6 @@ struct Data {
 
 	float* _float_p;
 	bool _is_float_p;
-	// only for the state machine compiler to use
-	struct SparseMatrix* levels;
 	bool is_levels;
 };
 #endif
