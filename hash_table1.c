@@ -225,32 +225,3 @@ void ht_delete(ht_hash_table* ht, const char* key)
 
  	return ht_new_sized(HT_INITIAL_BASE_SIZE);
  }
- 
-/*
-// state_name ->  level_id_state_id
-struct Names {
-
-	char** strings;
-	int strings_size;
-};
-typedef struct
-{
-	int level_id;
-	int state_id;
-} level_id_state_id;
-
-typedef struct
-{
-	struct Names* key;
-	level_id_state_id* value;
-} state_name_look_up_entry;
-
-typedef struct
-{
-	int size;
-	int count;
-	int base_size;
-	state_name_look_up_entry** items;
-} state_x_y_hash_table;
-
-*/
