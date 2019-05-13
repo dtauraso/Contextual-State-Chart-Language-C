@@ -4,9 +4,10 @@
 #include <stdbool.h>
 //https://zserge.com/jsmn.html
 #include "jsmn/jsmn.h"
+#include "hash_table1.h"
 
-struct ContextState;
 
+ ht_hash_table* ht_new();
 
 
 char* getNextWord(char* input, int i)
@@ -380,6 +381,7 @@ int main(int argc, char** argv)
 		} jsmntype_t;
 
 	*/
+	
 	for(int i = 0; i < parsing_results; i++)
 	{
 		int json_type = tokens[i].type;
@@ -411,6 +413,9 @@ int main(int argc, char** argv)
 						 jsmntok_t *tokens,
 						 unsigned int num_tokens) {
 	*/
+
+	ht_hash_table* parsing_states = ht_new();
+
 
 	return 0;
 }

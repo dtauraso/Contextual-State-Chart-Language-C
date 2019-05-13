@@ -1,4 +1,4 @@
-#include "hash_table.h"
+#include "hash_table1.h"
 
 static ht_item HT_DELETED_ITEM = {NULL, NULL};
 // primes > 128
@@ -254,4 +254,3 @@ typedef struct
 } state_x_y_hash_table;
 
 */
-

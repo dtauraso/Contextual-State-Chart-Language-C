@@ -1,7 +1,9 @@
 #ifndef HASH_TABLE
 #define HASH_TABLE
-#include "standard_headers.h"
-#include "state.h"
+#include <stdio.h> 
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
 /*
 hash table
 https://github.com/jamesroutley/write-a-hash-table/tree/master/01-introduction
