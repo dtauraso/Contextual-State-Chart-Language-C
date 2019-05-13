@@ -1,0 +1,125 @@
+[
+  {
+    "name":           ["states", "state"],
+    "nexts":          [],
+    "start_children": [["names", "0"]],
+    "children":       [],
+    "function_name":  "returnTrue",
+    "data":           {"nothing": "null"},
+    "parents":        [["root", "0"]]
+  },
+  {           
+    "name":           ["prev_prev_indent"],
+    "nexts":          [],
+    "start_children": [],
+    "children":       [],
+    "function_name":  "returnTrue",
+    "data":           {"Int": "0"},
+    "parents":        []
+  },
+  {           
+    "name":           ["prev_indent"],
+    "nexts":          [],
+    "start_children": [],
+    "children":       [],
+    "function_name":  "returnTrue",
+    "data":           {"Int": "0"},
+    "parents":        []
+  },
+  {
+    "name":           ["prev_word"],
+    "nexts":          [],
+    "start_children": [],
+    "children":       [],
+    "function_name":  "returnTrue",
+    "data":           {"String":"root"},
+    "parents":        []
+  },
+  {
+    "name":           ["current_word"],
+    "nexts":          [],
+    "start_children": [],
+    "children":       [],
+    "function_name":  "returnTrue",
+    "data":           {"String":""},
+    "parents":        []
+  },
+  {
+    "name":           ["next_indent"],
+    "nexts":          [],
+    "start_children": [],
+    "children":       [],
+    "function_name":  "returnTrue",
+    "data":           {"Int": "0"},
+    "parents":        []
+  },
+  {
+    "name":           ["level_indent_stack"],
+    "nexts":          [],
+    "start_children": [["level_number", "0"],
+                       ["state_number", "0"],
+                       ["indent_number", "0"],
+                       ["max_stack_index"]],
+    "children":        [],
+    "function_name":  "returnTrue",
+    "data":           {"Int": "null"},
+    "parents":        []
+  },
+  {
+    "name":           ["level_number", "0"],
+    "nexts":          [],
+    "start_children": [],
+    "children":       [],
+    "function_name":  "returnTrue",
+    "data":           {"Int": "0"},
+    "parents":        []
+  },
+  {
+    "name":           ["state_number", "0"],
+    "nexts":          [],
+    "start_children": [],
+    "children":       [],
+    "function_name":  "returnTrue",
+    "data":           {"Int": "0"},
+    "parents":        []
+  },
+  {
+    "name":           ["indent_number", "0"],
+    "nexts":          [],
+    "start_children": [],
+    "children":       [],
+    "function_name":  "returnTrue",
+    "data":           {"Int": "0"},
+    "parents":        []
+  },
+    
+  {
+    "name":           ["max_stack_index"],
+    "nexts":          [],
+    "start_children": [],
+    "children":       [],
+    "function_name":  "returnTrue",
+    "data":           {"Int": "0"},
+    "parents":        []
+  },
+  {
+    "name":           ["i"],
+    "nexts":          [],
+    "start_children": [],
+    "children":       [],
+    "function_name":  "returnTrue",
+    "data":           {"Int": "0"},
+    "parents":        []
+  },
+  {
+    "name":           ["what_is_current_word_to_pre_word"],
+    "nexts":          [],
+    "start_children": [["child"],
+                       ["sibling"],
+                       ["new_parent"]],
+    "children":       [],
+    "function_name":  "returnTrue",
+    "data":           {"nothing": "null"},
+    "parents":        []
+  }
+]

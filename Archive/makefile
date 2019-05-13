@@ -5,9 +5,9 @@
 #object_files = data.o name.o point.o state.o states.o hash_table.o visit_functions.o state_machine.o
 
 
-include_and_c_files2 = state3.c state3.h main.c jsmn.c jsmn.h
+include_and_c_files2 = state2.h state2.c main.c
 
-object_files2 = state3.o main.o jsmn.o
+object_files2 = state2.o main.o
 
 
 
@@ -15,11 +15,7 @@ object_files2 = state3.o main.o jsmn.o
 	gcc $< -c
 
 
-#state2.o: state2.c state2.h
-#	gcc state2.c -c
 
-#main.o: main.c state2.o
-#	gcc main.c state2.c -c
 
 state_machine.x: $(object_files2)
 
@@ -27,9 +23,8 @@ state_machine.x: $(object_files2)
 
 run:
 	-make clean
-	#g++ main.c -o state_machine.x
 	-make state_machine.x
 	#-./state_machine.x input.txt
-	-./state_machine.x parsing_tree.json calculator_example.txt
+	-./state_machine.x calculator_example.txt
 clean:
 	-rm *.o *.x

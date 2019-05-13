@@ -1,24 +1,32 @@
-#include "standard_headers.h"
 
-#include "state.h"
-#include "point.h"
-#include "name.h"
-#include "states.h"
+//#include "state.h"
+//#include "point.h"
+//#include "name.h"
+#include "state2.h"
 
 
+// state2.h is not being read before this is
+struct ContextState* newState()
+{
+	struct ContextState* test =  malloc(sizeof(struct ContextState));
+	test->name = malloc(sizeof(char) * 50);
+	//memcpy(test->name, input, sizeof(char) * strlen(input));
+	return test;
+}
 //#include "states.h"
 // forward declaration of a struct
 //struct Names;
 //struct ContextState;
 //struct SparseMatrix;
-enum attributes {_StartChildren, _Parents, _Children, _Nexts, _int, _string, string_size, _float, _int_p, _string_p, string_p_size, _float_p, sparse_matrix_levels};
+//enum attributes {_StartChildren, _Parents, _Children, _Nexts, _int, _string, string_size, _float, _int_p, _string_p, string_p_size, _float_p, sparse_matrix_levels};
 /*
 bool runFunction(struct ContextState* state, struct SparseMatrix* levels, struct level_id_state_id* point, struct Names* current_state_name)
 {
-	
+
 	return levels[point->level_id].state_list[point->state_id]->function_pointer(current_state_name, levels);
 }
 */
+/*
 struct ContextState* makeNewState()
 {
 	struct ContextState* new_state = malloc(sizeof(struct ContextState));
@@ -28,7 +36,7 @@ void setFunctionPointer(struct ContextState* node, bool (*function_pointer)(stru
 {
 	node->function_pointer = function_pointer;
 	node->function_pointer_name = function_pointer_name
-	
+
 	//return node->function_pointer;
 }
 void setNames(struct ContextState* state, struct Names* names)
@@ -388,5 +396,4 @@ struct ContextState* addNode(struct ContextState* node,
 	}
 
 	return node;
-}
-
+}*/

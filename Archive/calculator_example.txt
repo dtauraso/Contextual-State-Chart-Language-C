@@ -1,33 +1,22 @@
 Start
-	Function
-		returnTrue
 	Children
 		variables
-			Function
-				returnTrue
 			Children
 				operation_vars
-					Children
-						a
-							Data
-								0
-						b
-							Data
-								0
+					Data
+						["a": 0, "b": 0]
 				lex_vars
 					Children
 						operators
-							*
-								mult
-							/
-								divide
-							-
-								minus
-							+
-								plus
+							Data
+								["*", "/", "-", "+"]
 						j
 							Data
 								0
+
+						operations
+							Data
+								["*": "mult", "/": "divide", "-": "plus", "+": "minus"]
 				array
 					input
 						Children
@@ -51,37 +40,31 @@ Start
 							first contex
 								Data
 									"output"
-					expression
-						input
-							12345
-							"+"
-							65432
-		-split
+				parsing_checks
+					Data
+						["op" : "isOp", "value_ignore / 0" : "isDigit", "op_ignore" : "ignoreOp", " " : "isWhiteSpace"]
 			Function
 				returnTrue
-			Next
-				validate
-				invalid
+		-split
 			Children
 				-char
-					Function
-						collectChar
 					Next
 						last_to_save
 						char
 						save
-				save
 					Function
-						save
+						collectChar
+				save
 					Next
 						" "
-				" "
 					Function
-						parseChar
+						save
+				" "
 					Next
 						" "
 						init
-					
+					Function
+						parseChar
 				init
 					Next
 						char
@@ -93,79 +76,86 @@ Start
 						exit
 					Function
 						lastToSave
-		validate
-			Function
-				validate
 			Next
-				evaluate_expression
-		evaluate_expression
+				validate
+				invalid
 			Function
 				returnTrue
+		validate
 			Next
-				input_has_1_value
 				evaluate_expression
+			Function
+				validate
+		evaluate_expression
 			Children
 				-a
-					Function
-						getA
 					Next
 						reset_for_next_round_of_input
 						op
 						op_ignore
-				op
 					Function
-						parseChar
+						getA
+				op
 					Next
 						error
 						b / evaluate
+					Function
+						parseChar
 				b
 					evaluate
-						Function
-							evaluate
 						Next
 							reset_for_next_round_of_input
 							a
 							op_ignore
+						Function
+							evaluate
 				op_ignore
-					Function
-						parseChar
 					Next
 						error
 						value_ignore
+					Function
+						parseChar
 				value_ignore
 					0
-						Function
-							parseChar
 						Next
 							reset_for_next_round_of_input
 							op_ignore
 							value_ignore / valid_op
-					valid_op
 						Function
-							validOp
+							parseChar
+					valid_op
 						Next
 							op
+						Function
+							validOp
 				reset_for_next_round_of_input
-					Function
-						resetForNextRound
 					Next
 						end_of_evaluating
+					Function
+						resetForNextRound
 				end_of_evaluating
 				exit_2
 				error
-					Function
-						noMoreInput
 					Next
 						exit_2
-		invalid
+					Function
+						noMoreInput
+			Next
+				input_has_1_value
+				evaluate_expression
 			Function
-				inputIsInvalid
+				returnTrue
+		invalid
 			Next
 				exit_3
+			Function
+				inputIsInvalid
 		exit_3
 		done
 		input_has_1_value
-			Function
-				showAndExit
 			Next
 				done
+			Function
+				showAndExit
+	Function
+		returnTrue
