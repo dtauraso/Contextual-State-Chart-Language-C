@@ -8,34 +8,7 @@
 struct ContextState;
 
 
-/*
-    30 min a day on this
-    root
 
-    current_root
-    loop
-
-        if same(next indent == current indent)
-            connect current_root to next item(as the next child)
-
-
-        if pulling out(next indent < current indent)
-            loop until next indent == current indent - 1
-                set root to parent
-                decrement current indent
-            now root is 1 level above the next index
-            connect current_root to next item(as the next child)
-
-
-
-        if more depth(next indent > current indent)
-            connect current_root to next item
-            set current_root to next item
-
-     state coordinates stay consistent with the state
-     the level indicates where we are
-
-*/
 char* getNextWord(char* input, int i)
 {
  	// this function gets the next word
