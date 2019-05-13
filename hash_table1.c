@@ -6,10 +6,10 @@ const int HT_PRIME_1 = 131;
 const int HT_PRIME_2 = 137;
 const int HT_INITIAL_BASE_SIZE = 50;
 
-void ht_insert(ht_hash_table* ht, const char* key, const char* value);
-char* ht_search(ht_hash_table* ht, const char* key);
+void ht_insert(ht_hash_table* ht, const char* key, const void* value);
+void* ht_search(ht_hash_table* ht, const char* key);
 void ht_delete(ht_hash_table* h, const char* key);
-static ht_item* ht_new_item(const char* k, const char* v)
+static ht_item* ht_new_item(const char* k, const void* v)
 {
 	ht_item* i = malloc(sizeof(ht_item));
 	i->key = strdup(k);
@@ -140,7 +140,7 @@ static void ht_resize_down(ht_hash_table* ht)
 	ht_resize(ht, new_size);
 }
 
-void ht_insert(ht_hash_table* ht, const char* key, const char* value)
+void ht_insert(ht_hash_table* ht, const char* key, const void* value)
 {
 	const int load = ht->count * 100 / ht->size;
 	if(load > 70)
@@ -171,7 +171,7 @@ void ht_insert(ht_hash_table* ht, const char* key, const char* value)
 }
 
 
-char* ht_search(ht_hash_table* ht, const char* key)
+void* ht_search(ht_hash_table* ht, const char* key)
 {
 	int index = ht_get_hash(key, ht->size, 0);
 	ht_item* item = ht->items[index];

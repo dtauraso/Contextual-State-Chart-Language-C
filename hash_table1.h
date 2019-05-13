@@ -11,7 +11,7 @@ https://github.com/jamesroutley/write-a-hash-table/tree/master/01-introduction
 typedef struct
 {
 	char* key;
-	char* value;
+	void* value;
 } ht_item;
 
 typedef struct
