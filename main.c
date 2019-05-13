@@ -216,41 +216,20 @@ ContextState* makeTree(char* input)
 		//printf("count %i, num_lines %i, i %i, input len %lu\n", count+1, num_lines, i, strlen(input));
 
 		char* word = getNextWord(input, i);
-		//if(count == 2)
-		//{
-			//printf("final count %i\n", count);
 
-			//printf("last line %s\n", word);
-			//exit(0);
-		//}
 		ContextState* new_node = initContextState();
 		if(new_node == NULL) exit(1);
-		//printf("word %s length %lu\n", word, strlen(word));
+
 		new_node = setName(new_node, word);
-		//printf("child %s\n", child->name);
 
-		//printf("new link %s\n", child1->name);
 
-		// strlen(word) > strlen(tracker->name)
-		//printf("%s|%s|%i|%lu|%lu\n", parent->name[0], word, i, strlen( parent->name[0]), strlen(word));
 		free(word);
 
 		i += strlen(new_node->name) + 1;
-		//printf("|%c|\n", input[i+1]);
 
-		//printf("middle i %i\n", i);
 		next_indent = countTabs(input, i);
 		
-		//printf("tab count = %i\n", next_indent);
-		//printf("indents current %i, next %i\n", current_indent, next_indent);
 
-		//printf("%i|%i\n", next_indent, i);
-		// is this run for all new children?
-		// yes
-		// double link
-		// advance the pointers
-		// move i past indents to next word
-		// swap indents
 		if(next_indent > current_indent)
 		{
 			// GOING DOWN
