@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "hash_table1.h"
 
 
 enum stack_types{char_p_p, struct_context_state_p_p};
@@ -21,13 +22,19 @@ Stack* insert(Stack* stack, void* item);
 // typedef only seems to let me use "ContextState" outside the struct definition
 typedef struct ContextState
 {
-
+		// int** is for finding neighbors stored inside a hash table
 		char* name;
 
 		struct ContextState** start_children;
+		int* start_children_hash;
+
+		char** start_children_names;
 		int start_children_size;
 
 		struct ContextState** parents;
+		int* parents_hash;
+
+		char** parents_names;
 		int parents_size;
 
 
@@ -38,14 +45,29 @@ typedef struct ContextState
 		// (current state, prev item on stack, is_indent_on)
 
 		struct ContextState** children;
+		int* children_hash;
+
+		char** children_names;
 		int children_size;
 
 		struct ContextState** nexts;
+		int* nexts_hash;
+
+		char** nexts_names;
 		int nexts_size;
 
 		// tri tree for partial state name matches(can match only 1 name at a time)
 		struct ContextState** tri_children;
+		int* tri_children_hash;
+
+		// the next level from name's perspective
+		char** tri_children_names;
+
 		int tri_children_size;
+
+		// when parts of a full name are linked to a context state object
+		// the context state object may be a dummy node
+		bool dummy_node;
 
 		bool (*function_pointer)(char* name, void** tree);
 		char* function_pointer_name;
@@ -86,5 +108,12 @@ ContextState* initContextState();
 ContextState* setName(ContextState* node, char* name);
 ContextState* appendParent(ContextState* node, ContextState* parent);
 ContextState* appendChild(ContextState* node, ContextState* parent);
+ht_hash_table* appendParentHash(ht_hash_table* states,
+								int node,
+							    int parent);
+ht_hash_table* appendChildHash(ht_hash_table* states,
+							   int node,
+							   int child);
+
 
 #endif

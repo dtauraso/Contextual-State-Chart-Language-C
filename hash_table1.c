@@ -1,4 +1,5 @@
 #include "hash_table1.h"
+#include "state3.h"
 
 static ht_item HT_DELETED_ITEM = {NULL, NULL};
 // primes > 128
@@ -6,14 +7,31 @@ const int HT_PRIME_1 = 131;
 const int HT_PRIME_2 = 137;
 const int HT_INITIAL_BASE_SIZE = 50;
 
-void ht_insert(ht_hash_table* ht, const char* key, const void* value);
+void ht_insert(ht_hash_table* ht, const char* key, ContextState* value);
 void* ht_search(ht_hash_table* ht, const char* key);
 void ht_delete(ht_hash_table* h, const char* key);
-static ht_item* ht_new_item(const char* k, const void* v)
+ContextState* duplicate(ContextState* item);
+
+static ht_item* ht_new_item(const char* k, ContextState* v)
 {
+	// v->name gets's messed up when it comes in unless v->name ends in "\\" (for when it ends in t)
+	// works
+	//printf("v1 %s %lu\n", v->name, strlen(v->name));
+
 	ht_item* i = malloc(sizeof(ht_item));
-	i->key = strdup(k);
-	i->value = strdup(v);
+
+	i->key = strdup(k);//malloc(strlen (k) + 1);  // Space for length plus nul
+    //if (i->key == NULL) return NULL;          // No memory
+    //strcpy(i->key, k);
+	//memcpy(i->key, k, sizeof(char) * (strlen (k) + 1));
+	//i->key = strdup(k);
+	// gets messed up
+	//printf("v2 %s %lu\n", v->name, strlen(v->name));
+	//printf("making a state object\n");
+	ContextState* x = duplicate(v);
+	//memcpy(x, v, sizeof(ContextState));
+	i->value = x; //strdup(v);
+	//printf("made object\n");
 	return i;
 }
 
@@ -100,6 +118,25 @@ static int ht_get_hash(const char* s, const int num_buckets, const int attempt)
 	const int hash_b = ht_hash(s, HT_PRIME_2, num_buckets);
 	return (hash_a + (attempt * (hash_b + 1)) % num_buckets);
 }
+void printHash(ht_hash_table* ht)
+{
+	printf("size = %i, count = %i, base = %i\n", ht->size, ht->count, ht->base_size);
+	//printf("%i\n", &HT_DELETED_ITEM);
+	for(int i = 0; i < ht->size; i++)
+	{
+		printf("item %i\n", i);
+		//printf("%x\n", ht->items[i]);
+		if(ht->items[i] != 0)
+		{
+			printf("%i %s\n\n", i,  ht->items[i]->key);
+
+		}
+		else
+		{
+			printf("blank\n\n");
+		}
+	}
+}
 static void ht_resize(ht_hash_table* ht, const int base_size)
 {
 	if(base_size < HT_INITIAL_BASE_SIZE)
@@ -140,16 +177,27 @@ static void ht_resize_down(ht_hash_table* ht)
 	ht_resize(ht, new_size);
 }
 
-void ht_insert(ht_hash_table* ht, const char* key, const void* value)
+void ht_insert(ht_hash_table* ht, const char* key, ContextState* value)
 {
+	//printf("insert\n");
 	const int load = ht->count * 100 / ht->size;
+	//printf("load = %i\n", load);
+
 	if(load > 70)
 	{
 		ht_resize_up(ht);
 	}
+
+	printf("inserting value %s\n", value->name);
+
 	ht_item* item = ht_new_item(key, value);
+
 	int index = ht_get_hash(item->key, ht->size, 0);
+	//printf("location = %i\n", index);
 	ht_item* cur_item = ht->items[index];
+
+	//printf("%i %i\n\n", index, ht->items[index]);
+
 	int i = 1;
 	while (cur_item != NULL)
 	{
@@ -159,6 +207,8 @@ void ht_insert(ht_hash_table* ht, const char* key, const void* value)
 			{
 				ht_del_item(cur_item);
 				ht->items[index] = item;
+				// prove item has been stored successfully
+
 				return;
 			}
 		}
@@ -166,12 +216,20 @@ void ht_insert(ht_hash_table* ht, const char* key, const void* value)
 		cur_item = ht->items[index];
 		i++;
 	}
+
 	ht->items[index] = item;
+	//printf("%i %s\n\n", index, result->name);
+	//printf("done inserting\n");
+	//printf("%i %s\n\n", index, ht->items[index]->key);
+
 	ht->count++;
 }
 
-
-void* ht_search(ht_hash_table* ht, const char* key)
+void* getValueAt(ht_hash_table* ht, int i)
+{
+	return ht->items[i]->value;
+}
+int getIndexOfKey(ht_hash_table* ht, const char* key)
 {
 	int index = ht_get_hash(key, ht->size, 0);
 	ht_item* item = ht->items[index];
@@ -182,6 +240,38 @@ void* ht_search(ht_hash_table* ht, const char* key)
 		{
 			if (strcmp(item->key, key) == 0)
 			{
+				return index;
+			}
+		}
+		index = ht_get_hash(key, ht->size, i);
+		item = ht->items[index];
+		i++;
+	}
+	// can't find anything
+	return -1;
+}
+void* ht_search(ht_hash_table* ht, const char* key)
+{
+	//printf("searching for %s\n", key);
+	int index = ht_get_hash(key, ht->size, 0);
+	ht_item* item = ht->items[index];
+	int i = 1;
+	while(item != NULL)
+	{
+		if(item != &HT_DELETED_ITEM)
+		{
+			//printf("%i\n", index);
+			//printf("element %s, key %s\n", item->key, key);
+	//		printf("item %x, deleted tag %x\n", item, &HT_DELETED_ITEM);
+
+			if (strcmp(item->key, key) == 0)
+			{
+				//printf("done\n");
+				//printf("%s\n", item->key);
+				ContextState* result = (ContextState*) item->value;
+				// sometimes the name has garbage characters added
+				// prints out 'd' or segfaults
+				printf("name: %s\n", result->name );
 				return item->value;
 			}
 		}

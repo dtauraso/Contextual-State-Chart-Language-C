@@ -129,6 +129,16 @@ void doubleLink(ContextState* parent, ContextState* child)
 
 
 }
+void doubleLinkHash(ht_hash_table* input_states, int parent, int child)
+{
+
+	input_states = appendParentHash(input_states, child, parent);
+		printf("here\n");
+
+	input_states = appendChildHash(input_states, parent, child);
+	printf("here 2\n");
+
+}
 int countLines(char* input)
 {
 	int num_lines = 0;
@@ -140,6 +150,14 @@ int countLines(char* input)
 	}
 	return num_lines;
 }
+ht_hash_table* appendParentHash(ht_hash_table* states,
+								int node, // use char* instead because table[f(node)] will always get to the right thing, table[node] may not due to table being updated quite often
+							    int parent);
+void ht_insert(ht_hash_table* ht, const char* key, const void* value);
+int getIndexOfKey(ht_hash_table* ht, const char* key);
+void* ht_search(ht_hash_table* ht, const char* key);
+void printHash(ht_hash_table* ht);
+
 ContextState* makeTree(char* input)
 {
 	// needs the input to end on a newline after the last collectable text
@@ -148,18 +166,71 @@ ContextState* makeTree(char* input)
 	int next_indent = 0;
 	int i = 0;
 	int num_lines = countLines(input);
+	ht_hash_table* input_states = ht_new();
 	//printf("%s\n %i\n", input, i);
 	// this is so the we can traverse above nodes in the tree that have data
 	// from input
+	// something is wrong with adding and searching the hash table
 	ContextState* dummy_dummy_root = initContextState();
+	// when setting strings for ContextState I seem to have to save them as "\"" + name + "\"" or the string may resizes itself and puts in garbage chars
+	// the hash table(ht_hash_table) seems to be immune to this
+	// object is fine, but the entry in the table didn't save the name right
+	dummy_dummy_root = setName(dummy_dummy_root, "\"dummy_dummy_root\"");
+	printf("from original object %s\n", dummy_dummy_root->name);
+
+
+
+	// insert to table under "dummy_dummy_root"
+	ht_insert(input_states, "\"dummy_dummy_root\"", dummy_dummy_root);
+	/*printf("testing\n");
+	printHash(input_states);
+	printf("done testing\n");
+	*/
+	ContextState* test1 = (ContextState*) ht_search(input_states, "\"dummy_dummy_root\"");
+	printf("test1 %s\n", test1->name);
+	
+
+	int dummy_dummy_root_hash = getIndexOfKey(input_states, "\"dummy_dummy_root\"");
 
 	ContextState* dummy_root = initContextState();
+	// insert to table under "dummy_root"
+	dummy_root = setName(dummy_dummy_root, "\"dummy_root\"");
+
+
+	ht_insert(input_states, "\"dummy_root\"", dummy_root);
+	// maybe inserting another item causes the original index to be invalid because the table gets updated
+	int dummy_root_hash = getIndexOfKey(input_states, "\"dummy_root\"");
+
+
 
 	ContextState* root = initContextState();
+	root = setName(root, "\"root\"");
+
+	ht_insert(input_states, "\"root\"", root);
+	ContextState* test2 = (ContextState*) ht_search(input_states, "\"root\"");
+	printf("test2 %s\n", test2->name);
+
 	ContextState* parent = root;
+	//int parent_hash = getIndexOfKey(input_states, "root");
+
+	int child_hash;
 	ContextState* child;
+	// now have to 
+
+	exit(0);
+	//ContextState* test2 = (ContextState*) ht_search(input_states, "dummy_root");
+
+	//printf("%s\n", test1->name);
+	//printf("%s\n", test2->name);
+
+
 	doubleLink(dummy_dummy_root, dummy_root);
+
 	doubleLink(dummy_root, parent);
+
+	// error here
+	//doubleLinkHash(input_states, dummy_dummy_root_hash, dummy_root_hash);
+	//doubleLinkHash(input_states, dummy_root_hash, parent_hash);
 
 	// need a parent pointer and a child pointer
 	// have the parent and child already set up before the loop starts
@@ -181,8 +252,10 @@ ContextState* makeTree(char* input)
 		child = initContextState();
 		child = setName(child, word);
 
-
+		//ht_insert(input_states, word, child);
+		//child_hash = getIndexOfKey(input_states, word);
 		doubleLink(parent, child);
+		//doubleLinkHash(input_states, parent_hash, child_hash);
 		//next_indent = countTabs(input, i);
 		//printf("child%s\n", child->name[0]);
 		//next_indent = countTabs(input, i);
@@ -338,6 +411,20 @@ makeContextState
 	add each object to a hash table
 
 */
+// user can't use "\n" in the state name
+// make a string of entire name[name1\nname2/\n...] -> contextState map
+// then partal name -> contextState (each internal node in the trie is a dummy node, unless a state name is a partial path)
+void makeContextState(jsmntok_t token, ht_hash_table* parsing_graph)
+{
+	// token is array
+	if(token.type == 2)
+	{
+		// check array start and end for "[", "]"
+		// if not null
+		// check next item for being an array type
+		// while there are arrays
+	}
+}
 int main(int argc, char** argv)
 {
 	char* input = readFile(argv[2]);
@@ -345,7 +432,7 @@ int main(int argc, char** argv)
 	// todo
 	// get rid of all blank lines
 	ContextState* tree = makeTree(input);
-	printTree(tree, 0);
+	//printTree(tree, 0);
 	const char* parsing_graph = readFile(argv[1]);
 	//printf("%s\n", parsing_graph);
 	// the parser code appears to compile
@@ -381,7 +468,7 @@ int main(int argc, char** argv)
 		} jsmntype_t;
 
 	*/
-	
+	/*
 	for(int i = 0; i < parsing_results; i++)
 	{
 		int json_type = tokens[i].type;
@@ -404,6 +491,7 @@ int main(int argc, char** argv)
 
 		printf("|%s|\n", collectChars(tokens[i], parsing_graph));
 	}
+	*/
 	// loop untill hit object
 	// call makeContextState on object
 	/*
