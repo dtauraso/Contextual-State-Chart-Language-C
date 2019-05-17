@@ -142,21 +142,23 @@ ContextState* appendChild(ContextState* node, ContextState* child)
 // we are storing the index to the hash table to the state being linked to
 
 ht_hash_table* appendParentHash(ht_hash_table* states,
-								int node,
-							    int parent)
+								const char* node,
+							    const char* parent)
 {
 	// we have already looked up the node's name and gotten an index for its location in 
 	// the table
 	//printf("append parent\n");
-	ContextState* parent_state = (ContextState*) getValueAt(states, parent);
-	ContextState* node_state = (ContextState*) getValueAt(states, node);
-	if( parent_state->parents_size == 0)
+	ContextState* parent_state = (ContextState*) ht_search(states, parent);
+	ContextState* node_state = (ContextState*) ht_search(states, node);
+	if( node_state->parents_size == 0)
 	{
-		parent_state->parents_size = 1;
-
-		parent_state->parents_hash = malloc(sizeof(int));
-		if(!parent_state->parents_hash) exit(1);
-		parent_state->parents_hash[0] = parent;
+		node_state->parents_size = 1;
+		// make a list of parent names and add a copy of the parent to it
+		node_state->parents_hash = malloc(sizeof(int));
+		if(!node_state->parents_hash) exit(1);
+		// dupliate the parent name so the name to another row is completely
+		// controlled by the entry pointing to it
+		node_state->parents_hash[0] = parent;
 
 	}
 	else if(node_state->parents_size > 0)
@@ -186,8 +188,8 @@ ht_hash_table* appendParentHash(ht_hash_table* states,
 
 // error code
 ht_hash_table* appendChildHash(ht_hash_table* states,
-							   int node,
-							   int child)
+							   const char* node,
+							   const char* child)
 {
 	printf("append child\n");
 

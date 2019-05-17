@@ -119,6 +119,7 @@ void swap(int* a, int* b)
 	*a = *b;
 	*b = *a;
 }
+// pointer to string saved as a name
 void doubleLink(ContextState* parent, ContextState* child)
 {
 	child = appendParent(child, parent);
@@ -133,7 +134,7 @@ void doubleLinkHash(ht_hash_table* input_states, int parent, int child)
 {
 
 	input_states = appendParentHash(input_states, child, parent);
-		printf("here\n");
+	printf("here\n");
 
 	input_states = appendChildHash(input_states, parent, child);
 	printf("here 2\n");
@@ -151,13 +152,132 @@ int countLines(char* input)
 	return num_lines;
 }
 ht_hash_table* appendParentHash(ht_hash_table* states,
-								int node, // use char* instead because table[f(node)] will always get to the right thing, table[node] may not due to table being updated quite often
-							    int parent);
+								const char* node,
+							    const char* parent);
+ht_hash_table* appendChildHash(ht_hash_table* states,
+							   const char* node,
+							   const char* child);
+
 void ht_insert(ht_hash_table* ht, const char* key, const void* value);
 int getIndexOfKey(ht_hash_table* ht, const char* key);
 void* ht_search(ht_hash_table* ht, const char* key);
 void printHash(ht_hash_table* ht);
 
+char getHexLetter(int hex_value)
+{
+	switch(hex_value)
+	{
+		case 0:
+			return '0';
+		case 1:
+			return '1';
+		case 2:
+			return '2';
+		case 3:
+			return '3';
+		case 4:
+			return '4';
+		case 5:
+			return '5';
+		case 6:
+			return '6';
+		case 7:
+			return '7';
+		case 8:
+			return '8';
+		case 9:
+			return '9';
+		case 10:
+			return 'a';
+		case 11:
+			return 'b';
+		case 12:
+			return 'c';
+		case 13:
+			return 'd';
+		case 14:
+			return 'e';
+		case 15:
+			return 'f';
+		default:
+
+			return 'x';
+	}
+}
+// the address of the object will be appended to end of object's name
+// to enforce uniqueness in the hash table
+char* convertAddressToCString(ContextState* item)
+{
+	int value = (int) item;
+	int size = 8;
+	int i = 0;
+
+	char* address_string = malloc(sizeof(char) * size);
+	memset(address_string, 1, sizeof(char) * size);
+
+	address_string[size] = '\0';
+	if(value == 0)
+	{
+		memset(address_string, 0, sizeof(char) * size);
+		return address_string;
+	}
+
+	while(value != 0xffffffff)
+	{
+
+		int hex_value = value & 0x0000000f;
+
+		address_string[size - 1 - i] = getHexLetter(hex_value);
+
+		value = value >> 4;
+		if(value == 0)
+			break;
+		i++;
+	}
+	return address_string;
+}
+// 2 hash tables
+// each input name + object name -> object holding the name
+// parse tree each name part -> waypoint object or object holding data
+
+// 1 tri tree for the name part chain to the object holding data, so auto-enumerating
+// new states is simple
+
+char* combineNameAndObjectAddress(char* name, ContextState* address_in)
+{
+	char* address = convertAddressToCString(address_in);
+	// x = name without surrounding quotes
+	// returns '\"' + x + '_' + address + '\"'
+	unsigned size_of_name = strlen(name);
+	unsigned size_of_address = strlen(address);
+	int new_size = size_of_name + size_of_address + 1;
+
+	char* combined_name_and_object_address = malloc(sizeof(char) * new_size);
+
+	// insert x
+	memcpy(combined_name_and_object_address + 1,
+		   name + 1,
+		   sizeof(char) * (size_of_name - 2) );
+
+
+	combined_name_and_object_address[0] = '\"';
+	combined_name_and_object_address[size_of_name - 1] = '_';
+
+	// insert address
+	memcpy(combined_name_and_object_address + size_of_name,
+		   address,
+		   sizeof(char) * size_of_address);
+
+	combined_name_and_object_address[new_size - 1] = '\"';
+	combined_name_and_object_address[new_size] = '\0';
+
+	return combined_name_and_object_address;
+
+
+
+
+
+}
 ContextState* makeTree(char* input)
 {
 	// needs the input to end on a newline after the last collectable text
@@ -175,22 +295,34 @@ ContextState* makeTree(char* input)
 	// when setting strings for ContextState I seem to have to save them as "\"" + name + "\"" or the string may resizes itself and puts in garbage chars
 	// the hash table(ht_hash_table) seems to be immune to this
 	// object is fine, but the entry in the table didn't save the name right
-	dummy_dummy_root = setName(dummy_dummy_root, "\"dummy_dummy_root\"");
+	// combineNameAndObjectAddress("\"dummy_dummy_root\"",
+								// convertAddressToCString(dummy_dummy_root)
+	// = \"dummy_dummy_root_65434fd\"
+	// the surrounding quotes are to keep the string from being resized based on characters
+	// at the end
+	// adding "_" + address_of_object guarantees each entry is unique
+	char* name_and_address = combineNameAndObjectAddress("\"dummy_dummy_root\"",
+														 dummy_dummy_root);
+	printf("%s\n", name_and_address);
+	//exit(0);
+	dummy_dummy_root = setName(dummy_dummy_root, name_and_address);
 	printf("from original object %s\n", dummy_dummy_root->name);
 
 
-
+	// append the address of object to the end of the state name to enforce uniquness
 	// insert to table under "dummy_dummy_root"
-	ht_insert(input_states, "\"dummy_dummy_root\"", dummy_dummy_root);
+	ht_insert(input_states, name_and_address, dummy_dummy_root);
+	printf("passing\n");
 	/*printf("testing\n");
 	printHash(input_states);
 	printf("done testing\n");
 	*/
-	ContextState* test1 = (ContextState*) ht_search(input_states, "\"dummy_dummy_root\"");
-	printf("test1 %s\n", test1->name);
+
+	ContextState* test1 = (ContextState*) ht_search(input_states, name_and_address);
+	printf("test1 %s %x\n", test1->name, test1);
 	
 
-	int dummy_dummy_root_hash = getIndexOfKey(input_states, "\"dummy_dummy_root\"");
+	//int dummy_dummy_root_hash = getIndexOfKey(input_states, "\"dummy_dummy_root\"");
 
 	ContextState* dummy_root = initContextState();
 	// insert to table under "dummy_root"
@@ -199,7 +331,7 @@ ContextState* makeTree(char* input)
 
 	ht_insert(input_states, "\"dummy_root\"", dummy_root);
 	// maybe inserting another item causes the original index to be invalid because the table gets updated
-	int dummy_root_hash = getIndexOfKey(input_states, "\"dummy_root\"");
+	//int dummy_root_hash = getIndexOfKey(input_states, "\"dummy_root\"");
 
 
 
@@ -207,7 +339,7 @@ ContextState* makeTree(char* input)
 	root = setName(root, "\"root\"");
 
 	ht_insert(input_states, "\"root\"", root);
-	ContextState* test2 = (ContextState*) ht_search(input_states, "\"root\"");
+	ContextState* test2 = (ContextState*) ht_search(input_states, name_and_address);
 	printf("test2 %s\n", test2->name);
 
 	ContextState* parent = root;
@@ -216,6 +348,7 @@ ContextState* makeTree(char* input)
 	int child_hash;
 	ContextState* child;
 	// now have to 
+	printf("%i\n", sizeof(struct ContextState));
 
 	exit(0);
 	//ContextState* test2 = (ContextState*) ht_search(input_states, "dummy_root");

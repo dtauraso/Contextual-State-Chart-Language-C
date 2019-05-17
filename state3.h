@@ -57,13 +57,9 @@ typedef struct ContextState
 		int nexts_size;
 
 		// tri tree for partial state name matches(can match only 1 name at a time)
-		struct ContextState** tri_children;
-		int* tri_children_hash;
+		ht_hash_table* tri_children;
 
 		// the next level from name's perspective
-		char** tri_children_names;
-
-		int tri_children_size;
 
 		// when parts of a full name are linked to a context state object
 		// the context state object may be a dummy node
@@ -72,48 +68,98 @@ typedef struct ContextState
 		bool (*function_pointer)(char* name, void** tree);
 		char* function_pointer_name;
 
-		//struct Data* var;
-		
-		int _int;
-		bool _is_int;
+		int type_id; // enum
 
-		char* _string;
-		bool _is_string;
-
-		int string_size;
-
-		float _float;
-		bool _is_float;
-
-		int* _int_p;
-		bool _is_int_p;
+		int** _int_p;
+		int _int_p_size;
 
 		char** _string_p;
-		int _string_p_size;
-		bool _is_string_p;
-
 		int string_p_size;
 
-		float* _float_p;
-		bool _is_float_p;
-		void** additional_types;
-		int additional_types_size;
-		bool** is_additional_types;
-
-		struct ContextState** context_state_p;
-		int context_state_p_size;
+		float** _float_p;
+		int _float_p_size;		
+		
 		
 }ContextState;
+/*
+typedef struct Names
+{
+	char** strings;
+	int size;
+};
+
+typedef struct neighbors
+{
+		struct Names* start_children_names;
+		struct Names* parents_names;
+		struct Names* children_names;
+		struct Names* nexts_names;
+
+};
+typedef struct ContextState1
+{
+		// int** is for finding neighbors stored inside a hash table
+		char* name;
+
+		struct neighbors* neighbors_;
+		//struct Names* start_children_names;
+		ht_hash_table* tri_children;
+
+
+		//struct Names* parents_names;
+
+
+		// no recursion, have an indent on/off var in the stack
+		// when the child state is at a higher level than the current state
+			// deactivate the indent
+		// use last indent on/off value to find out if indents should be on or off
+		// (current state, prev item on stack, is_indent_on)
+
+
+		//struct Names* children_names;
+
+		//struct Names* nexts_names;
+
+		// tri tree for partial state name matches(can match only 1 name at a time)
+		//ht_hash_table* tri_children;
+
+		// the next level from name's perspective
+
+		// when parts of a full name are linked to a context state object
+		// the context state object may be a dummy node
+		bool dummy_node;
+
+		bool (*function_pointer)(char* name, void** tree);
+		char* function_pointer_name;
+
+		struct Data* var;
+		
+		
+		
+}ContextState1;
+typedef struct Data
+{
+	int type_id; // enum
+
+	int** _int_p;
+	int _int_p_size;
+
+	char** _string_p;
+	int string_p_size;
+
+	float** _float_p;
+	int _float_p_size;
+};*/
 ContextState* initContextState();
 ContextState* setName(ContextState* node, char* name);
 ContextState* appendParent(ContextState* node, ContextState* parent);
 ContextState* appendChild(ContextState* node, ContextState* parent);
 ht_hash_table* appendParentHash(ht_hash_table* states,
-								int node,
-							    int parent);
+								const char* node,
+							    const char* parent);
 ht_hash_table* appendChildHash(ht_hash_table* states,
-							   int node,
-							   int child);
+							   const char* node,
+							   const char* child);
 
 
 #endif

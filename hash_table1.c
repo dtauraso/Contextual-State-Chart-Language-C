@@ -205,11 +205,17 @@ void ht_insert(ht_hash_table* ht, const char* key, ContextState* value)
 		{
 			if(strcmp(cur_item->key, key) == 0)
 			{
-				ht_del_item(cur_item);
-				ht->items[index] = item;
-				// prove item has been stored successfully
+				// if value and cur_item->value are the same object
+				// then add to table
+				if(value == cur_item->value)
+				{
+					ht_del_item(cur_item);
+					ht->items[index] = item;
+					// prove item has been stored successfully
 
 				return;
+				}
+				
 			}
 		}
 		index = ht_get_hash(item->key, ht->size, i);
@@ -254,7 +260,10 @@ void* ht_search(ht_hash_table* ht, const char* key)
 {
 	//printf("searching for %s\n", key);
 	int index = ht_get_hash(key, ht->size, 0);
+
+
 	ht_item* item = ht->items[index];
+
 	int i = 1;
 	while(item != NULL)
 	{
@@ -268,10 +277,10 @@ void* ht_search(ht_hash_table* ht, const char* key)
 			{
 				//printf("done\n");
 				//printf("%s\n", item->key);
-				ContextState* result = (ContextState*) item->value;
+				//ContextState* result = (ContextState*) item->value;
 				// sometimes the name has garbage characters added
 				// prints out 'd' or segfaults
-				printf("name: %s\n", result->name );
+				//printf("name: %s\n", result->name );
 				return item->value;
 			}
 		}
