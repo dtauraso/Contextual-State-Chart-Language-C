@@ -1,4 +1,4 @@
-Start
+root
 	Function
 		returnTrue
 	Children
@@ -19,6 +19,8 @@ Start
 						operators
 							*
 								mult
+								other context
+									cross product
 							/
 								divide
 							-
@@ -26,8 +28,14 @@ Start
 							+
 								plus
 						j
-							Data
-								0
+							ith_operator
+								Data
+									0
+							function name
+								Data
+									0
+							aditional context operator
+								other context
 				array
 					input
 						Children

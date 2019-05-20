@@ -31,7 +31,27 @@ ContextState* initContextState()
 
 	return test;
 }
+void printState(ContextState* node)
+{
+	if(node != NULL)
+	{
+		printf("\nname: %s\n", node->name);
+		printf("parents: size = %i\n", node->parents_size);
+		for(int i = 0; i < node->parents_size; i++)
+		{
+			printf("%s, ", node->parents_names[i]);
+		}
+		printf("\n");
+		printf("children: size = %i\n", node->children_size);
+		for(int i = 0; i < node->children_size; i++)
+		{
+			printf("%s, ", node->children_names[i]);
+		}
+		printf("\n");
 
+	}
+}
+// unit test all of these functions
 ContextState* setName(ContextState* node, char* name)
 {
 	// if I don't put name_length here the size of the new string has changed possibly due to setting node->name
@@ -138,113 +158,82 @@ ContextState* appendChild(ContextState* node, ContextState* child)
 	return node;
 }
 
-// for appendParentHash, appendChildHash
-// we are storing the index to the hash table to the state being linked to
-
-ht_hash_table* appendParentHash(ht_hash_table* states,
-								const char* node,
-							    const char* parent)
+char** setLink(int* size, char** names, const char* other_node)
 {
-	// we have already looked up the node's name and gotten an index for its location in 
-	// the table
-	//printf("append parent\n");
-	ContextState* parent_state = (ContextState*) ht_search(states, parent);
-	ContextState* node_state = (ContextState*) ht_search(states, node);
-	if( node_state->parents_size == 0)
+	// case 0 works
+	if(*size == 0)
 	{
-		node_state->parents_size = 1;
-		// make a list of parent names and add a copy of the parent to it
-		node_state->parents_hash = malloc(sizeof(int));
-		if(!node_state->parents_hash) exit(1);
-		// dupliate the parent name so the name to another row is completely
-		// controlled by the entry pointing to it
-		node_state->parents_hash[0] = parent;
+		*size = 1;
+		names = malloc(sizeof(char*));
+		if(!names) exit(1);
+		names[0] = strdup(other_node);
 
 	}
-	else if(node_state->parents_size > 0)
+	// case 1, n not tested
+	else if(*size > 0)
 	{
-		node_state->parents_size += 1;
-
-		int* new_parents = malloc(sizeof(int) * node_state->parents_size);
-		if(!new_parents) exit(1);
-
-		memcpy(new_parents,
-			   node_state->parents_hash,
-			   sizeof(int) * node_state->parents_size - 1);
-
-		free(node_state->parents_hash);
-		
-		node_state->parents_hash = new_parents;
-		node_state->parents_hash[node_state->parents_size - 1] = parent;
-
-	}
-
-
-	//printf("%s\n", node->parents[0]->name);
-	//printf("passes parent\n");
-	//memcpy(node->parents, parent, 1);
-	return states;
-}
-
-// error code
-ht_hash_table* appendChildHash(ht_hash_table* states,
-							   const char* node,
-							   const char* child)
-{
-	printf("append child\n");
-
-	ContextState* child_state = (ContextState*) getValueAt(states, child);
-	ContextState* node_state = (ContextState*) getValueAt(states, node);
-	printf("%i\n", node_state->children_size);
-	printf("%s\n", node_state->name);
-	printf("node is valid\n");
-
-	if(node_state->children_size == 0)
-	{
-		node_state->children_size = 1;
-
-		node_state->children_hash = malloc(sizeof(int));
-
-		if(!node_state->children_hash) exit(1);
-		//printf("child saved 1.2.0 %s\n", child->name);
-
-		//memcpy(node->children[0], child, sizeof(ContextState*));
-		printf("base case\n");
-		node_state->children_hash[0] = child;
-		//printf("child saved 1.2.9 %s\n", child->name);
-
-
-	}
-	else if(node_state->children_size > 0)
-	{
-		//printf("here\n");
-		printf("inductive case\n");
-		// very large value
-		printf("%i\n", node_state->children_size);
-
-		node_state->children_size += 1;
-		int* new_children = malloc(sizeof(int) * node_state->children_size);
+		*size += 1;
+		char** new_children = malloc(sizeof(char*) * (*size));
 
 		if(!new_children) exit(1);
-		// problem line
-		memcpy(new_children,
-			   node_state->children_hash,
-			   sizeof(int) * (node_state->children_size - 2) );
 
-		//new_children[node_state->children_size - 1] = child;
+		// using old size
+		for(int i = 0; i < (*size) - 1; i++)
+		{
+			new_children[i] = strdup(names[i]);
+			free(names[i]);
+		}
+		new_children[(*size)] = strdup(other_node);
 
-		free(node_state->children_hash);
-		//printf("got here\n");
-		//exit(0);
-		node_state->children_hash = new_children;
-		//printf("afer adding in\n");
-		//printTree(node, 0);
+
+		free(names);
+		names = new_children;
+	}
+	// not sure why we need to return names or segfault
+	return names;
+}
+//enum doubly_linked_attribues {children, parents};
+/*
+void appendLink(ht_hash_table* states,
+			    const char* node,
+				const char* other_node, // child node or parent node
+				int attribute)
+{
+	// node -> other_node
+	//printf("append other_node\n");
+ 	//printf("appending 2 %s <=> %s\n", node, other_node);
+	//printHash(states);
+	ContextState* other_node_state = (ContextState*) ht_search(states, other_node);
+	ContextState* node_state = (ContextState*) ht_search(states, node);
+	//printf("%i\n", node_state);
+	//printf("%i\n", node_state->children_size);
+	//printf("%s\n", node_state->name);
+	//printf("node is valid\n");
+
+	// attribute == children
+	if(attribute == 0)
+	{
+		//printf("setting children\n");
+		// setLink(&node_state->children_size, node_state->children_names, other_node);
+		node_state->children_names = setLink(&node_state->children_size, node_state->children_names, other_node);
+		//printf("saved\n");
+		//printf("name saved: %s\n", node_state->children_names[0]);
+
+		//printState(node_state);
+
+	}
+	else
+	{
+		//printf("setting parents\n");
+		// setLink(&node_state->parents_size, node_state->parents_names, other_node);
+		node_state->parents_names = setLink(&node_state->parents_size, node_state->parents_names, other_node);
+		//printf("saved\n");
+		//printf("name saved: %s\n", node_state->parents_names[0]);
+		//printState(node_state);
+
 
 	}
 
-
-	//printf("%s\n", node->parents[0]->name);
-	printf("passes child\n");
-	//memcpy(node->parents, parent, 1);
-	return states;
-}
+	// if it returns the table the table gets corrupted
+	//return states;
+}*/

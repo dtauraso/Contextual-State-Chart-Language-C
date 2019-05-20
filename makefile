@@ -5,9 +5,9 @@
 #object_files = data.o name.o point.o state.o states.o hash_table.o visit_functions.o state_machine.o
 
 
-include_and_c_files2 = state3.c state3.h main.c jsmn.c jsmn.h hash_table1.h hash_table1.c
+include_and_c_files2 = state3.c state3.h main.c jsmn.c jsmn.h
 
-object_files2 = state3.o main.o jsmn.o hash_table1.o
+object_files2 = state3.o main.o jsmn.o
 
 
 

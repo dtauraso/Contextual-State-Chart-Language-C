@@ -20,10 +20,23 @@ Stack* setup(int type_value);
 Stack* insert(Stack* stack, void* item);
 
 // typedef only seems to let me use "ContextState" outside the struct definition
+
+
+typedef struct TrieNode
+{
+	// letters of the entire state name
+	char letter;
+	struct TrieNode* neighbors;
+	struct ContextState* object;
+}TrieNodee;
+
+
 typedef struct ContextState
 {
-		// int** is for finding neighbors stored inside a hash table
 		char* name;
+
+		int** neighbors;
+		int* neighbors_count;
 
 		struct ContextState** start_children;
 		int* start_children_hash;
@@ -77,10 +90,11 @@ typedef struct ContextState
 		int string_p_size;
 
 		float** _float_p;
-		int _float_p_size;		
-		
+		int _float_p_size;
 		
 }ContextState;
+
+
 /*
 typedef struct Names
 {
@@ -160,6 +174,13 @@ ht_hash_table* appendParentHash(ht_hash_table* states,
 ht_hash_table* appendChildHash(ht_hash_table* states,
 							   const char* node,
 							   const char* child);
+char** setLink(int* size, char** names, const char* other_node);
+
+void appendLink(ht_hash_table* states,
+							   const char* node,
+							   const char* child,
+							   int attribute);
+
 
 
 #endif

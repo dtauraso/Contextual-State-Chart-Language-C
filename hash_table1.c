@@ -11,6 +11,8 @@ void ht_insert(ht_hash_table* ht, const char* key, ContextState* value);
 void* ht_search(ht_hash_table* ht, const char* key);
 void ht_delete(ht_hash_table* h, const char* key);
 ContextState* duplicate(ContextState* item);
+void printState(ContextState* node);
+
 
 static ht_item* ht_new_item(const char* k, ContextState* v)
 {
@@ -104,9 +106,12 @@ static ht_hash_table* ht_new_sized(const int base_size)
 static int ht_hash(const char* s, const int a, const int m)
 {
 	long hash = 0;
+				//printf("%i\n", hash);
+
 	const int len_s = strlen(s);
 	for(int i = 0; i < len_s; i++)
 	{
+
 		hash += (long) pow(a, len_s - (i+1)) * s[i];
 		hash = hash % m;
 	}
@@ -114,13 +119,23 @@ static int ht_hash(const char* s, const int a, const int m)
 }
 static int ht_get_hash(const char* s, const int num_buckets, const int attempt)
 {
+	//"root_1a500610", 53, 241218,    3, 52,   3
+	// seeds are the same but s is forcing results that result in an infinite loop
+	// is the loop item specific or table instance specific?
+	// the infinite loop is item specific
 	const int hash_a = ht_hash(s, HT_PRIME_1, num_buckets);
+
 	const int hash_b = ht_hash(s, HT_PRIME_2, num_buckets);
-	return (hash_a + (attempt * (hash_b + 1)) % num_buckets);
+	printf("%s, %i, %i,    %i, %i,   %i\n", s, num_buckets, attempt, hash_a, hash_b,
+		(hash_a + (attempt * (hash_b + 1))) % num_buckets);
+
+	return (hash_a + (attempt * (hash_b + 1))) % num_buckets;
 }
 void printHash(ht_hash_table* ht)
 {
-	printf("size = %i, count = %i, base = %i\n", ht->size, ht->count, ht->base_size);
+	//printf("got here\n");
+	printf("size = %i, count = %i, base = %x\n", ht->size, ht->count, ht->base_size);
+	//printf("starting to search\n");
 	//printf("%i\n", &HT_DELETED_ITEM);
 	for(int i = 0; i < ht->size; i++)
 	{
@@ -128,7 +143,10 @@ void printHash(ht_hash_table* ht)
 		//printf("%x\n", ht->items[i]);
 		if(ht->items[i] != 0)
 		{
-			printf("%i %s\n\n", i,  ht->items[i]->key);
+			printf("key: %s ", ht->items[i]->key);
+			printState(ht->items[i]->value);
+			printf("\n");
+			//printf("%i %s\n\n", i,  ht->items[i]->key);
 
 		}
 		else
@@ -176,9 +194,20 @@ static void ht_resize_down(ht_hash_table* ht)
 	const int new_size = ht->base_size / 2;
 	ht_resize(ht, new_size);
 }
+bool canItemBeChained(const char* key)
+{
+	// runs first 2 hash attempts and if they are different return true
+	// else return false
+}
 
 void ht_insert(ht_hash_table* ht, const char* key, ContextState* value)
 {
+	// prove if the item can't be chained then use linear probing
+	// if(canItemBeChained(key))
+	// do what we are doing already
+	// else
+	// do linear probing
+	// the double hash formula 
 	//printf("insert\n");
 	const int load = ht->count * 100 / ht->size;
 	//printf("load = %i\n", load);
@@ -193,28 +222,44 @@ void ht_insert(ht_hash_table* ht, const char* key, ContextState* value)
 	ht_item* item = ht_new_item(key, value);
 
 	int index = ht_get_hash(item->key, ht->size, 0);
-	//printf("location = %i\n", index);
+	printf("location = %i\n", index);
 	ht_item* cur_item = ht->items[index];
 
-	//printf("%i %i\n\n", index, ht->items[index]);
-
+	printf("%i %x  table size %i\n\n", index, ht->items[index], ht->size);
+	printf("item to insert 2\n");
+	printState(item->value);
 	int i = 1;
 	while (cur_item != NULL)
 	{
+		/*
+			1 8
+			2 8
+			3 8
+			4 8
+			5 8
+			6 8
+			7 8
+			8 8
+			9 8
+			10 8
+			11 8
+			12 8
+			13 8
+
+		*/
+		printf("%i %i\n", i, index);
 		if(cur_item != &HT_DELETED_ITEM)
 		{
 			if(strcmp(cur_item->key, key) == 0)
 			{
-				// if value and cur_item->value are the same object
-				// then add to table
-				if(value == cur_item->value)
-				{
-					ht_del_item(cur_item);
-					ht->items[index] = item;
-					// prove item has been stored successfully
+				
+				ht_del_item(cur_item);
+				ht->items[index] = item;
+				// prove item has been stored successfully
+				printf("done inserting\n");
 
 				return;
-				}
+
 				
 			}
 		}
@@ -225,7 +270,7 @@ void ht_insert(ht_hash_table* ht, const char* key, ContextState* value)
 
 	ht->items[index] = item;
 	//printf("%i %s\n\n", index, result->name);
-	//printf("done inserting\n");
+	printf("done inserting\n");
 	//printf("%i %s\n\n", index, ht->items[index]->key);
 
 	ht->count++;
@@ -256,11 +301,21 @@ int getIndexOfKey(ht_hash_table* ht, const char* key)
 	// can't find anything
 	return -1;
 }
+/*
+typedef struct
+{
+	ht_item* item;
+	int location_in_table;
+}item_found;
+*/
+// return last index used and the entry found
 void* ht_search(ht_hash_table* ht, const char* key)
 {
 	//printf("searching for %s\n", key);
+	//printf("%i\n", ht->size);
 	int index = ht_get_hash(key, ht->size, 0);
-
+	//printf("here\n");
+	//printf("index = %i\n", index);
 
 	ht_item* item = ht->items[index];
 

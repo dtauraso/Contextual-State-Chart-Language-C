@@ -7,7 +7,6 @@
 #include "hash_table1.h"
 
 
- ht_hash_table* ht_new();
 
 
 char* getNextWord(char* input, int i)
@@ -19,15 +18,15 @@ char* getNextWord(char* input, int i)
 	{
 		return NULL;
 	}
-	while(input[i+j] != '\n')
+	while(input[i + j] != '\n')
 	{
-		//printf("%c ", input[i+j]);
+		//printf("%c ", input[i + j]);
 
 		j++;
-		count ++;
+		count++;
 	}
 	//printf("character count %i\n", count);
-	char* word = malloc(sizeof(char) * j);
+	char* word = malloc(sizeof(char) * j );
 	//printf("%i\n", j);
 	memcpy(word, input + i, j);
 	word[j] = '\0';
@@ -39,12 +38,24 @@ char* getNextWord(char* input, int i)
 	*/
 	return word;
 }
+char* surroundByQuotes(char* word_from_input)
+{
+	int size = strlen(word_from_input);
+	int new_size = size + 2;
+	char* word_surrounded_by_quotes = malloc(sizeof(char) * new_size);
+
+	word_surrounded_by_quotes[0] = '\"';
+	memcpy(word_surrounded_by_quotes + 1, word_from_input, sizeof(char) * size);
+	word_surrounded_by_quotes[new_size - 1] = '\"';
+	word_surrounded_by_quotes[new_size] = '\0';
+	return word_surrounded_by_quotes;
+}
 int countTabs(char* input, int i)
 {
 	int k = 0;
 	//printf("|%x|\n", input[i+k]);
 	// this 't' is actually invisable from Atom when used as a tab character
-	while(input[i+k] == '\t')
+	while(input[i + k] == '\t')
 		k++;
 	return k;
 }
@@ -119,6 +130,13 @@ void swap(int* a, int* b)
 	*a = *b;
 	*b = *a;
 }
+void printHash(ht_hash_table* ht);
+
+void appendLink(ht_hash_table* states,
+			    const char* node,
+				const char* other_node, // child node or parent node
+				int attribute);
+
 // pointer to string saved as a name
 void doubleLink(ContextState* parent, ContextState* child)
 {
@@ -130,16 +148,21 @@ void doubleLink(ContextState* parent, ContextState* child)
 
 
 }
-void doubleLinkHash(ht_hash_table* input_states, int parent, int child)
+/*
+void doubleLinkHash(ht_hash_table* input_states, const char* parent, const char* child)
 {
+	//printf("%s <=> %s\n", parent, child);
+	//printHash(input_states);
 
-	input_states = appendParentHash(input_states, child, parent);
-	printf("here\n");
+	//input_states = appendParentLink(input_states, child, parent);
+	appendLink(input_states, child, parent, 1); // 1 == parents
 
-	input_states = appendChildHash(input_states, parent, child);
-	printf("here 2\n");
+	//printf("here\n");
 
-}
+	appendLink(input_states, parent, child, 0); // 0 == children
+	//printf("here 2\n");
+
+}*/
 int countLines(char* input)
 {
 	int num_lines = 0;
@@ -151,91 +174,11 @@ int countLines(char* input)
 	}
 	return num_lines;
 }
-ht_hash_table* appendParentHash(ht_hash_table* states,
-								const char* node,
-							    const char* parent);
-ht_hash_table* appendChildHash(ht_hash_table* states,
-							   const char* node,
-							   const char* child);
 
-void ht_insert(ht_hash_table* ht, const char* key, const void* value);
-int getIndexOfKey(ht_hash_table* ht, const char* key);
-void* ht_search(ht_hash_table* ht, const char* key);
-void printHash(ht_hash_table* ht);
 
-char getHexLetter(int hex_value)
-{
-	switch(hex_value)
-	{
-		case 0:
-			return '0';
-		case 1:
-			return '1';
-		case 2:
-			return '2';
-		case 3:
-			return '3';
-		case 4:
-			return '4';
-		case 5:
-			return '5';
-		case 6:
-			return '6';
-		case 7:
-			return '7';
-		case 8:
-			return '8';
-		case 9:
-			return '9';
-		case 10:
-			return 'a';
-		case 11:
-			return 'b';
-		case 12:
-			return 'c';
-		case 13:
-			return 'd';
-		case 14:
-			return 'e';
-		case 15:
-			return 'f';
-		default:
 
-			return 'x';
-	}
-}
-// the address of the object will be appended to end of object's name
-// to enforce uniqueness in the hash table
-char* convertAddressToCString(ContextState* item)
-{
-	int value = (int) item;
-	int size = 8;
-	int i = 0;
+void printState(ContextState* node);
 
-	char* address_string = malloc(sizeof(char) * size);
-	memset(address_string, 1, sizeof(char) * size);
-
-	address_string[size] = '\0';
-	if(value == 0)
-	{
-		memset(address_string, 0, sizeof(char) * size);
-		return address_string;
-	}
-
-	while(value != 0xffffffff)
-	{
-
-		int hex_value = value & 0x0000000f;
-
-		address_string[size - 1 - i] = getHexLetter(hex_value);
-
-		value = value >> 4;
-		if(value == 0)
-			break;
-		i++;
-	}
-	return address_string;
-}
 // 2 hash tables
 // each input name + object name -> object holding the name
 // parse tree each name part -> waypoint object or object holding data
@@ -243,140 +186,50 @@ char* convertAddressToCString(ContextState* item)
 // 1 tri tree for the name part chain to the object holding data, so auto-enumerating
 // new states is simple
 
-char* combineNameAndObjectAddress(char* name, ContextState* address_in)
-{
-	char* address = convertAddressToCString(address_in);
-	// x = name without surrounding quotes
-	// returns '\"' + x + '_' + address + '\"'
-	unsigned size_of_name = strlen(name);
-	unsigned size_of_address = strlen(address);
-	int new_size = size_of_name + size_of_address + 1;
 
-	char* combined_name_and_object_address = malloc(sizeof(char) * new_size);
-
-	// insert x
-	memcpy(combined_name_and_object_address + 1,
-		   name + 1,
-		   sizeof(char) * (size_of_name - 2) );
-
-
-	combined_name_and_object_address[0] = '\"';
-	combined_name_and_object_address[size_of_name - 1] = '_';
-
-	// insert address
-	memcpy(combined_name_and_object_address + size_of_name,
-		   address,
-		   sizeof(char) * size_of_address);
-
-	combined_name_and_object_address[new_size - 1] = '\"';
-	combined_name_and_object_address[new_size] = '\0';
-
-	return combined_name_and_object_address;
-
-
-
-
-
-}
 ContextState* makeTree(char* input)
 {
 	// needs the input to end on a newline after the last collectable text
 	// there can't be any lines with only indents
+
 	int current_indent = 0;
 	int next_indent = 0;
 	int i = 0;
 	int num_lines = countLines(input);
-	ht_hash_table* input_states = ht_new();
-	//printf("%s\n %i\n", input, i);
-	// this is so the we can traverse above nodes in the tree that have data
-	// from input
-	// something is wrong with adding and searching the hash table
+
 	ContextState* dummy_dummy_root = initContextState();
-	// when setting strings for ContextState I seem to have to save them as "\"" + name + "\"" or the string may resizes itself and puts in garbage chars
-	// the hash table(ht_hash_table) seems to be immune to this
-	// object is fine, but the entry in the table didn't save the name right
-	// combineNameAndObjectAddress("\"dummy_dummy_root\"",
-								// convertAddressToCString(dummy_dummy_root)
-	// = \"dummy_dummy_root_65434fd\"
-	// the surrounding quotes are to keep the string from being resized based on characters
-	// at the end
-	// adding "_" + address_of_object guarantees each entry is unique
-	char* name_and_address = combineNameAndObjectAddress("\"dummy_dummy_root\"",
-														 dummy_dummy_root);
-	printf("%s\n", name_and_address);
-	//exit(0);
-	dummy_dummy_root = setName(dummy_dummy_root, name_and_address);
-	printf("from original object %s\n", dummy_dummy_root->name);
+	dummy_dummy_root = setName(dummy_dummy_root, "\"dummy_dummy_root\"");
 
-
-	// append the address of object to the end of the state name to enforce uniquness
-	// insert to table under "dummy_dummy_root"
-	ht_insert(input_states, name_and_address, dummy_dummy_root);
-	printf("passing\n");
-	/*printf("testing\n");
-	printHash(input_states);
-	printf("done testing\n");
-	*/
-
-	ContextState* test1 = (ContextState*) ht_search(input_states, name_and_address);
-	printf("test1 %s %x\n", test1->name, test1);
-	
-
-	//int dummy_dummy_root_hash = getIndexOfKey(input_states, "\"dummy_dummy_root\"");
 
 	ContextState* dummy_root = initContextState();
-	// insert to table under "dummy_root"
+
 	dummy_root = setName(dummy_dummy_root, "\"dummy_root\"");
-
-
-	ht_insert(input_states, "\"dummy_root\"", dummy_root);
-	// maybe inserting another item causes the original index to be invalid because the table gets updated
-	//int dummy_root_hash = getIndexOfKey(input_states, "\"dummy_root\"");
 
 
 
 	ContextState* root = initContextState();
+
 	root = setName(root, "\"root\"");
 
-	ht_insert(input_states, "\"root\"", root);
-	ContextState* test2 = (ContextState*) ht_search(input_states, name_and_address);
-	printf("test2 %s\n", test2->name);
 
 	ContextState* parent = root;
-	//int parent_hash = getIndexOfKey(input_states, "root");
 
-	int child_hash;
 	ContextState* child;
-	// now have to 
-	printf("%i\n", sizeof(struct ContextState));
-
-	exit(0);
-	//ContextState* test2 = (ContextState*) ht_search(input_states, "dummy_root");
-
-	//printf("%s\n", test1->name);
-	//printf("%s\n", test2->name);
 
 
 	doubleLink(dummy_dummy_root, dummy_root);
 
 	doubleLink(dummy_root, parent);
 
-	// error here
-	//doubleLinkHash(input_states, dummy_dummy_root_hash, dummy_root_hash);
-	//doubleLinkHash(input_states, dummy_root_hash, parent_hash);
-
-	// need a parent pointer and a child pointer
-	// have the parent and child already set up before the loop starts
 	char* word = getNextWord(input, i);
+
 	parent = setName(parent, word);
 
 	i += strlen(word) + 1;
+
 	next_indent = countTabs(input, i);
 	i += next_indent;
 	free(word);
-	//printf("indents current %i, next %i\n", current_indent, next_indent);
-
-	// swap(&current_indent, &next_indent);
 
 	// assuming there will be 1 state and 1 child
 	if(next_indent > current_indent)
@@ -385,36 +238,21 @@ ContextState* makeTree(char* input)
 		child = initContextState();
 		child = setName(child, word);
 
-		//ht_insert(input_states, word, child);
-		//child_hash = getIndexOfKey(input_states, word);
 		doubleLink(parent, child);
-		//doubleLinkHash(input_states, parent_hash, child_hash);
-		//next_indent = countTabs(input, i);
-		//printf("child%s\n", child->name[0]);
-		//next_indent = countTabs(input, i);
-		//printf("indents current %i, next %i\n", current_indent, next_indent);
 
-		//printf("|%c|\n", input[i]);
 		i += strlen(word) + 1;
-		//printf("|%c|\n", input[i]);
+
 		next_indent = countTabs(input, i);
 
 		i += next_indent;
 
-		//next_indent = countTabs(input, i);
 
 		swap(&current_indent, &next_indent);
 
 		free(word);
 
 	}
-	//printTree(parent, 0);
-	//i++;
-	//next_indent = countTabs(input, i);
-	//printf("indents current %i, next %i\n", current_indent, next_indent);
 
-	//printf("%lu\n", sizeof(struct ContextState));
-	//printf("|%c|\n", input[i]);
 
 	// input[i] should be first char of 3rd word
 	int count = 0;
@@ -529,6 +367,104 @@ char* collectChars(jsmntok_t token, const char* input)
 
 }
 /*
+typedef struct TrieNode
+{
+	// letters of the entire state name
+	char letter;
+	struct TrieNode* neighbors;
+	struct ContextState* object;
+}TrieNodee;
+
+name:
+string
+|name|
+array
+|["states", "state"]|
+string
+|states|
+string
+|state|
+array string string
+
+
+next:
+string
+|nexts|
+array
+|[]|
+array([])
+
+start children:
+string
+|start_children|
+array
+|[["names", "0"]]|
+array
+|["names", "0"]|
+string
+|names|
+string
+|0|
+
+array array string string
+
+array array string string ... array string ...
+
+first array
+	[]
+	done
+1, nth array
+	strings
+	if string == children
+		done
+if first array
+	if next token == []
+		done
+while(true)
+	if next token == string
+		has string
+		if token.strings != keyword
+			collect
+		else
+			done
+
+children:
+string
+|children|
+array
+|[]|
+
+function name:
+string
+|function_name|
+string
+|returnTrue|
+
+data:
+string
+|data|
+object
+|{"nothing": "null"}|
+string
+|nothing|
+string
+|null|
+
+parents:
+string
+|parents|
+array
+|[["root", "0"]]|
+array
+|["root", "0"]|
+string
+|root|
+string
+|0|
+
+insert the link names into the trie
+the leaf nodes will link to the ContextState object
+
 object is the ContextState
 first array token will be ignored
 array -> []
@@ -547,16 +483,218 @@ makeContextState
 // user can't use "\n" in the state name
 // make a string of entire name[name1\nname2/\n...] -> contextState map
 // then partal name -> contextState (each internal node in the trie is a dummy node, unless a state name is a partial path)
-void makeContextState(jsmntok_t token, ht_hash_table* parsing_graph)
+enum token_types {_primitive, _object, _array, _string};
+char* tokenType(jsmntok_t token)
 {
-	// token is array
-	if(token.type == 2)
+	switch(token.type)
 	{
-		// check array start and end for "[", "]"
-		// if not null
-		// check next item for being an array type
-		// while there are arrays
+		case _primitive:
+			return "primitive";
+		case _object:
+			return "object";
+		case _array:
+			return "array";
+		case _string:
+			return "string";
 	}
+}
+bool tokenIsKeyWord(char* token_string)
+{
+	return ((strcmp(token_string, "function_name") == 0)  	||
+		    (strcmp(token_string, "start_children") == 0) 	||
+		    (strcmp(token_string, "children") == 0)		  	||
+		    (strcmp(token_string, "nexts") == 0)			||
+  		    (strcmp(token_string, "name") == 0)			 	||
+    	    (strcmp(token_string, "parents") == 0)		 	||
+      	    (strcmp(token_string, "data") == 0));
+}
+void arrayOfArrays(int* i, jsmntok_t tokens[], const char* input)
+{
+	// the array token is also [] or [stuff]
+	// current token is at an array
+	// automaticall sets i to the next token
+	jsmntok_t token = tokens[*i];
+	if(token.type != _array) exit(1);
+	//*i += 1;
+	//token = tokens[*i];
+
+	char* token_string = collectChars(token, input);
+	if(strcmp(token_string, "[]") == 0)
+	{
+		printf("empty array\n");
+		*i += 1;
+
+	}
+	else
+	{
+		// current token is at first array in the sequence:
+		// array array strings array strings
+		// array strings not_array
+		if(tokens[ *i ].type 		 == _array &&
+		   tokens[ ( *i ) + 1 ].type == _array)
+		{
+			*i += 1;
+		}
+		while(!tokenIsKeyWord(token_string))
+		{
+
+			if(token.type == _object)
+			{
+				printf("here\n");
+				return;
+			}
+			else if(token.type == _array)
+			{
+				// no data to collect the first time this is run
+				printf("end of last block and start of next block\n");
+
+			}
+			else
+			{
+				printf("%s\n", tokenType(token));
+				printf("	%s\n", token_string);
+				printf("increment insert to trie\n\n");
+
+			}
+
+			
+			
+
+			*i += 1;
+			token = tokens[*i];
+
+			token_string = collectChars(token, input);
+			if(tokenIsKeyWord(token_string))
+			{
+				printf("end of final block\n");
+				printf("rest trie tracker to trie root\n");
+			}
+		}
+	}
+}
+void variable(int* i, jsmntok_t tokens[], const char* input)
+{
+	jsmntok_t token = tokens[*i];
+	if(token.type != _object) exit(1);
+	printf("%s\n", tokenType(token));
+	printf("%s\n", collectChars(token, input));
+	char* token_string = collectChars(token, input);
+	if(strcmp(token_string, "{}") == 0)
+	{
+		printf("empty variable\n");
+		*i += 1;
+	}
+	else
+	{
+		printf("%s\n", token_string);
+		*i += 1;
+		token = tokens[*i];
+		printf("	%s\n", collectChars(token, input));
+		*i += 1;
+		token = tokens[*i];
+		printf("	%s\n", collectChars(token, input));
+		*i += 1;
+	}
+
+}
+void makeContextState(int* i, jsmntok_t tokens[], const char* input, int token_count)
+{
+	printf("object to run |%s|\n", collectChars(tokens[*i], input));
+
+	jsmntok_t token = tokens[*i];
+	printf("%s\n", tokenType(token));
+	if(token.type != _object) exit(1);
+	*i += 1;
+	token = tokens[*i];
+	//printf("%s\n", tokenType(token));
+	if(token.type != _string) exit(1);
+	*i += 1;
+	token = tokens[*i];
+	//printf("%s\n", tokenType(token));
+	arrayOfArrays(i, tokens, input);
+	// tokens[i] == "nexts"
+	token = tokens[*i];
+
+	//printf("%s\n", collectChars(token, input));
+	printf("%s\n", collectChars(token, input));
+
+	// at keyword now
+	*i += 1;
+	token = tokens[*i];
+	printf("%s\n", tokenType(token));
+	arrayOfArrays(i, tokens, input);
+
+
+	token = tokens[*i];
+
+	//printf("%s\n", collectChars(token, input));
+	printf("%s\n", collectChars(token, input));
+	// at keyword now
+	*i += 1;
+	token = tokens[*i];
+	printf("%s\n", tokenType(token));
+	arrayOfArrays(i, tokens, input);
+
+
+	token = tokens[*i];
+
+	//printf("%s\n", collectChars(token, input));
+	printf("%s\n", collectChars(token, input));
+	// at keyword now
+	*i += 1;
+	token = tokens[*i];
+	printf("%s\n", tokenType(token));
+	arrayOfArrays(i, tokens, input);
+	token = tokens[*i];
+	printf("%s\n", tokenType(token));
+	printf("%s\n", collectChars(token, input));
+
+
+	*i += 1;
+	token = tokens[*i];
+	printf("%s\n", tokenType(token));
+	printf("%s\n", collectChars(token, input));
+
+	*i += 1;
+	token = tokens[*i];
+	printf("%s\n", tokenType(token));
+	printf("%s\n", collectChars(token, input));
+
+	*i += 1;
+	token = tokens[*i];
+	variable(i, tokens, input);
+	printf("done with variable\n");
+	token = tokens[*i];
+	printf("%s\n", collectChars(token, input));
+
+	*i += 1;
+	token = tokens[*i];
+	printf("%s\n", tokenType(token));
+	arrayOfArrays(i, tokens, input);
+	// now we are at the next object
+	printf("next\n");
+	//*i += 1;
+	// may be out of tokens
+	if(*i < token_count)
+	{
+		token = tokens[*i];
+		printf("done %i\n", *i);
+	}
+	
+	//if(token.type != _array) exit(1);
+	//printf("%s\n", collectChars(token, input));
+	/*
+	if first array
+	if next token == []
+		done
+	while(true)
+	if next token == string
+		has string
+		if token.strings != keyword
+			collect
+		else
+			done
+	*/
 }
 int main(int argc, char** argv)
 {
@@ -601,30 +739,43 @@ int main(int argc, char** argv)
 		} jsmntype_t;
 
 	*/
-	/*
-	for(int i = 0; i < parsing_results; i++)
+	printf("%i\n", _primitive);
+	for(int i = 0; i < parsing_results;)
 	{
 		int json_type = tokens[i].type;
 		if(json_type == 0)
 		{
 			printf("primitive\n");
+			 i++;
 		}
 		else if(json_type == 1)
 		{
-			printf("object\n");
+			//printf("object to run %i\n", i);
+			//printf("|%s|\n", collectChars(tokens[i], parsing_graph));
+
+			makeContextState(&i, tokens, parsing_graph, parsing_results);
+			if(i >= parsing_results)
+			{
+				break;
+			}
+
+			//exit(2);
+
 		}
 		else if(json_type == 2)
 		{
 			printf("array\n");
+			 i++;
 		}
 		else if(json_type == 3)
 		{
 			printf("string\n");
+			 i++;
 		}
 
-		printf("|%s|\n", collectChars(tokens[i], parsing_graph));
+		//printf("|%s|\n", collectChars(tokens[i], parsing_graph));
 	}
-	*/
+	
 	// loop untill hit object
 	// call makeContextState on object
 	/*
@@ -635,7 +786,7 @@ int main(int argc, char** argv)
 						 unsigned int num_tokens) {
 	*/
 
-	ht_hash_table* parsing_states = ht_new();
+	//ht_hash_table* parsing_states = ht_new();
 
 
 	return 0;
