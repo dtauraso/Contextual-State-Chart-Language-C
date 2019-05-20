@@ -508,6 +508,8 @@ bool tokenIsKeyWord(char* token_string)
     	    (strcmp(token_string, "parents") == 0)		 	||
       	    (strcmp(token_string, "data") == 0));
 }
+// each function consuming tokens advance the index
+// to the token for the next function
 void arrayOfArrays(int* i, jsmntok_t tokens[], const char* input)
 {
 	// the array token is also [] or [stuff]
@@ -543,10 +545,13 @@ void arrayOfArrays(int* i, jsmntok_t tokens[], const char* input)
 				printf("here\n");
 				return;
 			}
+			// blocks 0 to n-1
 			else if(token.type == _array)
 			{
 				// no data to collect the first time this is run
 				printf("end of last block and start of next block\n");
+				printf("rest trie tracker to trie root\n");
+
 
 			}
 			else
@@ -564,6 +569,7 @@ void arrayOfArrays(int* i, jsmntok_t tokens[], const char* input)
 			token = tokens[*i];
 
 			token_string = collectChars(token, input);
+			// block n
 			if(tokenIsKeyWord(token_string))
 			{
 				printf("end of final block\n");
