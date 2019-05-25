@@ -1,7 +1,159 @@
 #include "state3.h"
-#include "hash_table1.h"
-void* ht_search(ht_hash_table* ht, const char* key);
-void* getValueAt(ht_hash_table* ht, int i);
+char* makeSpaces(int indent_level);
+
+/*
+typedef struct StringNode
+{
+	char* word;
+	struct StringNode* next;
+}StringNode;
+
+typedef struct List
+{
+	void* first;
+	void* last;
+	bool void_is_string_node;
+
+	int count
+}List;
+
+*/
+/*
+typedef struct LispNode
+{
+	void* value;
+	struct LispNode* next;
+
+	int count_of_value_items;
+	bool value_type;
+}*/
+enum data_types{is_list, is_string, is_empty_case};
+
+void printLispNodes(LispNode* root, int indent_level)
+{
+	//LispNode* root_list = (LispNode*) root->value;
+	//printf("%x\n", root);
+	// can't seem to get the last list
+	if(root != NULL)
+	{
+
+		// root could have a list in value or a string
+		// each node containing a string points to the next one
+		if(root->value_type == is_string)
+		{
+			//printf("indent level %i\n", indent_level);
+			//printf("|%s|\n", makeSpaces(indent_level));
+			if(root->value != NULL)
+			{
+				char* string = (char*) root->value;
+				printf("%s%s\n", makeSpaces(indent_level), string);
+			
+				printLispNodes(root->next, indent_level);
+
+			}	
+		}
+		else if(root->value_type == is_list)
+		{
+			// visiting a list of lists
+			printf("list\n");
+			LispNode* list_of_lists_tracker = root;
+			LispNode* list_of_strings = (LispNode*) root->value;
+			int count = 0;
+			while(list_of_lists_tracker != NULL && list_of_strings != NULL)
+			{
+				printf("%i\n", count);
+
+				printLispNodes(list_of_strings, indent_level + 1);
+				list_of_lists_tracker = list_of_lists_tracker->next;
+				if(list_of_lists_tracker == NULL)
+						break;
+				list_of_strings = (LispNode*) list_of_lists_tracker->value;
+				count++;
+			}
+		}
+		
+	}
+
+	
+}
+LispNode* cons(void* data, void* link, int data_type)
+{
+	LispNode* new_ob = malloc(sizeof(LispNode));
+	new_ob->value = data;
+	new_ob->next = link;
+	//printf("void link %i\n", link);
+	//printf("void data %i\n", data);
+	
+	/*if(data_type == is_string)
+	{
+		char* x = (char*) new_ob->value;
+		printf("saved string %s\n", x);
+	}*/
+	if(data_type == is_list)
+		new_ob->value_type = is_list;
+	else if(data_type == is_string)
+		new_ob->value_type = is_string;
+	else if(data_type == is_empty_case)
+		new_ob->value_type = is_empty_case;
+	return new_ob;
+
+}
+LispNode* makeLispNode()
+{
+	LispNode* node = malloc(sizeof(LispNode));
+	node->value = NULL;
+	node->next = NULL;
+	node->count_of_value_items = 0;
+
+	node->value_type = 2;
+
+
+	// not valid anymore
+	// char* = 0
+	// LispNode* = 1
+
+	// unset = 2
+	return node;
+}
+
+LispNode* setValueToList(LispNode* list_a, LispNode* list_b)
+{
+	if(list_b->value_type == 2)
+	{
+		list_a->value = list_b;
+		list_a->count_of_value_items = 1;
+		list_a->value_type = 1;
+		list_a->next = makeLispNode();
+
+	}
+
+	return list_a;
+}
+LispNode* setValueToString(LispNode* list, char* word)
+{
+	if(list->value_type == 2)
+	{
+		list->value = strdup(word);
+		printf("SAVED VALUE %s\n", list->value);
+		list->count_of_value_items = 1;
+		list->value_type = 0;
+		list->next = makeLispNode();
+
+
+	}
+	return list;
+}
+/*
+LispNode* appendList(LispNode* root, LispNode* list_a, LispNode* list_b)
+{
+	// assume root -> list_a
+	// grow the list, don't nest it
+	list_a->value = list_b;
+	root->count_of_value_items++;
+	list_a->next = makeLispNode();
+	return root;
+}
+*/
 
 
 ContextState* duplicate(ContextState* item)
@@ -157,7 +309,7 @@ ContextState* appendChild(ContextState* node, ContextState* child)
 	//memcpy(node->parents, parent, 1);
 	return node;
 }
-
+/*
 char** setLink(int* size, char** names, const char* other_node)
 {
 	// case 0 works
@@ -192,48 +344,4 @@ char** setLink(int* size, char** names, const char* other_node)
 	// not sure why we need to return names or segfault
 	return names;
 }
-//enum doubly_linked_attribues {children, parents};
-/*
-void appendLink(ht_hash_table* states,
-			    const char* node,
-				const char* other_node, // child node or parent node
-				int attribute)
-{
-	// node -> other_node
-	//printf("append other_node\n");
- 	//printf("appending 2 %s <=> %s\n", node, other_node);
-	//printHash(states);
-	ContextState* other_node_state = (ContextState*) ht_search(states, other_node);
-	ContextState* node_state = (ContextState*) ht_search(states, node);
-	//printf("%i\n", node_state);
-	//printf("%i\n", node_state->children_size);
-	//printf("%s\n", node_state->name);
-	//printf("node is valid\n");
-
-	// attribute == children
-	if(attribute == 0)
-	{
-		//printf("setting children\n");
-		// setLink(&node_state->children_size, node_state->children_names, other_node);
-		node_state->children_names = setLink(&node_state->children_size, node_state->children_names, other_node);
-		//printf("saved\n");
-		//printf("name saved: %s\n", node_state->children_names[0]);
-
-		//printState(node_state);
-
-	}
-	else
-	{
-		//printf("setting parents\n");
-		// setLink(&node_state->parents_size, node_state->parents_names, other_node);
-		node_state->parents_names = setLink(&node_state->parents_size, node_state->parents_names, other_node);
-		//printf("saved\n");
-		//printf("name saved: %s\n", node_state->parents_names[0]);
-		//printState(node_state);
-
-
-	}
-
-	// if it returns the table the table gets corrupted
-	//return states;
-}*/
+*/

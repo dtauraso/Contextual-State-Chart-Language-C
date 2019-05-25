@@ -4,24 +4,45 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "hash_table1.h"
 
 
 enum stack_types{char_p_p, struct_context_state_p_p};
-typedef struct Stack
+
+
+/*
+char*** lists_of_list_of_char_p
+int count
+
+
+char** list_of_char_p
+int count
+*/
+typedef struct LispNode
 {
-	void** container;
-	int size;
-	int last_pos;
-	bool is_char_p_p;
-	bool is_struct_context_state_p_p;
-}Stack;
-Stack* setup(int type_value);
-Stack* insert(Stack* stack, void* item);
+	void* value;
+	struct LispNode* next;
 
-// typedef only seems to let me use "ContextState" outside the struct definition
+	int count_of_value_items;
+	int value_type;
+}LispNode;
+
+// for collecting a list of lists of strings for ContextState
+typedef struct StringNode
+{
+	char* word;
+	struct StringNode* next;
+}StringNode;
+
+typedef struct List
+{
+	void* first;
+	void* last;
+	bool void_is_string_node;
+	int count;
+}List;
 
 
+// for storing the name -> ContextState map
 typedef struct TrieNode
 {
 	// letters of the entire state name
@@ -30,6 +51,16 @@ typedef struct TrieNode
 	struct ContextState* object;
 }TrieNodee;
 
+
+typedef struct TrieTree
+{
+	struct TrieNode* root;
+	struct TrieNode* insert_tracker;
+
+}TrieTree;
+
+
+// typedef only seems to let me use "ContextState" outside the struct definition
 
 typedef struct ContextState
 {
@@ -70,7 +101,7 @@ typedef struct ContextState
 		int nexts_size;
 
 		// tri tree for partial state name matches(can match only 1 name at a time)
-		ht_hash_table* tri_children;
+		struct TrieNode* tri_children;
 
 		// the next level from name's perspective
 
@@ -168,18 +199,10 @@ ContextState* initContextState();
 ContextState* setName(ContextState* node, char* name);
 ContextState* appendParent(ContextState* node, ContextState* parent);
 ContextState* appendChild(ContextState* node, ContextState* parent);
-ht_hash_table* appendParentHash(ht_hash_table* states,
-								const char* node,
-							    const char* parent);
-ht_hash_table* appendChildHash(ht_hash_table* states,
-							   const char* node,
-							   const char* child);
-char** setLink(int* size, char** names, const char* other_node);
+LispNode* cons(void* data, void* link, int data_type);
 
-void appendLink(ht_hash_table* states,
-							   const char* node,
-							   const char* child,
-							   int attribute);
+//char** setLink(int* size, char** names, const char* other_node);
+
 
 
 
