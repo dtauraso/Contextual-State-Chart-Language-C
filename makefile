@@ -10,10 +10,14 @@ include_and_c_files2 = state3.c state3.h main.c jsmn.c jsmn.h
 object_files2 = state3.o main.o jsmn.o
 
 
+include_and_c_files3 = testing.c state3.c state3.h
+object_files3 = state3.o testing.o
 
 %.o:%.c $(include_and_c_files2)
 	gcc $< -c
 
+%.o:%.c $(include_and_c_files3)
+	gcc $< -c
 
 #state2.o: state2.c state2.h
 #	gcc state2.c -c
@@ -24,12 +28,17 @@ object_files2 = state3.o main.o jsmn.o
 state_machine.x: $(object_files2)
 
 	gcc $(object_files2) -o state_machine.x
+testing.x: $(object_files3)
+
+	gcc $(object_files3) -o testing.x
 
 run:
 	-make clean
 	#g++ main.c -o state_machine.x
 	-make state_machine.x
+	#-make testing.x
 	#-./state_machine.x input.txt
-	-./state_machine.x parsing_tree.json calculator_example.txt
+	-./state_machine.x parsing_tree_copy.json calculator_example.txt
+	#-./testing.x parsing_tree.json calculator_example.txt
 clean:
 	-rm *.o *.x

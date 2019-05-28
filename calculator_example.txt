@@ -58,12 +58,21 @@ root
 									0
 							first contex
 								Data
-									"output"
+									"output"	
 					expression
 						input
 							12345
 							"+"
 							65432
+						storage
+							0
+								int
+									Data
+										12345
+							1
+								string
+									Data
+										"+"
 		-split
 			Function
 				returnTrue

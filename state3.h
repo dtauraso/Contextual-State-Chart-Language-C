@@ -22,8 +22,10 @@ typedef struct LispNode
 	void* value;
 	struct LispNode* next;
 
-	int count_of_value_items;
 	int value_type;
+	int count;
+	int call_count;
+
 }LispNode;
 
 // for collecting a list of lists of strings for ContextState
@@ -45,9 +47,11 @@ typedef struct List
 // for storing the name -> ContextState map
 typedef struct TrieNode
 {
-	// letters of the entire state name
-	char letter;
-	struct TrieNode* neighbors;
+
+	char* word;
+	struct TrieNode** neighbors;
+	int neighbors_count;
+
 	struct ContextState* object;
 }TrieNodee;
 
@@ -55,11 +59,39 @@ typedef struct TrieNode
 typedef struct TrieTree
 {
 	struct TrieNode* root;
-	struct TrieNode* insert_tracker;
 
 }TrieTree;
 
+typedef struct NamesSize
+{
+	char** names;
+	int size;
 
+}NamesDelimiterLocations;
+
+typedef struct ListNames
+{
+	struct NamesSize* full_name;
+	int size;
+}ListNames;
+typedef struct ListOfNames
+{
+
+	int list_of_names_size;  // put here cause altering list_of_names messes it up
+	char*** list_of_names;
+	int* names_sizes;
+
+
+
+}ListOfNames;
+
+typedef struct NeighborNames
+{
+	char** list_of_names;
+	int* start_names;
+}NeighborNames;
+// can't group it like this
+// need to think by letter than by word
 // typedef only seems to let me use "ContextState" outside the struct definition
 
 typedef struct ContextState
@@ -72,8 +104,9 @@ typedef struct ContextState
 		struct ContextState** start_children;
 		int* start_children_hash;
 
-		char** start_children_names;
-		int start_children_size;
+		char*** start_children_list_of_names;
+		int* start_children_names_sizes;
+		int list_of_names_size;
 
 		struct ContextState** parents;
 		int* parents_hash;
@@ -182,24 +215,25 @@ typedef struct ContextState1
 		
 		
 }ContextState1;
+*/
 typedef struct Data
 {
 	int type_id; // enum
 
-	int** _int_p;
+	int* _int_p;
 	int _int_p_size;
 
 	char** _string_p;
 	int string_p_size;
 
-	float** _float_p;
+	float* _float_p;
 	int _float_p_size;
-};*/
+}Data;
 ContextState* initContextState();
 ContextState* setName(ContextState* node, char* name);
 ContextState* appendParent(ContextState* node, ContextState* parent);
 ContextState* appendChild(ContextState* node, ContextState* parent);
-LispNode* cons(void* data, void* link, int data_type);
+LispNode* cons(void* data, void* link, int data_type, int count, int call_count);
 
 //char** setLink(int* size, char** names, const char* other_node);
 

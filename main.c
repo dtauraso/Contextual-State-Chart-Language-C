@@ -514,11 +514,13 @@ LispNode* setValueToList(LispNode* list_a, LispNode* list_b);
 LispNode* setValueToString(LispNode* list, char* word);
 LispNode* appendList(LispNode* root, LispNode* list_a, LispNode* list_b);
 enum data_types{is_list, is_string, is_empty_case};
-LispNode* cons(void* data, void* link, int data_type);
+LispNode* cons(void* data, void* link, int data_type, int count, int call_count);
 void printLispNodes(LispNode* root, int indent_level);
 
+// for reading the token sequence the json parsing api provides
 
-LispNode* strings(int* i, jsmntok_t tokens[], const char* input, int number_of_strings_left)
+//////////////
+LispNode* strings(int* i, jsmntok_t tokens[], const char* input, int number_of_strings_left, int call_count)
 {
 	jsmntok_t current_token = tokens[*i];
 	char* current_string = collectChars(current_token, input);
@@ -529,7 +531,7 @@ LispNode* strings(int* i, jsmntok_t tokens[], const char* input, int number_of_s
 		//printf("type %s\n", tokenType(current_token));
 		//printf("last case keword\n");
 		*i += 1;
-		return cons(current_string, NULL, is_string);
+		return cons(current_string, NULL, is_string, 0, call_count);
 	}
 	
 	else //if(current_token.type == _string)
@@ -537,20 +539,32 @@ LispNode* strings(int* i, jsmntok_t tokens[], const char* input, int number_of_s
 		//printf("got here 2\n %s\n", current_string);
 
 		*i += 1;
-		LispNode* x = cons(current_string, strings(i, tokens, input, number_of_strings_left - 1), is_string);
+		LispNode* n = strings(i, tokens, input, number_of_strings_left - 1, call_count + 1);
+		printf("total count %i\n", n->call_count);
+		LispNode* x = cons(current_string,
+						   n,
+						   is_string,
+						   0,
+						   n->call_count);
+		// how many more items from this one?
 		//printLispNodes(x, 1);
 		return x;
 	}
 	
 }
-
-LispNode* array(int* i, jsmntok_t tokens[], const char* input)
+// record # of total calls
+LispNode* array(int* i, jsmntok_t tokens[], const char* input, int call_count)
 {
+
+
+	// count # of calls to obtain a total # of strings in adition to counting how many strings in each list
+	// return a lisp style linked list holding the strings collected
+
 	jsmntok_t current_token = tokens[*i];
 	if(current_token.type != _array)  	// error
 	{
 		//printf("we have a problem\n");
-		return cons(NULL, NULL, is_empty_case);
+		return cons(NULL, NULL, is_empty_case, 0, call_count);
 	}
 	//printf("number of nested items %i\n", current_token.size);
 	// null array
@@ -558,7 +572,7 @@ LispNode* array(int* i, jsmntok_t tokens[], const char* input)
 	{
 		// done with all inner arrays and outer arrays
 		//printf("null array\n");
-		return cons(NULL, NULL, is_empty_case);
+		return cons(NULL, NULL, is_empty_case, 0, call_count);
 	}
 	
 	*i += 1;
@@ -568,14 +582,14 @@ LispNode* array(int* i, jsmntok_t tokens[], const char* input)
 	if(current_token.type != _string)
 	{
 		//printf("we have a problem\n");
-		return cons(NULL, NULL, is_empty_case);
+		return cons(NULL, NULL, is_empty_case, 0, call_count);
 	}
-	LispNode* string_coll = strings(i, tokens, input, items_in_array);
+	LispNode* string_coll = strings(i, tokens, input, items_in_array, call_count + 1);
+	//string_coll->count = items_in_array;
 	// token is o keyword or array
 	//printf("%i, %i\n", *i, max_tokens);
 	//if(*i >= max_tokens)
 	//	return cons(string_coll, NULL, is_list);
-
 	current_token = tokens[*i];
 	//printf("array or keyword %s\n", tokenType(current_token));
 
@@ -584,76 +598,30 @@ LispNode* array(int* i, jsmntok_t tokens[], const char* input)
 
 		//printf("at keyword\n");
 		//printf("%s %s\n", tokenType(current_token), collectChars(current_token, input));
-
-		return cons(string_coll, NULL, is_list);
+		// setting the number of items in string_coll would not be meaningfull
+		return cons(string_coll, NULL, is_list, items_in_array, string_coll->call_count);
 	}
 	else if(current_token.type == _array)  // end of inner array, still in object
 	{
-		return cons(string_coll, array(i, tokens, input), is_list);
+		//printf("items in array %i\n", items_in_array);
+		LispNode* x = array(i, tokens, input, string_coll->call_count);
+		return cons(string_coll, x, is_list, items_in_array, x->call_count);
 	}
 	else  // end of object
 	{
-		return cons(string_coll, NULL, is_list);
+		//printf("items in array %i\n", items_in_array);
+		// setting the number of items in string_coll would not be meaningfull
+		return cons(string_coll, NULL, is_list, items_in_array, string_coll->call_count);
 	}
 
 	//printf("got here object\n");
 
 }
-/*
-(cons data link_to_next_item)
-cons(void* data, void* link, int data_type)
+void printNodes2(LispNode* root);
 
-	new_ob->data = data
-	new_ob->link = link
-
-	data_type is list
-		new_op->data_type = list
-	data_type is string
-		new_op->data_type = string
-	data_type is empty case
-		new_op->data_type = empty case
-	return new_op
-
-
-trying to reduce the possibilities of tricky mistakes
-for array strings repeat
-root = (cons string_coll array() is_list)
-	array()
-		if current token is not array
-			return
-
-		if not string
-			if array
-				if array == "[]"
-					list_collection.advance()
-					string_collection_tracker = list_collection->value
-					return (cons null null is_empty_case)
-			else
-				return failure
-		i++
-
-		string_coll = call strings
-		if current token is array
-			array()
-			return (cons string_coll array() is_list)
-
-	strings(token, &list_collection, &string_collection, &i)
-		if keyword (past last array) or array (past last string in current array)
-			list_collection = collect string_collection
-			list_collection.advance()
-			string_collection_tracker = list_collection->value
-
-			return (cons string null is_string)
-		else if string
-			string_collection = collect string
-			string_collection.advance()
-			strings(token, &list_collection, &string_collection, &i)
-			return (cons string nextString() is_string)
-
-*/
 // each function consuming tokens advance the index
 // to the token for the next function
-void /*struct List**/ arrayOfArrays(int* i,
+LispNode* arrayOfArrays(int* i,
 				   jsmntok_t tokens[],
 				   const char* input)
 {
@@ -672,20 +640,7 @@ void /*struct List**/ arrayOfArrays(int* i,
 		}List;
 
 	*/
-	// test a fake linked list
-		/*
-	LispNode* linked_list = makeLispNode();
-	LispNode* linked_list_tracker = linked_list;
-	linked_list_tracker = setValueToString(linked_list_tracker, "test 1");
 
-	linked_list_tracker->next = makeLispNode();
-	linked_list_tracker = linked_list_tracker->next;
-	linked_list_tracker = setValueToString(linked_list_tracker, "test 2");
-
-	printf("%s, %s\n", ((char*) linked_list->value), (char*) linked_list_tracker->value);
-	printLispNodes(linked_list);
-	*/
-	//exit(1);
 	// the array token is also [] or [stuff]
 	// current token is at an array
 	// automaticall sets i to the next token
@@ -707,56 +662,90 @@ void /*struct List**/ arrayOfArrays(int* i,
 		// current token is at first array in the sequence:
 		// array array strings array strings
 		// array strings not_array
-		printf("%s\n", tokenType(tokens[ ( *i ) ]));
-
+		//printf("%s\n", tokenType(tokens[ ( *i ) ]));
+		//printf("number of nested items %i\n", tokens[ ( *i ) ].size);
+		int items_in_array = tokens[ ( *i ) ].size;
+		// for the top level, we want to record a size of 1 for the container of n lists
+		int items_in_high_level = 1;
 		if(tokens[ *i ].type 		 == _array &&
 		   tokens[ ( *i ) + 1 ].type == _array)
 		{
 			*i += 1;
+			items_in_high_level = items_in_array;
 		}
-		printf("%s\n", tokenType(tokens[ ( *i ) ]));
+		//printf("items in outer array %i\n", items_in_array);
+		//printf("%s\n", tokenType(tokens[ ( *i ) ]));
+		// inner cons for the array of lists count
+		// outer cons to tell the difference from a list of lists of strings and a list of strings
+		LispNode* x = array(i, tokens, input, 0);
+		root = cons(cons(x, NULL, is_list, items_in_array, x->call_count), NULL, is_list, items_in_high_level, x->call_count);
+		//root->count = items_in_array;
+		//printf("items at top level %i\n", root->count);
 
-		LispNode* root_of_chain = array(i, tokens, input);
-		//*i += 1;
-		printLispNodes(root_of_chain, 1);
+		printNodes2(root);
 
-		// (cons "number" (cons "0" (cons "76543" null)))
-		//LispNode* test = cons("indent_number", cons("0", cons("76543", NULL, is_string), is_string), is_string);
-		//cons("number", cons("0", cons("76543", NULL, is_string), is_string), is_string);
-		/*
-		printf("testing\n");
-		char* first = (char*) test->value;
-		printf("%s\n", first);
+		//printLispNodes(root->value, 1);
 
-		char* second = (char*) ((LispNode*)test->next)->value;
-		printf("%s\n", second);
-
-
-		char* third = (char*) ((LispNode*)((LispNode*)test->next)->next)->value;
-		printf("%s\n", third);
-		printLispNodes(test, 1);
-		*/
-		//exit(1);
-		// array()
-		// array strings array strings
-		// array strings not_array
-
+		
 
 		
 
 	}
-	//return blocks;
+	return root;
 }
-void variable(int* i, jsmntok_t tokens[], const char* input)
+// count backwards from current sequence
+// 0th items, 0
+// n-(n - 1)1th item, 0
+// n-(n-2)th item, 1
+// n-(n-3)th item, 2
+// ...
+// nth item, |delimiter_indicies|
+// call stack evaluation order
+// f(name3, (NULL, [0, 0])) => (name3, [0, 0])
+// f(name2, (name3, [0, 0])) => (name2_name3, [5, 0])
+// f(name1, (name2_name3, [5, 0])) => (name1_name2_name3, [5, 11])
+/*
+ith_call counts down
+ith_call_revers counts up
+f(nth_name, f_name_delimiter_loc, ith_call, ith_call_reverse)
+	if(f_name_delimiter_loc.f_name == NULL)
+		return (nth_name, delimiter_loc.set(zeros, size = ith_call_reverse - 1))
+	else
+		new_name = concat(nth_name, "_", f_name_delimiter_loc.f_name)
+		if(ith_call <= 1)  second to last and last calls
+			index = 0
+		else
+			index = ith_call - 1
+		f_name_delimiter_loc[index] = |nth_name| + 1
+		return(new_name, f_name_delimiter_loc))
+*/
+Data* variable(int* i, jsmntok_t tokens[], const char* input)
 {
 	jsmntok_t token = tokens[*i];
 	if(token.type != _object) exit(1);
 	//printf("%s\n", tokenType(token));
 	//printf("%s\n", collectChars(token, input));
 	char* token_string = collectChars(token, input);
+	/*
+	typedef struct Data
+	{
+	int type_id; // enum
+
+	int* _int_p;
+	int _int_p_size;
+
+	char** _string_p;
+	int string_p_size;
+
+	float* _float_p;
+	int _float_p_size;
+	}Data;
+	*/
+	Data* variable = malloc(sizeof(Data));
+
 	if(strcmp(token_string, "\"{}\"") == 0)
 	{
-		printf("empty variable\n");
+		//printf("empty variable\n");
 		*i += 1;
 	}
 	else
@@ -764,19 +753,52 @@ void variable(int* i, jsmntok_t tokens[], const char* input)
 		printf("%s\n", token_string);
 		*i += 1;
 		token = tokens[*i];
+		char* type_name = collectChars(token, input);
+
 		printf("	%s\n", collectChars(token, input));
 		*i += 1;
 		token = tokens[*i];
+		char* data = collectChars(token, input);
 		printf("	%s\n", collectChars(token, input));
 		*i += 1;
+		if(strcmp(type_name, "\"int\"") == 0)
+		{
+			int integer;
+			sscanf(data, "%i", &integer);
+			variable->_int_p = malloc(sizeof(int));
+			variable->_int_p = &integer;
+			variable->_int_p_size = 1;
+			variable->type_id = 0;
+		}
+		else if(strcmp(type_name, "\"string\"") == 0)
+		{
+			variable->_string_p = malloc(sizeof(char*));
+			variable->_string_p = &data;
+			variable->string_p_size = 1;
+			variable->type_id = 1;
+		}
+		else if(strcmp(type_name, "\"float\"") == 0)
+		{
+			float float_value;
+			sscanf(data, "%f", &float_value);
+			variable->_float_p = malloc(sizeof(float));
+			variable->_float_p = &float_value;
+			variable->_float_p_size = 1;
+			variable->type_id = 1;
+
+		}
 	}
+	return variable;
 
 }
+//////////
+
+
+
 void makeContextState(int* i, jsmntok_t tokens[], const char* input, int token_count)
 {
 	printf("object to run |%s|\n", collectChars(tokens[*i], input));
 	//TrieTree* name_context_state = makeDict();
-	ContextState* current_state = initContextState();
 	jsmntok_t token = tokens[*i];
 	//printf("%s\n", tokenType(token));
 	if(token.type != _object) exit(1);
@@ -787,33 +809,24 @@ void makeContextState(int* i, jsmntok_t tokens[], const char* input, int token_c
 	*i += 1;
 	token = tokens[*i];
 	//printf("%s\n", tokenType(token));
-	arrayOfArrays(i, tokens, input);
-			printf("got here\n");
+	printf("name\n");
+	LispNode* name = arrayOfArrays(i, tokens, input);
+	//printf("got here\n");
 
 	// tokens[i] == "nexts"
 	token = tokens[*i];
 
-	printf("%s\n", collectChars(token, input));
-		printf("%s\n", tokenType(token));
+	//printf("%s\n", collectChars(token, input));
+	//printf("%s\n", tokenType(token));
 
 	//printf("%s\n", collectChars(token, input));
 
-	// at keyword now
-	*i += 1;
-	token = tokens[*i];
-	printf("%s\n", tokenType(token));
-	arrayOfArrays(i, tokens, input);
-
-	token = tokens[*i];
-
-	//printf("%s\n", collectChars(token, input));
-	//printf("%s\n", collectChars(token, input));
 	// at keyword now
 	*i += 1;
 	token = tokens[*i];
 	//printf("%s\n", tokenType(token));
-	arrayOfArrays(i, tokens, input);
-
+	printf("nexts\n");
+	LispNode* nexts = arrayOfArrays(i, tokens, input);
 
 	token = tokens[*i];
 
@@ -823,7 +836,20 @@ void makeContextState(int* i, jsmntok_t tokens[], const char* input, int token_c
 	*i += 1;
 	token = tokens[*i];
 	//printf("%s\n", tokenType(token));
-	arrayOfArrays(i, tokens, input);
+	printf("start children\n");
+	LispNode* start_children = arrayOfArrays(i, tokens, input);
+
+
+	token = tokens[*i];
+
+	//printf("%s\n", collectChars(token, input));
+	//printf("%s\n", collectChars(token, input));
+	// at keyword now
+	*i += 1;
+	token = tokens[*i];
+	//printf("%s\n", tokenType(token));
+	printf("children\n");
+	LispNode* children = arrayOfArrays(i, tokens, input);
 
 	token = tokens[*i];
 	//printf("%s\n", tokenType(token));
@@ -833,6 +859,7 @@ void makeContextState(int* i, jsmntok_t tokens[], const char* input, int token_c
 	*i += 1;
 	token = tokens[*i];
 	//printf("%s\n", tokenType(token));
+	char* function_name = collectChars(token, input);
 	printf("function name %s\n", collectChars(token, input));
 
 	*i += 1;
@@ -842,7 +869,7 @@ void makeContextState(int* i, jsmntok_t tokens[], const char* input, int token_c
 
 	*i += 1;
 	token = tokens[*i];
-	variable(i, tokens, input);
+	Data* variable_from_json_dict = variable(i, tokens, input);
 	printf("done with variable\n");
 	token = tokens[*i];
 	//printf("%s\n", collectChars(token, input));
@@ -851,10 +878,19 @@ void makeContextState(int* i, jsmntok_t tokens[], const char* input, int token_c
 	token = tokens[*i];
 	printf("before arrayOfArrays %s\n", tokenType(token));
 
-	arrayOfArrays(i, tokens, input);
+	LispNode* parents = arrayOfArrays(i, tokens, input);
+	/*
+	ContextState* current_state = makeFullContextState(
+		nexts,
+		start_children,
+		children,
+		function_name,
+		variable_from_json_dict,
+		parents);
+	*/
 	// now we are at the next object
 	printf("next\n");
-	//*i += 1;
+
 	// may be out of tokens
 	if(*i < token_count)
 	{

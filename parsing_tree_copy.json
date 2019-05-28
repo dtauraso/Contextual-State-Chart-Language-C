@@ -17,6 +17,6 @@
                        ["new_parent"]],
     "function_name":  "returnTrue",
     "data":           {"int": "0"},
-    "parents":        []
+    "parents":        [["root"], ["0"]]
   }
 ]
