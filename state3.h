@@ -88,7 +88,9 @@ typedef struct ListOfNames
 typedef struct NeighborNames
 {
 	char** list_of_names;
+	int number_of_names;
 	int* start_names;
+	int number_of_start_names;
 }NeighborNames;
 // can't group it like this
 // need to think by letter than by word

@@ -96,8 +96,77 @@ void printLispNodes(LispNode* root, int indent_level)
 
 	
 }
+void deleteLispNodes(LispNode* root)
+{
+	//LispNode* root_list = (LispNode*) root->value;
+	//printf("%x\n", root);
+	// can't seem to get the last list
+	if(root != NULL)
+	{
+
+		// root could have a list in value or a string
+		// each node containing a string points to the next one
+		if(root->value_type == is_string)
+		{
+			//printf("indent level %i\n", indent_level);
+			//printf("|%s|\n", makeSpaces(indent_level));
+			if(root->value != NULL)
+			{
+				//printf("%s%s\n", makeSpaces(indent_level), string);
+				// returns NamesSize*
+				deleteLispNodes(root->next);
+				if(root->value != NULL)
+				{
+					free(root->value);
+				}
+				if(root->next != NULL)
+				{
+					free(root->next);
+					//free(root);  // temp's value from call in while loop
+				}
+			}
+
+		}
+		else if(root->value_type == is_list)
+		{
+			// visiting a list of lists
+			//printf("list\n");
+			LispNode* list_of_lists_tracker = root;
+			LispNode* list_of_strings = (LispNode*) root->value;
+			int count = 0;
+			while(list_of_lists_tracker != NULL && list_of_strings != NULL)
+			{
+				//printf("%i\n", count);
+				//printf("count %i\n", list_of_lists_tracker->count);
+				// doesn't return anything to use
+				deleteLispNodes(list_of_strings);
+				LispNode* temp = list_of_lists_tracker;
+				list_of_lists_tracker = list_of_lists_tracker->next;
+
+				if(list_of_lists_tracker == NULL)
+						break;
+				list_of_strings = (LispNode*) list_of_lists_tracker->value;
+				
+				if(temp->value != NULL)
+				{
+					free(temp->value);
+
+				}
+				if(temp != NULL)
+				{
+					free(temp);
+				}
+				count++;
+			}
+		}
+		
+	}
+
+	
+}
+
 // list of lists -> lisp chain -> char pointers
-void printNodes2(LispNode* root)
+NeighborNames* printNodes2(LispNode* root)
 {
 	/*
 	typedef struct ListOfNames
@@ -109,7 +178,7 @@ void printNodes2(LispNode* root)
 	}ListOfNames;
 
 	*/
-	printf("PRINTING\n");
+	//printf("PRINTING\n");
 	// assume root has 2 levels of strings and 1 level of root
 	if(root != NULL)
 	{
@@ -143,16 +212,30 @@ void printNodes2(LispNode* root)
 			if i > j
 				done
 
+		
+		typedef struct NeighborNames
+		{
+			char** list_of_names;
+			int number_of_names;
+			int* start_names;
+			int number_of_start_names;
+		}NeighborNames;
 		*/
-		printf("total = %i\n", root->call_count);
-		ListOfNames* list_of_words = malloc(sizeof(ListNames));
-		list_of_words->list_of_names = malloc(sizeof(char**) * root->count);
-		memset(list_of_words->list_of_names, 0, sizeof(char**) * root->count);
-		list_of_words->names_sizes = malloc(sizeof(int));
-		memset(list_of_words->names_sizes, 0, sizeof(int) * root->count);
+		//printf("total = %i\n", root->call_count);
+		NeighborNames* names = malloc(sizeof(NeighborNames));
+		names->list_of_names = malloc(sizeof(char*) * root->call_count);
+		names->number_of_names = root->call_count;
+		names->number_of_start_names = root->count;
+
+		//ListOfNames* list_of_words = malloc(sizeof(ListNames));
+		//list_of_words->list_of_names = malloc(sizeof(char**) * root->count);
+		//memset(list_of_words->list_of_names, 0, sizeof(char**) * root->count);
+		//list_of_words->names_sizes = malloc(sizeof(int));
+		//memset(list_of_words->names_sizes, 0, sizeof(int) * root->count);
 		//LispNode* n = NULL;
 		LispNode* list_of_lists_tracker = root->value;
 		int count = list_of_lists_tracker->count;
+		/*
 		if(root->count == 1)
 		{
 			// list of strings
@@ -160,101 +243,70 @@ void printNodes2(LispNode* root)
 
 			// wrong
 			// 1 list of words
-			list_of_words->names_sizes[0] = 1;
+			//list_of_words->names_sizes[0] = 1;
 			// 1 list holding 1 list of words
-			list_of_words->list_of_names_size = 1;
+			//list_of_words->list_of_names_size = 1;
 		}
 		else
 		{
 			printf("list of lists of strings %i\n", root->count);
 
-			list_of_words->list_of_names_size = list_of_lists_tracker->count;
-			printf("count %i\n", list_of_words->list_of_names_size);
 			//list_of_words->list_of_names_size = list_of_lists_tracker->count;
-		}
+			//printf("count %i\n", list_of_words->list_of_names_size);
+			//list_of_words->list_of_names_size = list_of_lists_tracker->count;
+		}*/
 		//printf("list_of_words->list_of_names_size 2 %i\n", list_of_words->list_of_names_size);
+		names->start_names = malloc(sizeof(int) * root->count);
+		names->start_names[0] = 0;
+		int k = 0;
 
-
-		printf("# of items %i\n", count);
+		//printf("# of items %i\n", count);
 		//printf("type %s\n", lispNodeType(list_of_lists_tracker->value_type));
 
 		list_of_lists_tracker = (LispNode*) list_of_lists_tracker->value;
 		int i = 0;
 		while(list_of_lists_tracker != NULL && i < root->count)
 		{
-			printf("# of sub items LIST %i: %i, %i\n", list_of_lists_tracker->count, i, root->count);
-			//printf("type %s\n", lispNodeType(list_of_lists_tracker->value_type));
-			//list_of_words->names_sizes[i] = 0;
+			//printf("# of sub items LIST %i: %i, %i\n", list_of_lists_tracker->count, i, root->count);
 
-			list_of_words->list_of_names[i] = malloc(sizeof(char*) * list_of_lists_tracker->count/*what goes here*/);
-			//memset(list_of_words->list_of_names[i], 0,  list_of_lists_tracker->count);
-
-
-			// [0][3] = [2][0]
-			// (i, j) => (0, k)
-			// i*j
-			// root->count * ith list_of_lists_tracker->count
-			//printf("here\n");
 			LispNode* list_of_strings_tracker = list_of_lists_tracker->value;
 			int j = 0;
 			// char* list_of_string_collected = f(list_of_strings_tracker, list_of_words->list_of_names[i])
 			while(list_of_strings_tracker != NULL && j < list_of_lists_tracker->count)
 			{
-				//printf("# of sub sub items %i\n", list_of_strings_tracker->count);
-				//printf("type %s\n", lispNodeType(list_of_strings_tracker->value_type));
-
-				//list_of_words->names_sizes[i] = 
-				// still on the char**
-				// not actually at the char* or the char
-				list_of_words->list_of_names[i][j] = malloc(sizeof(char) * strlen(list_of_strings_tracker->value));
-				//memset(list_of_words->list_of_names[i][j], 0, sizeof(char));
-				//list_of_words->list_of_names[i][j] = list_of_strings_tracker->value; //malloc(sizeof(char) * strlen(list_of_strings_tracker->value));
-				// setting it after above line to prevent the mess up
-				printf("		%s: %i\n", list_of_strings_tracker->value, j);
-				printf("		%i, %i\n", i, j);
-				printf("		%x\n", list_of_words->list_of_names[i][j]);
-				//printf()
-				memcpy(list_of_words->list_of_names[i][j],
-					list_of_strings_tracker->value,
-					sizeof(char) * strlen(list_of_strings_tracker->value));
-				printf(" name found %x\n", list_of_words->list_of_names[i][j]);
-
-				//printf("		%s\n", list_of_words->list_of_names[i][j]);
-
+				
+				//printf("		%i, %i\n", i, j);
+				names->list_of_names[k] = malloc(sizeof(char) * strlen(list_of_strings_tracker->value));
+				memcpy(	names->list_of_names[k],
+						list_of_strings_tracker->value,
+						sizeof(char) * strlen(list_of_strings_tracker->value));
 				list_of_strings_tracker = list_of_strings_tracker->next;
 
 				j++;
-				printf("j incremented %i\n", j);
-				printf(" name found 2 %x\n", list_of_words->list_of_names[0][0]);
+				k++;
 
 			}
-			printf(" name found 3 %x\n", list_of_words->list_of_names[0][0]);
 
-			//printf("list_of_words->list_of_names_size 4 %i\n", list_of_words->list_of_names_size);
-
-			list_of_words->names_sizes[i] = list_of_lists_tracker->count;
-			//printf("size %i\n", list_of_words->names_sizes[i]);
 
 			list_of_lists_tracker = list_of_lists_tracker->next;
 			// don't want the size to increase if there is nothing there
 			// not quite it yet
 			if(list_of_lists_tracker != NULL)
 			{
-				//list_of_words->list_of_names_size += 1;
-				//break;
 				i++;
-				printf("i incremented %i\n", i);
-				printf("		%i, %i\n", i-1, j-1);
+				if(root->count == 1)
+				{
 
-				printf(" name found 4 %x\n", list_of_words->list_of_names[0][0]);
+				}
+				else
+				{
+					names->start_names[i] = k;
+
+				}
 
 			}
 			else
 			{
-				printf("i incremented %i\n", i);
-				printf("		%i, %i\n", i, j-1);
-
-				printf(" name found 4 %x\n", list_of_words->list_of_names[0][0]);
 
 				break;
 			}
@@ -263,82 +315,51 @@ void printNodes2(LispNode* root)
 
 		}
 		/*
+		for(int i = 0; i < root->count; i++)
+		{
+			printf("%i, %i\n", i, names->start_names[i]);
+		}
+		for(int i = 0; i < root->call_count; i++)
+		{
+			printf("%s ", names->list_of_names[i]);
+		}
+		printf("\n\n");
+
+		printf("printing lists\n");
+		for(int i = 0, j = 0; i < root->call_count; i++)
+		{
+			if(i == 0 && j == 0)
+			{
+				printf("start of list\n");
+			}
+
+			//printf("%i, %i\n", i, j);
+			if(i != 0)
+			{
+				if(i == names->start_names[j+1])
+				{
+					j++;
+					printf("start of list\n");
+
+				}
+			}
+			printf("%s\n", names->list_of_names[i]);
+
+		}
+		printf("\n\n");
+		*/
+		/*
 		char*** list_of_names;
 		int* names_sizes;
 		int list_of_names_size;
 		*/
-		printf("list_of_words->list_of_names_size ::: %i\n", list_of_words->list_of_names_size);
-		// erased after setting it?
-		//printf(" name found again %s\n", list_of_words->list_of_names[0][0]);
-
-		for(int k = 0; k < list_of_words->list_of_names_size; k++)
-		{
-			//printf("%i\n", list_of_words->names_sizes[k]);
-			
-			for(int l = 0; l < list_of_words->names_sizes[k]; l++)
-			{
-				printf("%i, %i\n", k, l);
-				//printf("|%s|\n", list_of_words->list_of_names[k][l]);
-			}
-		}
 		
-		
-	}
-	printf("DONE PRINTING\n");
-}
-void collectNodes2(LispNode* root)
-{
-	
-	//printf("PRINTING\n");
-	// assume root has 2 levels of strings and 1 level of root
-	if(root != NULL)
-	{
-		ListOfNames* list_of_words = malloc(sizeof(ListNames));
-		//LispNode* n = NULL;
-		if(root->count == 1)
-		{
-			// list of strings
-			printf("list of strings %i\n", root->count);
-			list_of_words->list_of_names = malloc(sizeof(char**) * root->count);
-			memset(list_of_words->list_of_names, 0, sizeof(char**) * root->count);
-			//n = root->value;
-		}
-		else
-		{
-			printf("list of lists of strings %i\n", root->count);
-			//n = root->value;
-		}
-		LispNode* list_of_lists_tracker = root->value;
-		int count = list_of_lists_tracker->count;
-		printf("# of items %i\n", count);
-		//printf("type %s\n", lispNodeType(list_of_lists_tracker->value_type));
-
-		list_of_lists_tracker = (LispNode*) list_of_lists_tracker->value;
-
-		while(list_of_lists_tracker != NULL)
-		{
-			printf("# of sub items LIST %i\n", list_of_lists_tracker->count);
-			//printf("type %s\n", lispNodeType(list_of_lists_tracker->value_type));
-			LispNode* list_of_strings_tracker = list_of_lists_tracker->value;
-			if(list_of_strings_tracker != NULL)
-			{
-				while(list_of_strings_tracker != NULL)
-				{
-					//printf("# of sub sub items %i\n", list_of_strings_tracker->count);
-					//printf("type %s\n", lispNodeType(list_of_strings_tracker->value_type));
-					printf("		%s\n", list_of_strings_tracker->value);
-					list_of_strings_tracker = list_of_strings_tracker->next;
-
-				}
-			}
-
-			list_of_lists_tracker = list_of_lists_tracker->next;
-		}
-		
-		
+		return names;	
 	}
 	//printf("DONE PRINTING\n");
+	return NULL;
 }
+
 
 /*
 void* createContextStateAttribute(LispNode* root, int indent_level)

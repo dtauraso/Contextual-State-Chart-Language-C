@@ -540,7 +540,7 @@ LispNode* strings(int* i, jsmntok_t tokens[], const char* input, int number_of_s
 
 		*i += 1;
 		LispNode* n = strings(i, tokens, input, number_of_strings_left - 1, call_count + 1);
-		printf("total count %i\n", n->call_count);
+		//printf("total count %i\n", n->call_count);
 		LispNode* x = cons(current_string,
 						   n,
 						   is_string,
@@ -617,11 +617,12 @@ LispNode* array(int* i, jsmntok_t tokens[], const char* input, int call_count)
 	//printf("got here object\n");
 
 }
-void printNodes2(LispNode* root);
+NeighborNames* printNodes2(LispNode* root);
+void deleteLispNodes(LispNode* root);
 
 // each function consuming tokens advance the index
 // to the token for the next function
-LispNode* arrayOfArrays(int* i,
+NeighborNames* arrayOfArrays(int* i,
 				   jsmntok_t tokens[],
 				   const char* input)
 {
@@ -652,9 +653,11 @@ LispNode* arrayOfArrays(int* i,
 	char* token_string = collectChars(token, input);
 	if(strcmp(token_string, "\"[]\"") == 0)
 	{
-		printf("empty array\n");
+		//printf("empty array\n");
 		*i += 1;
 		// return list;
+
+		return NULL;
 
 	}
 	else
@@ -682,16 +685,17 @@ LispNode* arrayOfArrays(int* i,
 		//root->count = items_in_array;
 		//printf("items at top level %i\n", root->count);
 
-		printNodes2(root);
+		 NeighborNames* list_of_list_of_names = printNodes2(root);
+		 deleteLispNodes(root);
 
 		//printLispNodes(root->value, 1);
 
 		
+		return list_of_list_of_names;
 
 		
 
 	}
-	return root;
 }
 // count backwards from current sequence
 // 0th items, 0
@@ -793,7 +797,40 @@ Data* variable(int* i, jsmntok_t tokens[], const char* input)
 }
 //////////
 
+void printListOfListsOfStrings(NeighborNames* names)
+{
+	if(names != NULL)
+	{
+		printf("printing lists\n");
+		for(int i = 0, j = 0; i < names->number_of_names; i++)
+		{
+			if(i == 0 && j == 0)
+			{
+				printf("start of list\n");
+			}
 
+			//printf("%i, %i\n", i, j);
+			if(i != 0)
+			{
+				if(i == names->start_names[j+1])
+				{
+					j++;
+					printf("start of list\n");
+
+				}
+			}
+			printf("%s\n", names->list_of_names[i]);
+
+		}
+		printf("\n\n");
+	}
+	else
+	{
+		printf("empty list\n");
+		printf("\n\n");
+
+	}
+}
 
 void makeContextState(int* i, jsmntok_t tokens[], const char* input, int token_count)
 {
@@ -810,7 +847,21 @@ void makeContextState(int* i, jsmntok_t tokens[], const char* input, int token_c
 	token = tokens[*i];
 	//printf("%s\n", tokenType(token));
 	printf("name\n");
-	LispNode* name = arrayOfArrays(i, tokens, input);
+	NeighborNames* name = arrayOfArrays(i, tokens, input);
+
+	/*
+	typedef struct NeighborNames
+		{
+			char** list_of_names;
+			int number_of_names;
+			int* start_names;
+			int number_of_start_names;
+		}NeighborNames;
+	*/
+	printListOfListsOfStrings(name);
+	
+	
+	
 	//printf("got here\n");
 
 	// tokens[i] == "nexts"
@@ -826,8 +877,8 @@ void makeContextState(int* i, jsmntok_t tokens[], const char* input, int token_c
 	token = tokens[*i];
 	//printf("%s\n", tokenType(token));
 	printf("nexts\n");
-	LispNode* nexts = arrayOfArrays(i, tokens, input);
-
+	NeighborNames* nexts = arrayOfArrays(i, tokens, input);
+	printListOfListsOfStrings(nexts);
 	token = tokens[*i];
 
 	//printf("%s\n", collectChars(token, input));
@@ -837,8 +888,8 @@ void makeContextState(int* i, jsmntok_t tokens[], const char* input, int token_c
 	token = tokens[*i];
 	//printf("%s\n", tokenType(token));
 	printf("start children\n");
-	LispNode* start_children = arrayOfArrays(i, tokens, input);
-
+	NeighborNames* start_children = arrayOfArrays(i, tokens, input);
+	printListOfListsOfStrings(start_children);
 
 	token = tokens[*i];
 
@@ -849,8 +900,8 @@ void makeContextState(int* i, jsmntok_t tokens[], const char* input, int token_c
 	token = tokens[*i];
 	//printf("%s\n", tokenType(token));
 	printf("children\n");
-	LispNode* children = arrayOfArrays(i, tokens, input);
-
+	NeighborNames* children = arrayOfArrays(i, tokens, input);
+	printListOfListsOfStrings(children);
 	token = tokens[*i];
 	//printf("%s\n", tokenType(token));
 	//printf("%s\n", collectChars(token, input));
@@ -878,7 +929,8 @@ void makeContextState(int* i, jsmntok_t tokens[], const char* input, int token_c
 	token = tokens[*i];
 	printf("before arrayOfArrays %s\n", tokenType(token));
 
-	LispNode* parents = arrayOfArrays(i, tokens, input);
+	NeighborNames* parents = arrayOfArrays(i, tokens, input);
+	printListOfListsOfStrings(parents);
 	/*
 	ContextState* current_state = makeFullContextState(
 		nexts,
