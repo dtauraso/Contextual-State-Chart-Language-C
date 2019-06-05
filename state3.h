@@ -52,9 +52,32 @@ typedef struct TrieNode
 	struct TrieNode** neighbors;
 	int neighbors_count;
 
+	int size; // power of 2
 	struct ContextState* object;
-}TrieNodee;
+}TrieNode;
 
+/*
+dummy node
+		root2->word = NULL;
+		root2->object = NULL;
+		root2->neighbors = malloc(sizeof(TrieNode*) * root->call_count);
+		root2->neighbors_count = 0;
+		root2->size = 0;
+
+*/
+typedef struct TrieNodePackage
+{
+	TrieNode* address;
+	int ith_name_checked_in_search;
+
+}TrieNodePackage;
+
+typedef struct TrieNodePackage2
+{
+	TrieNode* address;
+	bool address_is_match;
+
+}TrieNodePackage2;
 
 typedef struct TrieTree
 {
@@ -95,26 +118,40 @@ typedef struct NeighborNames
 // can't group it like this
 // need to think by letter than by word
 // typedef only seems to let me use "ContextState" outside the struct definition
+typedef struct Data
+{
+	int type_id; // enum
+	/*
+	0 => int
+	1 => string
+	2 => float
 
+	*/
+	int _int;
+
+	char* _string;
+	int string_size;
+
+	float _float;
+}Data;
 typedef struct ContextState
 {
 		char* name;
+		TrieNode* state_name;
 
 		int** neighbors;
 		int* neighbors_count;
 
-		struct ContextState** start_children;
-		int* start_children_hash;
+		TrieNode* start_children;
 
-		char*** start_children_list_of_names;
-		int* start_children_names_sizes;
-		int list_of_names_size;
 
 		struct ContextState** parents;
 		int* parents_hash;
 
 		char** parents_names;
 		int parents_size;
+
+		TrieNode* parents_;
 
 
 		// no recursion, have an indent on/off var in the stack
@@ -129,14 +166,20 @@ typedef struct ContextState
 		char** children_names;
 		int children_size;
 
+		TrieNode* children_;
+
+
 		struct ContextState** nexts;
 		int* nexts_hash;
 
 		char** nexts_names;
 		int nexts_size;
 
+
+		TrieNode* nexts_;
+
 		// tri tree for partial state name matches(can match only 1 name at a time)
-		struct TrieNode* tri_children;
+		//struct TrieNode* tri_children;
 
 		// the next level from name's perspective
 
@@ -147,16 +190,9 @@ typedef struct ContextState
 		bool (*function_pointer)(char* name, void** tree);
 		char* function_pointer_name;
 
-		int type_id; // enum
+		Data* var_data;
 
-		int** _int_p;
-		int _int_p_size;
-
-		char** _string_p;
-		int string_p_size;
-
-		float** _float_p;
-		int _float_p_size;
+		
 		
 }ContextState;
 
@@ -218,19 +254,7 @@ typedef struct ContextState1
 		
 }ContextState1;
 */
-typedef struct Data
-{
-	int type_id; // enum
 
-	int* _int_p;
-	int _int_p_size;
-
-	char** _string_p;
-	int string_p_size;
-
-	float* _float_p;
-	int _float_p_size;
-}Data;
 ContextState* initContextState();
 ContextState* setName(ContextState* node, char* name);
 ContextState* appendParent(ContextState* node, ContextState* parent);

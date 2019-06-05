@@ -1,11 +1,20 @@
 [
+  {
+    "name":           ["states", "state"],
+    "nexts":          [],
+    "start_children": [["names", "0"]],
+    "children":       [],
+    "function_name":  "returnTrue",
+    "data":           {},
+    "parents":        [["root", "0"]]
+  },
     {
     "name":           ["indent_number", "0", "76543"],
     "nexts":          [],
     "start_children": [],
     "children":       [],
     "function_name":  "returnTrue",
-    "data":           {"int": "0"},
+    "data":           {"int": "1234"},
     "parents":        []
   },
   {

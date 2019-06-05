@@ -38,7 +38,7 @@ run:
 	-make state_machine.x
 	#-make testing.x
 	#-./state_machine.x input.txt
-	-./state_machine.x parsing_tree_copy.json calculator_example.txt
+	-./state_machine.x parsing_tree_copy_1.json calculator_example.txt
 	#-./testing.x parsing_tree.json calculator_example.txt
 clean:
 	-rm *.o *.x

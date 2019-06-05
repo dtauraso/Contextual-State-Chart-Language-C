@@ -1,0 +1,13 @@
+[
+  {
+    "name":           ["indent_number", "0", "76543"],
+    "nexts":          [],
+    "start_children": [],
+    "children":       [["child", "nexts"],
+                       ["sibling"],
+                       ["new_parent"]],
+    "function_name":  "returnTrue",
+    "data":           {"int": "0"},
+    "parents":        [["root"], ["0"]]
+  }
+]
