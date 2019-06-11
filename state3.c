@@ -285,18 +285,36 @@ void printTrieNodeTreeFlat(TrieNode* root)
 {
 	// printContextState2 calls this
 	//printf("printing\n");
+
 	TrieNode* root_tracker = root;
 	if(root_tracker != NULL)
 	{
+		//printf("\nabout to print word root_tracker->word %x, root_tracker->neighbors %x\n", root_tracker->word, root_tracker->neighbors);
+
 		if(root_tracker->word != NULL)
 		{
+
 			printf("%s ", root_tracker->word);
 		}
-		if(root_tracker->neighbors != NULL)
+		//printf("neighbors count %i\n", root_tracker->neighbors_count);
+		//printf("tracker size %i\n", root_tracker->size);
+		//printf("neighbors %x\n", root_tracker->neighbors);
+
+		if(root_tracker->neighbors != 0)
 		{
-			//printf("# of neighbors %i\n", root_tracker->neighbors_count);
-			for(int i = 0; i < root_tracker->size; i++)
+			//printf("neighbors 2 %x\n", root_tracker->neighbors);
+
+			// can't check it, doesn't happen all the time, the nodes are set correctly
+			//if(root_tracker->neighbors_count != NULL)
+			//	printf("# of neighbors %i\n", root_tracker->neighbors_count);
+			//else
+			//	printf("no neighbor count\n");
+			//printf("size %i\n", root_tracker->size);
+			//printf("# of neighbors %i, size %i\n", root_tracker->neighbors_count, root_tracker->size);
+			//printf("will the loop happen\n");
+			for(int i = 0; i < root_tracker->neighbors_count; i++)
 			{
+				//printf("%i problem? %i\n", i, root_tracker->size);
 				if(root_tracker->neighbors[i] != NULL)
 				{
 					printTrieNodeTreeFlat(root_tracker->neighbors[i]);
@@ -353,11 +371,11 @@ TrieNode* convertLispChainToTrieNodeChain(LispNode* root)
 			{
 
 				// add word to trie_node_squence_tracker
-				trie_node_squence_tracker->word = malloc(sizeof(char) * strlen(list_of_strings_tracker->value));
+				trie_node_squence_tracker->word = malloc(sizeof(char) * (strlen(list_of_strings_tracker->value) + 1) );
 
 				memcpy(trie_node_squence_tracker->word,
 					   list_of_strings_tracker->value,
-					   sizeof(char) * strlen(list_of_strings_tracker->value));
+					   sizeof(char) * (strlen(list_of_strings_tracker->value) + 1));
 				// to match the parallel states in state charts for version 1, considering doing this
 				// an extra bit
 				// dashed lines for parallel states
@@ -382,10 +400,12 @@ TrieNode* convertLispChainToTrieNodeChain(LispNode* root)
 					TrieNode* new_node = initTrieNodeWithNeighborCount(1);
 					trie_node_squence_tracker->neighbors[0] = new_node;
 					trie_node_squence_tracker->neighbors_count = 1;
+
 					trie_node_squence_tracker = trie_node_squence_tracker->neighbors[0];
 					list_of_strings_tracker = list_of_strings_tracker->next;
 
 				}
+				//printf("size == %i, count == %i\n", trie_node_squence_tracker->size, trie_node_squence_tracker->neighbors_count);
 				j++;
 
 					// if it's last then set trie_node_squence_tracker->neighbors to null 
@@ -420,7 +440,22 @@ TrieNode* convertLispChainToTrieNodeChain(LispNode* root)
 			list_of_lists_tracker = list_of_lists_tracker->next;
 
 			root2->neighbors[i] = trie_node_sequence;
-			root2->neighbors_count++;
+
+			if(root2->neighbors_count == root2->size)
+			{
+				if(root2->size == 0)
+				{
+					root2->size = 1;
+				}
+				else
+				{
+					root2->size = root2->size * 2;
+
+				}
+
+			}
+			root2->neighbors_count += 1;
+			//printf("size 2 == %i, count 2 == %i\n", root2->size, root2->neighbors_count);
 
 			if(list_of_lists_tracker != NULL)
 			{
@@ -436,6 +471,8 @@ TrieNode* convertLispChainToTrieNodeChain(LispNode* root)
 
 
 		}
+		//printf("size 2 == %i, count 2 == %i\n", root2->size, root2->neighbors_count);
+
 		return root2;	
 	}
 	return NULL;

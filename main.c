@@ -700,10 +700,11 @@ TrieNode* arrayOfArrays(int* i,
 		//root->count = items_in_array;
 		printf("items at top level %i\n", root->count);
 
-		 TrieNode* trie_tree_of_names = convertLispChainToTrieNodeChain(root);
+		TrieNode* trie_tree_of_names = convertLispChainToTrieNodeChain(root);
+		printf("conversion complete\n");
 		printTrieNodeTreeFlat(trie_tree_of_names);
-
-		 deleteLispNodes(root);
+		printf("printed\n");
+		deleteLispNodes(root);
 
 		//printLispNodes(root->value, 1);
 
@@ -1277,6 +1278,7 @@ TrieNodePackage* findInTrie(TrieNode* root, NeighborNames* name)
 }
 TrieNodePackage2* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 {
+
 	// sequence_of_strings is the address of the first word in the state name
 	// sequence_of_strings attribute set
 	// word has a word stored
@@ -1443,7 +1445,7 @@ TrieNodePackage2* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 						// ContextState object
 						// the contest state attribute tracker is null because we have no new trie nodes to insert
 						package3->dict_trie_node = package3->dict_trie_node->neighbors[ith_branch];
-						package3->context_state_attribute_trie_node = NULL;
+						//package3->context_state_attribute_trie_node = NULL;
 						//package3->dict_trie_node = package3->dict_trie_node->neighbors;
 
 						/*if(package3->dict_trie_node->word != NULL &&
@@ -1557,17 +1559,22 @@ typedef struct NeighborNames
 */
 TrieNode* appendWord(TrieNode* node, char* ith_name)
 {
+	printf("appendWord\n");
+	// what happens the first time?
+	// size and neighbors_count still being set by compiler
 	if(ith_name != NULL)
 	{
+		// make sure node->neighbors_count > node->size is not happening anywhere these are updated
 		// node->neighbors_count > node->size is wrong
-		printf("neighbors_count %i  node size %i\n", node->neighbors_count, node->size);
+		printf("before size %i, count %i\n",node->size, node->neighbors_count);
 
-		TrieNode** neighbors = node->neighbors;
+		//TrieNode** neighbors = NULL;//node->neighbors;
 		// 
 		// new item was stored at node->neighbors_count + 1 and node->neighbors_count == 0
 		//int neighbors_count = node->neighbors_count + 1;
 		//printf("neighbors_count %i\n", neighbors_count);
 		int sizeof_new_neighbors;
+		// not safely making a trinode*
 		TrieNode** new_neighbors = NULL;
 		if(node->neighbors_count == node->size)
 		{
@@ -1583,20 +1590,19 @@ TrieNode* appendWord(TrieNode* node, char* ith_name)
 
 			}
 			memcpy(new_neighbors,
-			   neighbors,
+			   node->neighbors,
 			   sizeof(TrieNode*) * node->neighbors_count);
 
 		}
 		else if(node->neighbors_count < node->size)
 		{
-			new_neighbors = neighbors;
+			new_neighbors = node->neighbors;
 		}
 		// might be a problem when node->neighbors_count < node->size
 
 		//printf("here\n");
 
 		
-
 
 		// add (k+1)th word
 		//printf("got here\n");
@@ -1613,6 +1619,8 @@ TrieNode* appendWord(TrieNode* node, char* ith_name)
 
 		new_neighbors[node->neighbors_count]->neighbors = NULL;
 		new_neighbors[node->neighbors_count]->object = NULL;
+		new_neighbors[node->neighbors_count]->neighbors_count = 0;
+		new_neighbors[node->neighbors_count]->size = 0;
 
 
 
@@ -1630,6 +1638,8 @@ TrieNode* appendWord(TrieNode* node, char* ith_name)
 			node->neighbors = new_neighbors;
 
 		}
+		printf("after size %i, count %i\n",node->size, node->neighbors_count);
+
 		// will not work
 		// doesn't work if size == 0
 		if(node->neighbors_count == node->size)
@@ -1645,7 +1655,11 @@ TrieNode* appendWord(TrieNode* node, char* ith_name)
 			}
 
 		}
-		node->neighbors_count += 1;
+		if(node->neighbors_count < node->size)
+		{
+			node->neighbors_count += 1;
+
+		}
 		// the node appended to end of array
 		//printf("saved string %s\n", node->neighbors[node->neighbors_count - 1]->word);
 		return node;
@@ -1667,27 +1681,34 @@ TrieNode* appendTrieChain(TrieNode* root, ContextState* state, TrieNode* name)
 
 	while(name_tracker != NULL && root_tracker != NULL)
 	{
-
+		// sometimes the final word can't be added and segfault happens
 		printf("%i\n", count);
 		printf("%s   %s\n", root_tracker->word, name_tracker->word);
-		printf("root_tracker %i, %i\n", root_tracker->size, root_tracker->neighbors_count);
+		printf("before root_tracker %i, %i\n", root_tracker->size, root_tracker->neighbors_count);
 
 		//printf("name_tracker %x\n", name_tracker);
 		//printf("about to append\n");
+		// messed up before this line
+		// messes up on the second x 
 		// not updating root_tracker correctly
 
+		// appending and then root gets ille
 		root_tracker = appendWord(root_tracker, name_tracker->word);
-		//printf("root_tracker %i, %i\n", root_tracker->size, root_tracker->neighbors_count);
+		printf("after root_tracker %i, %i\n", root_tracker->neighbors[root_tracker->neighbors_count - 1]->size, root_tracker->neighbors[root_tracker->neighbors_count - 1]->neighbors_count);
 		//printTrieNodeTree(root, 1);
 		printf("appended\n");
 		if(name_tracker->neighbors != NULL)
 		{
+			// the root has nothing to move to?
+
 			name_tracker = name_tracker->neighbors[0];
 			// go to the last one found
+
 			root_tracker = root_tracker->neighbors[root_tracker->neighbors_count - 1];
 		}
 		else
 		{
+			//printf("problem\n");
 			// no more words left to add so go to the last word added
 			root_tracker = root_tracker->neighbors[root_tracker->neighbors_count - 1];
 			//printf("last word %s\n", root_tracker->word);
@@ -1707,6 +1728,7 @@ TrieNode* appendTrieChain(TrieNode* root, ContextState* state, TrieNode* name)
 // adding a ContextState to a 
 void insert(TrieNode* root, ContextState* state)
 {
+	printf("insert\n");
 	// tracker is always pointing to root
 	TrieNode* root_tracker = root;
 	printf("neighbors_count %i\n", root_tracker->neighbors_count);
@@ -1744,7 +1766,7 @@ void insert(TrieNode* root, ContextState* state)
 
 	else
 	{
-
+		printf("have node data to add\n");
 		// the trackers have already be adjusted acording to their situation
 		TrieNode* dict_trie_node = last_word_index_correctly_matched_package->dict_trie_node;
 		TrieNode* context_state_attribute_trie_node = last_word_index_correctly_matched_package->context_state_attribute_trie_node;
@@ -1760,6 +1782,7 @@ void insert(TrieNode* root, ContextState* state)
 				if(is_first_mismatch)
 				{
 					printf("first mismatch\n");
+					// wrong
 					root_tracker = appendTrieChain(dict_trie_node, state, state->state_name->neighbors[0]);
 
 					//printf("\n\nprint out tree\n");
@@ -1778,7 +1801,7 @@ void insert(TrieNode* root, ContextState* state)
 			else
 			{
 				printf("add as an internal node\n");
-				root_tracker = appendTrieChain(dict_trie_node, state, context_state_attribute_trie_node);
+				root_tracker = appendTrieChain(dict_trie_node, state, NULL);
 			}
 			// x x something
 			// x x isn't being added right
