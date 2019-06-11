@@ -1440,6 +1440,7 @@ TrieNodePackage2* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 						(package3->dict_trie_node->neighbors[ith_branch] 		!= NULL))
 					{
 						package3->dict_trie_node = package3->dict_trie_node->neighbors[ith_branch];
+						package3->context_state_attribute_trie_node = NULL;
 						//package3->dict_trie_node = package3->dict_trie_node->neighbors;
 
 						/*if(package3->dict_trie_node->word != NULL &&
@@ -1741,6 +1742,7 @@ void insert(TrieNode* root, ContextState* state)
 	else
 	{
 
+		// the trackers have already be adjusted acording to their situation
 		TrieNode* dict_trie_node = last_word_index_correctly_matched_package->dict_trie_node;
 		TrieNode* context_state_attribute_trie_node = last_word_index_correctly_matched_package->context_state_attribute_trie_node;
 		//printf("%x, %x\n", dict_trie_node, context_state_attribute_trie_node);
@@ -1773,7 +1775,7 @@ void insert(TrieNode* root, ContextState* state)
 			else
 			{
 				printf("add as an internal node\n");
-				root_tracker = appendTrieChain(dict_trie_node, state, NULL);
+				root_tracker = appendTrieChain(dict_trie_node, state, context_state_attribute_trie_node);
 			}
 			// x x something
 			// x x isn't being added right
