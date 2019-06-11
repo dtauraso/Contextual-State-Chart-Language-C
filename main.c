@@ -1439,6 +1439,9 @@ TrieNodePackage2* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 					if((package3->context_state_attribute_trie_node->neighbors == NULL) 		||
 						(package3->dict_trie_node->neighbors[ith_branch] 		!= NULL))
 					{
+						// advance the dict tracker to the next one because it already matched and will be the location of the next
+						// ContextState object
+						// the contest state attribute tracker is null because we have no new trie nodes to insert
 						package3->dict_trie_node = package3->dict_trie_node->neighbors[ith_branch];
 						package3->context_state_attribute_trie_node = NULL;
 						//package3->dict_trie_node = package3->dict_trie_node->neighbors;
