@@ -288,7 +288,7 @@ int isMatch(char* ith_word, TrieNode* node)
 	return -1;
 }
 
-TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
+TrieNodePackage* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 {
 
 	// sequence_of_strings is the address of the first word in the state name
@@ -323,14 +323,14 @@ TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 		bool need_to_append_more_name;
 	}TrieNodePackage3;
 	*/
-	TrieNodePackage3* package3 = malloc(sizeof(TrieNodePackage3));
+	TrieNodePackage* package = malloc(sizeof(TrieNodePackage));
 
-	package3->dict_trie_node = root;
-	package3->context_state_attribute_trie_node = sequence_of_strings;
+	package->dict_trie_node = root;
+	package->context_state_attribute_trie_node = sequence_of_strings;
 
-	package3->context_state_is_found = NULL;
-	package3->is_first_mismatch = NULL;
-	package3->need_to_append_more_name = NULL;
+	package->context_state_is_found = NULL;
+	package->is_first_mismatch = NULL;
+	package->need_to_append_more_name = NULL;
 
 	//TrieNode* dict_trie_node_prev = root;  // can't be null cause isMatch may return -1
 
@@ -379,7 +379,7 @@ TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 	is_partial_match
 	need_to_append_more_name
 	*/
-	if(package3->dict_trie_node == NULL || package3->context_state_attribute_trie_node == NULL)
+	if(package->dict_trie_node == NULL || package->context_state_attribute_trie_node == NULL)
 	{
 		// return null package
 		return NULL;
@@ -394,8 +394,8 @@ TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 	1, 0
 	*/
 	int i = 0;
-	while(package3->dict_trie_node != NULL &&
-		  package3->context_state_attribute_trie_node != NULL)
+	while(package->dict_trie_node != NULL &&
+		  package->context_state_attribute_trie_node != NULL)
 	{
 		/*
 		if(package3->dict_trie_node->word != NULL &&
@@ -406,12 +406,12 @@ TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 		}
 		*/
 		// first time the root's neighbors are checked with the first name
-		int ith_branch = isMatch(package3->context_state_attribute_trie_node->word,
-								 package3->dict_trie_node);
+		int ith_branch = isMatch(package->context_state_attribute_trie_node->word,
+								 package->dict_trie_node);
 		if(ith_branch >= 0) // match
 		{
 			//printf("perfect match\n");
-			package3->is_first_mismatch = false;
+			package->is_first_mismatch = false;
 			// stop conditiions
 			// perfect match(full match) or
 			// input was completely found but tree still has more nodes (full match)
@@ -420,45 +420,45 @@ TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 			// *, null(input was completely found but tree still has more nodes)(match)
 
 			if(
-				(package3->context_state_attribute_trie_node->neighbors == NULL) 		||  // safety check only(not a case)
+				(package->context_state_attribute_trie_node->neighbors == NULL) 		||  // safety check only(not a case)
 
-				(package3->dict_trie_node->neighbors[ith_branch] 			== NULL &&
-			   package3->context_state_attribute_trie_node->neighbors[0] 	== NULL) 	||
+				(package->dict_trie_node->neighbors[ith_branch] 			== NULL &&
+			   package->context_state_attribute_trie_node->neighbors[0] 	== NULL) 	||
 
-				(package3->dict_trie_node->neighbors[ith_branch] 			 != NULL &&
-			   	   package3->context_state_attribute_trie_node->neighbors[0] == NULL)
+				(package->dict_trie_node->neighbors[ith_branch] 			 != NULL &&
+			   	   package->context_state_attribute_trie_node->neighbors[0] == NULL)
 				)
 			{
 				if(
-					(package3->context_state_attribute_trie_node->neighbors == NULL) 		||
+					(package->context_state_attribute_trie_node->neighbors == NULL) 		||
 
-					(package3->dict_trie_node->neighbors[ith_branch] 		!= NULL))
+					(package->dict_trie_node->neighbors[ith_branch] 		!= NULL))
 				{
 					//printf("perfect match 2\n");
 
 				}
-				package3->need_to_append_more_name = false;
+				package->need_to_append_more_name = false;
 				//printf("%x\n", package3->dict_trie_node->neighbors[ith_branch]->object);
 
-				if(package3->dict_trie_node->neighbors[ith_branch]->object != NULL)
+				if(package->dict_trie_node->neighbors[ith_branch]->object != NULL)
 				{
 					// return a found flag
-					package3->context_state_is_found = true;	// 	0, 1
-					return package3;
+					package->context_state_is_found = true;	// 	0, 1
+					return package;
 				}
 				else
 				{
 					// already existing objects are being put in here as an objectless internal node
 					//printf("can add as an internal node\n");
 					// need to add it
-					package3->context_state_is_found = false;  // 	0, 0
-					if((package3->context_state_attribute_trie_node->neighbors == NULL) 		||
-						(package3->dict_trie_node->neighbors[ith_branch] 		!= NULL))
+					package->context_state_is_found = false;  // 	0, 0
+					if((package->context_state_attribute_trie_node->neighbors == NULL) 		||
+						(package->dict_trie_node->neighbors[ith_branch] 		!= NULL))
 					{
 						// advance the dict tracker to the next one because it already matched and will be the location of the next
 						// ContextState object
 						// the contest state attribute tracker is null because we have no new trie nodes to insert
-						package3->dict_trie_node = package3->dict_trie_node->neighbors[ith_branch];
+						package->dict_trie_node = package->dict_trie_node->neighbors[ith_branch];
 						//package3->context_state_attribute_trie_node = NULL;
 						//package3->dict_trie_node = package3->dict_trie_node->neighbors;
 
@@ -471,7 +471,7 @@ TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 
 					}
 					//package3->dict_trie_node = package3->dict_trie_node->neighbors[ith_branch];
-					return package3;
+					return package;
 				}
 			}
 			// relationship with ith_branch < 0
@@ -481,19 +481,19 @@ TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 			*/
 			// null, *(tree ran out of input first)
 			// tree ran out of input first(partial match)
-			else if(package3->dict_trie_node->neighbors[ith_branch] 	     == NULL &&
-			   	   package3->context_state_attribute_trie_node->neighbors[0] != NULL)
+			else if(package->dict_trie_node->neighbors[ith_branch] 	     == NULL &&
+			   	   package->context_state_attribute_trie_node->neighbors[0] != NULL)
 			{
 				//printf("partial match\n");
 
 				// 	1, 0
 
 				// sequence of strings doesn't exists
-				package3->context_state_is_found = false;
+				package->context_state_is_found = false;
 
 				// need to append more names to trie tree dict
-				package3->need_to_append_more_name = true;
-				return package3;
+				package->need_to_append_more_name = true;
+				return package;
 
 				// return current and string tracker
 			}
@@ -503,8 +503,8 @@ TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 			{
 				//printf("advance\n");
 				//dict_trie_node_prev = package3->dict_trie_node;
-				package3->dict_trie_node = package3->dict_trie_node->neighbors[ith_branch];
-				package3->context_state_attribute_trie_node = package3->context_state_attribute_trie_node->neighbors[0];
+				package->dict_trie_node = package->dict_trie_node->neighbors[ith_branch];
+				package->context_state_attribute_trie_node = package->context_state_attribute_trie_node->neighbors[0];
 			}
 		
 		}
@@ -521,17 +521,17 @@ TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 			// need to know if it was the first mismatch
 			if(i == 0)
 			{
-				package3->is_first_mismatch = true;
+				package->is_first_mismatch = true;
 			}
 			else
 			{
-				package3->is_first_mismatch = false;
+				package->is_first_mismatch = false;
 			}
 			//printf("here neighbors\n");
 			// 	NULL, 1, 0
 			// return dict_trie_node and context_state_attribute_trie_node
-			package3->context_state_is_found = false;
-			package3->need_to_append_more_name = true;
+			package->context_state_is_found = false;
+			package->need_to_append_more_name = true;
 			// package3->is_partial_match is not set cause we don't know if the first one was a mismatch or the nth one
 			// was a mismatch
 			// need to return the node in the dict path right before the mismatch occurred so the future checks looks like this
@@ -540,7 +540,7 @@ TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 			// which will be a match next time
 			// actually did go in right place entire time(not sure why)
 			//package3->dict_trie_node = dict_trie_node_prev;
-			return package3;
+			return package;
 		}
 		i++;
 	}
@@ -749,7 +749,7 @@ void insert(TrieNode* root, ContextState* state)
 
 	// take the name
 	// search for name in the trienode
-	TrieNodePackage3* last_word_index_correctly_matched_package = findInTrie2(root_tracker, state->state_name->neighbors[0]);
+	TrieNodePackage* last_word_index_correctly_matched_package = findInTrie2(root_tracker, state->state_name->neighbors[0]);
 	/*
 	typedef struct TrieNodePackage3
 	{

@@ -28,20 +28,20 @@ dummy node
 
 */
 
-typedef struct TrieNodePackage3
+typedef struct TrieNodePackage
 {
 	TrieNode* dict_trie_node;
 	TrieNode* context_state_attribute_trie_node;
 	bool context_state_is_found;
 	bool is_first_mismatch;
 	bool need_to_append_more_name;
-}TrieNodePackage3;
+}TrieNodePackage;
 
 TrieNode* initTrieNode();
 TrieNode* initTrieNodeWithNeighborCount(int number_of_possible_neighbors);
 TrieNode* arrayOfArrays(int* i, jsmntok_t tokens[], const char* input, int token_count);
 int isMatch(char* ith_word, TrieNode* node);
-TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings);
+TrieNodePackage* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings);
 TrieNode* appendWord(TrieNode* node, char* ith_name);
 TrieNode* appendTrieChain(TrieNode* root, struct ContextState* state, TrieNode* name);
 void insert(TrieNode* root, struct ContextState* state);
