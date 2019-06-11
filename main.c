@@ -1179,7 +1179,7 @@ int isMatch(char* ith_word, TrieNode* node)
 			{
 				if(node->neighbors[j]->word != NULL)
 				{
-					//printf("%s == %s\n", ith_word, node->neighbors[j]->word);
+					printf("%s == %s\n", ith_word, node->neighbors[j]->word);
 					if(strcmp(ith_word, node->neighbors[j]->word) == 0)
 					{
 						//printf("passes\n");
@@ -1383,7 +1383,12 @@ TrieNodePackage2* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 	while(package3->dict_trie_node != NULL &&
 		  package3->context_state_attribute_trie_node != NULL)
 	{
-		//printf("%s, %s\n", package3->dict_trie_node->word, package3->context_state_attribute_trie_node->word);
+		if(package3->dict_trie_node->word != NULL &&
+		  package3->context_state_attribute_trie_node->word != NULL)
+		{
+			printf("%s, %s\n", package3->dict_trie_node->word, package3->context_state_attribute_trie_node->word);
+
+		}
 		// first time the root's neighbors are checked with the first name
 		int ith_branch = isMatch(package3->context_state_attribute_trie_node->word,
 								 package3->dict_trie_node);
@@ -1408,10 +1413,18 @@ TrieNodePackage2* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 			   	   package3->context_state_attribute_trie_node->neighbors[0] == NULL)
 				)
 			{
-				printf("perfect match 2\n");
-				package3->need_to_append_more_name = false;
+				if(
+					(package3->context_state_attribute_trie_node->neighbors == NULL) 		||
 
-				if(package3->dict_trie_node->object != NULL)
+					(package3->dict_trie_node->neighbors[ith_branch] 		!= NULL))
+				{
+					printf("perfect match 2\n");
+
+				}
+				package3->need_to_append_more_name = false;
+				printf("%x\n", package3->dict_trie_node->neighbors[ith_branch]->object);
+
+				if(package3->dict_trie_node->neighbors[ith_branch]->object != NULL)
 				{
 					// return a found flag
 					package3->context_state_is_found = true;	// 	0, 1
@@ -1419,8 +1432,25 @@ TrieNodePackage2* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 				}
 				else
 				{
+					// already existing objects are being put in here as an objectless internal node
+					printf("can add as an internal node\n");
 					// need to add it
 					package3->context_state_is_found = false;  // 	0, 0
+					if((package3->context_state_attribute_trie_node->neighbors == NULL) 		||
+						(package3->dict_trie_node->neighbors[ith_branch] 		!= NULL))
+					{
+						package3->dict_trie_node = package3->dict_trie_node->neighbors[ith_branch];
+						//package3->dict_trie_node = package3->dict_trie_node->neighbors;
+
+						/*if(package3->dict_trie_node->word != NULL &&
+								  package3->context_state_attribute_trie_node->word != NULL)
+						{
+							printf("%s, %s\n", package3->dict_trie_node->word, package3->context_state_attribute_trie_node->word);
+
+						}*/
+
+					}
+					//package3->dict_trie_node = package3->dict_trie_node->neighbors[ith_branch];
 					return package3;
 				}
 			}
@@ -1628,12 +1658,14 @@ TrieNode* appendTrieChain(TrieNode* root, ContextState* state, TrieNode* name)
 	TrieNode* name_tracker = name;
 	int count = 0;
 	printf("appendTrieChain\n");
+	if(root->word != NULL)
+		printf("%s\n\n", root->word);
+
 	while(name_tracker != NULL && root_tracker != NULL)
 	{
-		printf("%s\n", root->word);
 
 		printf("%i\n", count);
-		printf("%s\n", name_tracker->word);
+		printf("%s   %s\n", root_tracker->word, name_tracker->word);
 		printf("root_tracker %i, %i\n", root_tracker->size, root_tracker->neighbors_count);
 
 		//printf("name_tracker %x\n", name_tracker);
@@ -1662,14 +1694,14 @@ TrieNode* appendTrieChain(TrieNode* root, ContextState* state, TrieNode* name)
 	}
 	// setting the state to the last word
 	root_tracker->object = state;
-	//printf("object %x\n", root_tracker->object);
+	printf("object added %x\n", root_tracker->object);
 	// need to add indents and a thumbnail attribute so not all of the state is printed out
 
 	return root;
 }
 
 // adding a ContextState to a 
-void addToTrie(TrieNode* root, ContextState* state)
+void insert(TrieNode* root, ContextState* state)
 {
 	// tracker is always pointing to root
 	TrieNode* root_tracker = root;
@@ -1738,8 +1770,20 @@ void addToTrie(TrieNode* root, ContextState* state)
 				
 
 			}
+			else
+			{
+				printf("add as an internal node\n");
+				root_tracker = appendTrieChain(dict_trie_node, state, NULL);
+			}
+			// x x something
+			// x x isn't being added right
+			// problem
 			// add context state
-			root_tracker->object = state;
+			//root_tracker->object = state;
+			// it might have connected this with the root
+			// 
+			//printContextState(root_tracker->object);
+
 		}
 		
 	}
@@ -1838,15 +1882,10 @@ int main(int argc, char** argv)
 			//printContextState(state);
 			if(root != NULL)
 			{
-				addToTrie(root, state);
+				insert(root, state);
 
 			}
-			if(root->neighbors != NULL)
-			{
-				printf("printing tree\n");
-				printTrieNodeTree(root, 1);
-				printf("\n");
-			}
+			
 
 			//void addToTrie(TrieNode* root, ContextState* state)
 
@@ -1874,7 +1913,12 @@ int main(int argc, char** argv)
 		// https://mattferderer.com/what-is-the-actor-model-and-when-should-you-use-it
 		//printf("|%s|\n", collectChars(tokens[i], parsing_graph));
 	}
-	
+	if(root->neighbors != NULL)
+	{
+		printf("printing tree\n");
+		printTrieNodeTree(root, 1);
+		printf("\n");
+	}
 	// loop untill hit object
 	// call makeContextState on object
 	/*

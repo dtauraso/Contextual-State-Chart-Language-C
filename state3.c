@@ -248,6 +248,13 @@ void printTrieNodeTree(TrieNode* root, int indent)
 		}
 		if(root_tracker->neighbors != NULL)
 		{
+			if(root_tracker->object != NULL)
+			{
+				printf("%s", makeSpaces(indent + 2));
+				printContextState2(root_tracker->object);
+				printf("\n");
+
+			}
 			//printf("# of neighbors %i\n", root_tracker->neighbors_count);
 			for(int i = 0; i < root_tracker->size; i++)
 			{

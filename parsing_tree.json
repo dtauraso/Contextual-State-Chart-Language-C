@@ -170,5 +170,23 @@
     "function_name":  "returnTrue",
     "data":           {},
     "parents":        [["root", "0"]]
+  },
+    {
+    "name":           ["x", "x", "another state"],
+    "nexts":          [],
+    "start_children": [["names", "0"]],
+    "children":       [],
+    "function_name":  "returnTrue",
+    "data":           {},
+    "parents":        [["root", "0"]]
+  },
+    {
+    "name":           ["x", "x"],
+    "nexts":          [],
+    "start_children": [["names", "0"]],
+    "children":       [],
+    "function_name":  "returnSomething",
+    "data":           {},
+    "parents":        [["root", "0"]]
   }
 ]
