@@ -78,7 +78,7 @@ TrieNode* arrayOfArrays(int* i,
 	//token = tokens[*i];
 	LispNode* root = makeLispNode();
 	char* token_string = collectChars(token, input);
-	printf("%s\n", token_string);
+	//printf("%s\n", token_string);
 	if(strcmp(token_string, "\"[]\"") == 0)
 	{
 		//printf("empty array\n");
@@ -108,21 +108,21 @@ TrieNode* arrayOfArrays(int* i,
 		//printf("%s\n", tokenType(tokens[ ( *i ) ]));
 		// inner cons for the array of lists count
 		// outer cons to tell the difference from a list of lists of strings and a list of strings
-		printf("about to convert to a lisp node chain\n");
+		//printf("about to convert to a lisp node chain\n");
 		LispNode* x = array(i, tokens, input, 0, token_count);
 		root = cons(cons(x, NULL, is_list, items_in_array, x->call_count), NULL, is_list, items_in_high_level, x->call_count);
 		//root->count = items_in_array;
-		printf("items at top level %i\n", root->count);
+		//printf("items at top level %i\n", root->count);
 
 		TrieNode* trie_tree_of_names = convertLispChainToTrieNodeChain(root);
-		printf("conversion complete\n");
-		printTrieNodeTreeFlat(trie_tree_of_names);
-		printf("printed\n");
+		//printf("conversion complete\n");
+		//printTrieNodeTreeFlat(trie_tree_of_names);
+		//printf("printed\n");
 		deleteLispNodes(root);
 
 		//printLispNodes(root->value, 1);
 
-		printf("\nreturning trie_tree_of_names\n");
+		//printf("\nreturning trie_tree_of_names\n");
 		return trie_tree_of_names;
 
 		
@@ -267,7 +267,7 @@ int isMatch(char* ith_word, TrieNode* node)
 			{
 				if(node->neighbors[j]->word != NULL)
 				{
-					printf("%s == %s\n", ith_word, node->neighbors[j]->word);
+					//printf("%s == %s\n", ith_word, node->neighbors[j]->word);
 					if(strcmp(ith_word, node->neighbors[j]->word) == 0)
 					{
 						//printf("passes\n");
@@ -311,7 +311,7 @@ TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 
 	}TrieNodePackage;
 	*/
-	printf("findInTrie2\n");
+	//printf("findInTrie2\n");
 
 	/*
 	typedef struct TrieNodePackage3
@@ -397,18 +397,20 @@ TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 	while(package3->dict_trie_node != NULL &&
 		  package3->context_state_attribute_trie_node != NULL)
 	{
+		/*
 		if(package3->dict_trie_node->word != NULL &&
 		  package3->context_state_attribute_trie_node->word != NULL)
 		{
 			printf("%s, %s\n", package3->dict_trie_node->word, package3->context_state_attribute_trie_node->word);
 
 		}
+		*/
 		// first time the root's neighbors are checked with the first name
 		int ith_branch = isMatch(package3->context_state_attribute_trie_node->word,
 								 package3->dict_trie_node);
 		if(ith_branch >= 0) // match
 		{
-			printf("perfect match\n");
+			//printf("perfect match\n");
 			package3->is_first_mismatch = false;
 			// stop conditiions
 			// perfect match(full match) or
@@ -432,7 +434,7 @@ TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 
 					(package3->dict_trie_node->neighbors[ith_branch] 		!= NULL))
 				{
-					printf("perfect match 2\n");
+					//printf("perfect match 2\n");
 
 				}
 				package3->need_to_append_more_name = false;
@@ -447,7 +449,7 @@ TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 				else
 				{
 					// already existing objects are being put in here as an objectless internal node
-					printf("can add as an internal node\n");
+					//printf("can add as an internal node\n");
 					// need to add it
 					package3->context_state_is_found = false;  // 	0, 0
 					if((package3->context_state_attribute_trie_node->neighbors == NULL) 		||
@@ -482,7 +484,7 @@ TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 			else if(package3->dict_trie_node->neighbors[ith_branch] 	     == NULL &&
 			   	   package3->context_state_attribute_trie_node->neighbors[0] != NULL)
 			{
-				printf("partial match\n");
+				//printf("partial match\n");
 
 				// 	1, 0
 
@@ -499,7 +501,7 @@ TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 			// all good, so advance
 			else
 			{
-				printf("advance\n");
+				//printf("advance\n");
 				//dict_trie_node_prev = package3->dict_trie_node;
 				package3->dict_trie_node = package3->dict_trie_node->neighbors[ith_branch];
 				package3->context_state_attribute_trie_node = package3->context_state_attribute_trie_node->neighbors[0];
@@ -514,8 +516,8 @@ TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 		// 1, 0
 		else // ith_branch < 0
 		{
-			printf("mismatch\n");
-			printf("%s, %s\n", package3->dict_trie_node->word, package3->context_state_attribute_trie_node->word);
+			//printf("mismatch\n");
+			//printf("%s, %s\n", package3->dict_trie_node->word, package3->context_state_attribute_trie_node->word);
 			// need to know if it was the first mismatch
 			if(i == 0)
 			{
@@ -525,7 +527,7 @@ TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 			{
 				package3->is_first_mismatch = false;
 			}
-			printf("here neighbors\n");
+			//printf("here neighbors\n");
 			// 	NULL, 1, 0
 			// return dict_trie_node and context_state_attribute_trie_node
 			package3->context_state_is_found = false;
@@ -571,14 +573,14 @@ typedef struct NeighborNames
 */
 TrieNode* appendWord(TrieNode* node, char* ith_name)
 {
-	printf("appendWord\n");
+	///printf("appendWord\n");
 	// what happens the first time?
 	// size and neighbors_count still being set by compiler
 	if(ith_name != NULL)
 	{
 		// make sure node->neighbors_count > node->size is not happening anywhere these are updated
 		// node->neighbors_count > node->size is wrong
-		printf("before size %i, count %i\n",node->size, node->neighbors_count);
+		//printf("before size %i, count %i\n",node->size, node->neighbors_count);
 
 		//TrieNode** neighbors = NULL;//node->neighbors;
 		// 
@@ -650,7 +652,7 @@ TrieNode* appendWord(TrieNode* node, char* ith_name)
 			node->neighbors = new_neighbors;
 
 		}
-		printf("after size %i, count %i\n",node->size, node->neighbors_count);
+		//printf("after size %i, count %i\n",node->size, node->neighbors_count);
 
 		// will not work
 		// doesn't work if size == 0
@@ -687,16 +689,16 @@ TrieNode* appendTrieChain(TrieNode* root, ContextState* state, TrieNode* name)
 	TrieNode* root_tracker = root;
 	TrieNode* name_tracker = name;
 	int count = 0;
-	printf("appendTrieChain\n");
-	if(root->word != NULL)
-		printf("%s\n\n", root->word);
+	//printf("appendTrieChain\n");
+	//if(root->word != NULL)
+		//printf("%s\n\n", root->word);
 
 	while(name_tracker != NULL && root_tracker != NULL)
 	{
 		// sometimes the final word can't be added and segfault happens
-		printf("%i\n", count);
-		printf("%s   %s\n", root_tracker->word, name_tracker->word);
-		printf("before root_tracker %i, %i\n", root_tracker->size, root_tracker->neighbors_count);
+		//printf("%i\n", count);
+		//printf("%s   %s\n", root_tracker->word, name_tracker->word);
+		//printf("before root_tracker %i, %i\n", root_tracker->size, root_tracker->neighbors_count);
 
 		//printf("name_tracker %x\n", name_tracker);
 		//printf("about to append\n");
@@ -706,9 +708,9 @@ TrieNode* appendTrieChain(TrieNode* root, ContextState* state, TrieNode* name)
 
 		// appending and then root gets ille
 		root_tracker = appendWord(root_tracker, name_tracker->word);
-		printf("after root_tracker %i, %i\n", root_tracker->neighbors[root_tracker->neighbors_count - 1]->size, root_tracker->neighbors[root_tracker->neighbors_count - 1]->neighbors_count);
+		//printf("after root_tracker %i, %i\n", root_tracker->neighbors[root_tracker->neighbors_count - 1]->size, root_tracker->neighbors[root_tracker->neighbors_count - 1]->neighbors_count);
 		//printTrieNodeTree(root, 1);
-		printf("appended\n");
+		//printf("appended\n");
 		if(name_tracker->neighbors != NULL)
 		{
 			// the root has nothing to move to?
@@ -740,10 +742,10 @@ TrieNode* appendTrieChain(TrieNode* root, ContextState* state, TrieNode* name)
 // adding a ContextState to a 
 void insert(TrieNode* root, ContextState* state)
 {
-	printf("insert\n");
+	//printf("insert\n");
 	// tracker is always pointing to root
 	TrieNode* root_tracker = root;
-	printf("neighbors_count %i\n", root_tracker->neighbors_count);
+	//printf("neighbors_count %i\n", root_tracker->neighbors_count);
 
 	// take the name
 	// search for name in the trienode
@@ -762,7 +764,7 @@ void insert(TrieNode* root, ContextState* state)
 	if(last_word_index_correctly_matched_package == NULL)
 	{
 		// root is empty
-		printf("root is empty\n");
+		//printf("root is empty\n");
 		// root_tracker = f(state, )
 		root_tracker = appendTrieChain(root_tracker, state, state->state_name->neighbors[0]);
 
@@ -778,7 +780,7 @@ void insert(TrieNode* root, ContextState* state)
 
 	else
 	{
-		printf("have node data to add\n");
+		//printf("have node data to add\n");
 		// the trackers have already be adjusted acording to their situation
 		TrieNode* dict_trie_node = last_word_index_correctly_matched_package->dict_trie_node;
 		TrieNode* context_state_attribute_trie_node = last_word_index_correctly_matched_package->context_state_attribute_trie_node;
@@ -793,7 +795,7 @@ void insert(TrieNode* root, ContextState* state)
 			{
 				if(is_first_mismatch)
 				{
-					printf("first mismatch\n");
+					//printf("first mismatch\n");
 					// wrong
 					root_tracker = appendTrieChain(dict_trie_node, state, state->state_name->neighbors[0]);
 
@@ -802,7 +804,7 @@ void insert(TrieNode* root, ContextState* state)
 				}
 				else
 				{
-					printf("2 to nth mismatch\n");
+					//printf("2 to nth mismatch\n");
 
 					// need to add stuff
 					root_tracker = appendTrieChain(dict_trie_node, state, context_state_attribute_trie_node);
@@ -812,17 +814,9 @@ void insert(TrieNode* root, ContextState* state)
 			}
 			else
 			{
-				printf("add as an internal node\n");
+				//printf("add as an internal node\n");
 				root_tracker = appendTrieChain(dict_trie_node, state, NULL);
 			}
-			// x x something
-			// x x isn't being added right
-			// problem
-			// add context state
-			//root_tracker->object = state;
-			// it might have connected this with the root
-			// 
-			//printContextState(root_tracker->object);
 
 		}
 		

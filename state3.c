@@ -786,7 +786,7 @@ Data* variable(int* i, jsmntok_t tokens[], const char* input)
 }
 ContextState* makeContextState(int* i, jsmntok_t tokens[], const char* input, int token_count)
 {
-	printf("object to run |%s|\n", collectChars(tokens[*i], input));
+	//printf("object to run |%s|\n", collectChars(tokens[*i], input));
 	//TrieTree* name_context_state = makeDict();
 	jsmntok_t token = tokens[*i];
 	//printf("%s\n", tokenType(token));
@@ -934,56 +934,4 @@ ContextState* makeContextState(int* i, jsmntok_t tokens[], const char* input, in
 	}
 	return current_state;
 	
-	//if(token.type != _array) exit(1);
-	//printf("%s\n", collectChars(token, input));
-	/*
-	if first array
-	if next token == []
-		done
-	while(true)
-	if next token == string
-		has string
-		if token.strings != keyword
-			collect
-		else
-			done
-	*/
 }
-
-
-/*
-char** setLink(int* size, char** names, const char* other_node)
-{
-	// case 0 works
-	if(*size == 0)
-	{
-		*size = 1;
-		names = malloc(sizeof(char*));
-		if(!names) exit(1);
-		names[0] = strdup(other_node);
-
-	}
-	// case 1, n not tested
-	else if(*size > 0)
-	{
-		*size += 1;
-		char** new_children = malloc(sizeof(char*) * (*size));
-
-		if(!new_children) exit(1);
-
-		// using old size
-		for(int i = 0; i < (*size) - 1; i++)
-		{
-			new_children[i] = strdup(names[i]);
-			free(names[i]);
-		}
-		new_children[(*size)] = strdup(other_node);
-
-
-		free(names);
-		names = new_children;
-	}
-	// not sure why we need to return names or segfault
-	return names;
-}
-*/

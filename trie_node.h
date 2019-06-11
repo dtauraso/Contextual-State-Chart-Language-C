@@ -39,10 +39,7 @@ typedef struct TrieNodePackage3
 
 TrieNode* initTrieNode();
 TrieNode* initTrieNodeWithNeighborCount(int number_of_possible_neighbors);
-TrieNode* arrayOfArrays(int* i,
-				   jsmntok_t tokens[],
-				   const char* input,
-				   int token_count);
+TrieNode* arrayOfArrays(int* i, jsmntok_t tokens[], const char* input, int token_count);
 int isMatch(char* ith_word, TrieNode* node);
 TrieNodePackage3* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings);
 TrieNode* appendWord(TrieNode* node, char* ith_name);

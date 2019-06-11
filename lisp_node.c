@@ -41,7 +41,7 @@ void printLispNodes(LispNode* root, int indent_level)
 			if(root->value != NULL)
 			{
 				char* string = (char*) root->value;
-				printf("%s%s\n", makeSpaces(indent_level), string);
+				//printf("%s%s\n", makeSpaces(indent_level), string);
 				// returns NamesSize*
 				printLispNodes(root->next, indent_level);
 
@@ -57,7 +57,7 @@ void printLispNodes(LispNode* root, int indent_level)
 			while(list_of_lists_tracker != NULL && list_of_strings != NULL)
 			{
 				//printf("%i\n", count);
-				printf("count %i\n", list_of_lists_tracker->count);
+				//printf("count %i\n", list_of_lists_tracker->count);
 				// doesn't return anything to use
 				printLispNodes(list_of_strings, indent_level + 1);
 				list_of_lists_tracker = list_of_lists_tracker->next;
@@ -144,11 +144,11 @@ LispNode* strings(int* i, jsmntok_t tokens[], const char* input, int number_of_s
 {
 	jsmntok_t current_token = tokens[*i];
 	char* current_string = collectChars(current_token, input);
-	printf("current string %s\n", current_string);
-	printf("items remaining %i\n", number_of_strings_left);
+	//printf("current string %s\n", current_string);
+	//printf("items remaining %i\n", number_of_strings_left);
 	if(number_of_strings_left == 1)
 	{
-		printf("type %s\n", tokenType(current_token));
+		//printf("type %s\n", tokenType(current_token));
 		//printf("last case keword\n");
 		*i += 1;
 		return cons(current_string, NULL, is_string, 0, call_count);
@@ -186,56 +186,56 @@ LispNode* array(int* i, jsmntok_t tokens[], const char* input, int call_count, i
 		//printf("we have a problem\n");
 		return cons(NULL, NULL, is_empty_case, 0, call_count);
 	}
-	printf("number of nested items %i\n", current_token.size);
+	//printf("number of nested items %i\n", current_token.size);
 	// null array
 	if(strcmp(collectChars(current_token, input), "\"[]\"") == 0)
 	{
 		// done with all inner arrays and outer arrays
-		printf("null array\n");
+		//printf("null array\n");
 		return cons(NULL, NULL, is_empty_case, 0, call_count);
 	}
 	
 	*i += 1;
 	int items_in_array = current_token.size;
 	current_token = tokens[*i];
-	printf("second time\n");
+	//printf("second time\n");
 	if(current_token.type != _string)
 	{
 		//printf("we have a problem\n");
 		return cons(NULL, NULL, is_empty_case, 0, call_count);
 	}
 	LispNode* string_coll = strings(i, tokens, input, items_in_array, call_count + 1);
-	printf("collected the strings\n");
+	//printf("collected the strings\n");
 	if(*i == token_count)
 	{
 		return cons(string_coll, NULL, is_list, items_in_array, string_coll->call_count);
 	}
 	//string_coll->count = items_in_array;
 	// token is o keyword or array
-	printf("i %i\n", *i);
+	//printf("i %i\n", *i);
 	//printf("%i, %i\n", *i, max_tokens);
 	//if(*i >= max_tokens)
 	//	return cons(string_coll, NULL, is_list);
 	current_token = tokens[*i];
-	printf("array or keyword %s\n", tokenType(current_token));
+	//printf("array or keyword %s\n", tokenType(current_token));
 
 	if(tokenIsKeyWord(collectChars(current_token, input)))  // end of outer array, still in object
 	{
 
-		printf("at keyword\n");
+		//printf("at keyword\n");
 		//printf("%s %s\n", tokenType(current_token), collectChars(current_token, input));
 		// setting the number of items in string_coll would not be meaningfull
 		return cons(string_coll, NULL, is_list, items_in_array, string_coll->call_count);
 	}
 	else if(current_token.type == _array)  // end of inner array, still in object
 	{
-		printf("items in array %i\n", items_in_array);
+		//printf("items in array %i\n", items_in_array);
 		LispNode* x = array(i, tokens, input, string_coll->call_count, token_count);
 		return cons(string_coll, x, is_list, items_in_array, x->call_count);
 	}
 	else  // end of object
 	{
-		printf("items in array 2 %i\n", items_in_array);
+		//printf("items in array 2 %i\n", items_in_array);
 		// setting the number of items in string_coll would not be meaningfull
 		return cons(string_coll, NULL, is_list, items_in_array, string_coll->call_count);
 	}

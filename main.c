@@ -6,15 +6,8 @@
 #include <stdbool.h>
 //https://zserge.com/jsmn.html
 #include "jsmn/jsmn.h"
-#include "hash_table1.h"
 
 void deleteLispNodes(LispNode* root);
-void printHash(ht_hash_table* ht);
-
-void appendLink(ht_hash_table* states,
-			    const char* node,
-				const char* other_node, // child node or parent node
-				int attribute);
 
 void printState(ContextState* node);
 enum token_types {_primitive, _object, _array, _string};
@@ -507,18 +500,17 @@ int main(int argc, char** argv)
 
 	*/
 
-	printf("%i\n", _primitive);
-	printf("%i\n", parsing_results);
+	//printf("%i\n", _primitive);
+	//printf("%i\n", parsing_results);
 	//exit(1);
 	for(int i = 0; i < parsing_results;)
 	{
 		int json_type = tokens[i].type;
 		if(json_type == 0)
 		{
-			printf("primitive\n");
+			//printf("primitive\n");
 			 i++;
 		}
-		// i == 73896
 		else if(json_type == 1)
 		{
 			//printf("object to run %i\n", i);
@@ -526,7 +518,7 @@ int main(int argc, char** argv)
 
 			ContextState* state = makeContextState(&i, tokens, parsing_graph, parsing_results);
 
-			printf("printing state\n\n");
+			//printf("printing state\n\n");
 			//printContextState(state);
 			if(root != NULL)
 			{
@@ -547,12 +539,12 @@ int main(int argc, char** argv)
 		}
 		else if(json_type == 2)
 		{
-			printf("array\n");
+			//printf("array\n");
 			 i++;
 		}
 		else if(json_type == 3)
 		{
-			printf("string\n");
+			//printf("string\n");
 			 i++;
 		}
 		// to ensure machines can't alter each other's data only allow the current machine to be passed to each function
