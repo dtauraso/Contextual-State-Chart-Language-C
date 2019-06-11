@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "jsmn/jsmn.h"
-#include "state3.h"
+#include "state.h"
 
 // for storing the name -> ContextState map
 typedef struct TrieNode

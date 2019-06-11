@@ -1,4 +1,4 @@
-#include "state3.h"
+#include "state.h"
 #include "lisp_node.h"
 #include "jsmn/jsmn.h"
 
@@ -233,24 +233,6 @@ void printContextState2(ContextState* node)
 }
 
 
-
-
-
-ContextState* duplicate(ContextState* item)
-{
-
-	ContextState* the_duplicate = malloc(sizeof(ContextState));
-	//printf("allocating\n");
-	//printf("item = %s\n", item->name);
-	the_duplicate->name = strdup(item->name);
-
-	/*malloc(sizeof(char) * strlen(item->name));
-	memcpy(the_duplicate->name, item->name, sizeof(char) * strlen(item->name));
-	the_duplicate->name[strlen(item->name)] = '\n';*/
-	//printf("done allocating\n");
-	return the_duplicate;
-
-}
 
 ContextState* initContextState()
 {
