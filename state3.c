@@ -184,21 +184,21 @@ TrieNode* initTrieNode()
 	return node;
 
 }
-TrieNode* initTrieNodeWithNeighborCount(int number_of_neighbors)
+TrieNode* initTrieNodeWithNeighborCount(int number_of_possible_neighbors)
 {
 	TrieNode* node = malloc(sizeof(TrieNode));
 
 	node->word = NULL;
 	node->object = NULL;
-	if(number_of_neighbors == 0)
+	if(number_of_possible_neighbors == 0)
 	{
 		node->neighbors = NULL;
 		node->size = 0;
 	}
 	else
 	{
-		node->neighbors = malloc(sizeof(TrieNode*) * number_of_neighbors);
-		node->size = number_of_neighbors;
+		node->neighbors = malloc(sizeof(TrieNode*) * number_of_possible_neighbors);
+		node->size = number_of_possible_neighbors;
 
 	}
 	node->neighbors_count = 0;
@@ -213,7 +213,9 @@ void printTrieNodes(TrieNode* trie_node_sequence)
 	{
 		if(trie_node_sequence_tracker->word != NULL)
 		{
-			printf("%s ", trie_node_sequence_tracker->word);
+			printf("%s\n", trie_node_sequence_tracker->word);
+			
+
 		}
 		if(trie_node_sequence_tracker->neighbors != NULL)
 		{
@@ -222,6 +224,12 @@ void printTrieNodes(TrieNode* trie_node_sequence)
 		}
 		else
 		{
+			//printf("at last node\n");
+			if(trie_node_sequence_tracker->object != NULL)
+			{
+				printContextState(trie_node_sequence_tracker->object);
+			}
+			
 			break;
 		}
 
@@ -250,12 +258,52 @@ void printTrieNodeTree(TrieNode* root, int indent)
 				}
 			}
 		}
+		else
+		{
+			if(root_tracker->object != NULL)
+			{
+				printf("%s", makeSpaces(indent + 2));
+				printContextState2(root_tracker->object);
+				printf("\n");
+
+			}
+		}
 	}
 	else
 	{
 		printf("[]\n");
 	}
 }
+void printTrieNodeTreeFlat(TrieNode* root)
+{
+	// printContextState2 calls this
+	//printf("printing\n");
+	TrieNode* root_tracker = root;
+	if(root_tracker != NULL)
+	{
+		if(root_tracker->word != NULL)
+		{
+			printf("%s ", root_tracker->word);
+		}
+		if(root_tracker->neighbors != NULL)
+		{
+			//printf("# of neighbors %i\n", root_tracker->neighbors_count);
+			for(int i = 0; i < root_tracker->size; i++)
+			{
+				if(root_tracker->neighbors[i] != NULL)
+				{
+					printTrieNodeTreeFlat(root_tracker->neighbors[i]);
+
+				}
+			}
+		}
+	}
+	else
+	{
+		printf("[]\n");
+	}
+}
+
 // list of lists -> lisp chain -> char pointers
 TrieNode* convertLispChainToTrieNodeChain(LispNode* root)
 {
@@ -303,10 +351,45 @@ TrieNode* convertLispChainToTrieNodeChain(LispNode* root)
 				memcpy(trie_node_squence_tracker->word,
 					   list_of_strings_tracker->value,
 					   sizeof(char) * strlen(list_of_strings_tracker->value));
+				// to match the parallel states in state charts for version 1, considering doing this
+				// an extra bit
+				// dashed lines for parallel states
+				// the parser must ensure all states are either parallel or not
+				// just need an example to prove the state were visited
+				// the functions don't need to be fancy
 
+				// check for last one here
+				
+				if(j == list_of_lists_tracker->count - 1)
+				{
+					//free(new_node->neighbors);
+					//new_node->neighbors = NULL;
+					trie_node_squence_tracker->neighbors = NULL;
+					trie_node_squence_tracker->neighbors_count = 0;
+					trie_node_squence_tracker->size = 0;
+
+
+				}
+				else
+				{
+					TrieNode* new_node = initTrieNodeWithNeighborCount(1);
+					trie_node_squence_tracker->neighbors[0] = new_node;
+					trie_node_squence_tracker->neighbors_count = 1;
+					trie_node_squence_tracker = trie_node_squence_tracker->neighbors[0];
+					list_of_strings_tracker = list_of_strings_tracker->next;
+
+				}
+				j++;
+
+					// if it's last then set trie_node_squence_tracker->neighbors to null 
+				// else
+					// make a new node
 				// untill have last element assume each new node has at least
 				// make new node
+				// only want to make a new node when there are words left
+				/*
 				TrieNode* new_node = initTrieNodeWithNeighborCount(1);
+
 
 				trie_node_squence_tracker->neighbors[0] = new_node;
 				trie_node_squence_tracker->neighbors_count = 1;
@@ -315,12 +398,13 @@ TrieNode* convertLispChainToTrieNodeChain(LispNode* root)
 				trie_node_squence_tracker = trie_node_squence_tracker->neighbors[0];
 				list_of_strings_tracker = list_of_strings_tracker->next;
 				j++;
+				// creating a node and not adding a word to it
 				if(j == list_of_lists_tracker->count)
 				{
 					free(new_node->neighbors);
 					new_node->neighbors = NULL;
 
-				}
+				}*/
 
 
 			}

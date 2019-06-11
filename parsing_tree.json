@@ -130,7 +130,7 @@
     "function_name":  "returnTrue",
     "data":           {},
     "parents":        []
-  }
+  },
   {
     "name":           ["states", "state"],
     "nexts":          [["one name"]],
@@ -141,5 +141,34 @@
     "function_name":  "returnTrue",
     "data":           {"int": "0"},
     "parents":        [["root"], ["0"]]
+  },
+  {
+    "name":           ["what_is_current_word_to_pre_word"],
+    "nexts":          [],
+    "start_children": [["child", "nexts"],
+                       ["sibling"],
+                       ["new_parent"]],
+    "children":       [],
+    "function_name":  "returnTrue",
+    "data":           {},
+    "parents":        []
+  },
+  {
+    "name":           ["states", "state", "other state"],
+    "nexts":          [],
+    "start_children": [["names", "0"]],
+    "children":       [],
+    "function_name":  "returnTrue",
+    "data":           {},
+    "parents":        [["root", "0"]]
+  },
+  {
+    "name":           ["states", "state2", "another state"],
+    "nexts":          [],
+    "start_children": [["names", "0"]],
+    "children":       [],
+    "function_name":  "returnTrue",
+    "data":           {},
+    "parents":        [["root", "0"]]
   }
 ]

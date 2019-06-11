@@ -8,7 +8,6 @@
 
 
 
-
 char* getNextWord(char* input, int i)
 {
  	// this function gets the next word
@@ -524,11 +523,11 @@ LispNode* strings(int* i, jsmntok_t tokens[], const char* input, int number_of_s
 {
 	jsmntok_t current_token = tokens[*i];
 	char* current_string = collectChars(current_token, input);
-	//printf("current string %s\n", current_string);
-	//printf("items remaining %i\n", number_of_strings_left);
+	printf("current string %s\n", current_string);
+	printf("items remaining %i\n", number_of_strings_left);
 	if(number_of_strings_left == 1)
 	{
-		//printf("type %s\n", tokenType(current_token));
+		printf("type %s\n", tokenType(current_token));
 		//printf("last case keword\n");
 		*i += 1;
 		return cons(current_string, NULL, is_string, 0, call_count);
@@ -553,7 +552,7 @@ LispNode* strings(int* i, jsmntok_t tokens[], const char* input, int number_of_s
 	
 }
 // record # of total calls
-LispNode* array(int* i, jsmntok_t tokens[], const char* input, int call_count)
+LispNode* array(int* i, jsmntok_t tokens[], const char* input, int call_count, int token_count)
 {
 
 
@@ -566,50 +565,56 @@ LispNode* array(int* i, jsmntok_t tokens[], const char* input, int call_count)
 		//printf("we have a problem\n");
 		return cons(NULL, NULL, is_empty_case, 0, call_count);
 	}
-	//printf("number of nested items %i\n", current_token.size);
+	printf("number of nested items %i\n", current_token.size);
 	// null array
 	if(strcmp(collectChars(current_token, input), "\"[]\"") == 0)
 	{
 		// done with all inner arrays and outer arrays
-		//printf("null array\n");
+		printf("null array\n");
 		return cons(NULL, NULL, is_empty_case, 0, call_count);
 	}
 	
 	*i += 1;
 	int items_in_array = current_token.size;
 	current_token = tokens[*i];
-	//printf("second time\n");
+	printf("second time\n");
 	if(current_token.type != _string)
 	{
 		//printf("we have a problem\n");
 		return cons(NULL, NULL, is_empty_case, 0, call_count);
 	}
 	LispNode* string_coll = strings(i, tokens, input, items_in_array, call_count + 1);
+	printf("collected the strings\n");
+	if(*i == token_count)
+	{
+		return cons(string_coll, NULL, is_list, items_in_array, string_coll->call_count);
+	}
 	//string_coll->count = items_in_array;
 	// token is o keyword or array
+	printf("i %i\n", *i);
 	//printf("%i, %i\n", *i, max_tokens);
 	//if(*i >= max_tokens)
 	//	return cons(string_coll, NULL, is_list);
 	current_token = tokens[*i];
-	//printf("array or keyword %s\n", tokenType(current_token));
+	printf("array or keyword %s\n", tokenType(current_token));
 
 	if(tokenIsKeyWord(collectChars(current_token, input)))  // end of outer array, still in object
 	{
 
-		//printf("at keyword\n");
+		printf("at keyword\n");
 		//printf("%s %s\n", tokenType(current_token), collectChars(current_token, input));
 		// setting the number of items in string_coll would not be meaningfull
 		return cons(string_coll, NULL, is_list, items_in_array, string_coll->call_count);
 	}
 	else if(current_token.type == _array)  // end of inner array, still in object
 	{
-		//printf("items in array %i\n", items_in_array);
-		LispNode* x = array(i, tokens, input, string_coll->call_count);
+		printf("items in array %i\n", items_in_array);
+		LispNode* x = array(i, tokens, input, string_coll->call_count, token_count);
 		return cons(string_coll, x, is_list, items_in_array, x->call_count);
 	}
 	else  // end of object
 	{
-		//printf("items in array %i\n", items_in_array);
+		printf("items in array 2 %i\n", items_in_array);
 		// setting the number of items in string_coll would not be meaningfull
 		return cons(string_coll, NULL, is_list, items_in_array, string_coll->call_count);
 	}
@@ -624,7 +629,8 @@ void deleteLispNodes(LispNode* root);
 // to the token for the next function
 TrieNode* arrayOfArrays(int* i,
 				   jsmntok_t tokens[],
-				   const char* input)
+				   const char* input,
+				   int token_count)
 {
 	// returns a TrieNode* type
 	// the word and object attributes will be set to null
@@ -658,6 +664,7 @@ TrieNode* arrayOfArrays(int* i,
 	//token = tokens[*i];
 	LispNode* root = makeLispNode();
 	char* token_string = collectChars(token, input);
+	printf("%s\n", token_string);
 	if(strcmp(token_string, "\"[]\"") == 0)
 	{
 		//printf("empty array\n");
@@ -687,19 +694,20 @@ TrieNode* arrayOfArrays(int* i,
 		//printf("%s\n", tokenType(tokens[ ( *i ) ]));
 		// inner cons for the array of lists count
 		// outer cons to tell the difference from a list of lists of strings and a list of strings
-		LispNode* x = array(i, tokens, input, 0);
+		printf("about to convert to a lisp node chain\n");
+		LispNode* x = array(i, tokens, input, 0, token_count);
 		root = cons(cons(x, NULL, is_list, items_in_array, x->call_count), NULL, is_list, items_in_high_level, x->call_count);
 		//root->count = items_in_array;
-		//printf("items at top level %i\n", root->count);
+		printf("items at top level %i\n", root->count);
 
 		 TrieNode* trie_tree_of_names = convertLispChainToTrieNodeChain(root);
-
+		printTrieNodeTreeFlat(trie_tree_of_names);
 
 		 deleteLispNodes(root);
 
 		//printLispNodes(root->value, 1);
 
-		
+		printf("\nreturning trie_tree_of_names\n");
 		return trie_tree_of_names;
 
 		
@@ -821,7 +829,7 @@ Data* variable(int* i, jsmntok_t tokens[], const char* input)
 
 }
 //////////
-
+/*
 void printListOfListsOfStrings(NeighborNames* names)
 {
 	if(names != NULL)
@@ -863,6 +871,7 @@ void printListOfListsOfStrings(NeighborNames* names)
 
 	}
 }
+*/
 void printData(Data* var_data)
 {
 	if(var_data != NULL)
@@ -952,6 +961,11 @@ void printContextState(ContextState* node)
 
 
 }
+
+void printContextState2(ContextState* node)
+{
+	printTrieNodeTreeFlat(node->state_name);
+}
 ContextState* makeContextState(int* i, jsmntok_t tokens[], const char* input, int token_count)
 {
 	printf("object to run |%s|\n", collectChars(tokens[*i], input));
@@ -967,8 +981,8 @@ ContextState* makeContextState(int* i, jsmntok_t tokens[], const char* input, in
 	token = tokens[*i];
 	//printf("%s\n", tokenType(token));
 	//printf("name\n");
-	TrieNode* name = arrayOfArrays(i, tokens, input);
-	//printListOfListsOfStrings(name);
+	TrieNode* name = arrayOfArrays(i, tokens, input, token_count);
+	//printTrieNodeTreeFlat(name);
 	/*
 	printf("printing trie tree\n");
 	printTrieNodeTree(name, 0);
@@ -1002,7 +1016,7 @@ ContextState* makeContextState(int* i, jsmntok_t tokens[], const char* input, in
 	token = tokens[*i];
 	//printf("%s\n", tokenType(token));
 	//printf("nexts\n");
-	TrieNode* nexts = arrayOfArrays(i, tokens, input);
+	TrieNode* nexts = arrayOfArrays(i, tokens, input, token_count);
 	/*
 	printf("printing trie tree\n");
 	printTrieNodeTree(nexts, 0);
@@ -1018,7 +1032,7 @@ ContextState* makeContextState(int* i, jsmntok_t tokens[], const char* input, in
 	token = tokens[*i];
 	//printf("%s\n", tokenType(token));
 	//printf("start children\n");
-	TrieNode* start_children = arrayOfArrays(i, tokens, input);
+	TrieNode* start_children = arrayOfArrays(i, tokens, input, token_count);
 	/*
 	printf("printing trie tree\n");
 	printTrieNodeTree(start_children, 0);
@@ -1035,7 +1049,7 @@ ContextState* makeContextState(int* i, jsmntok_t tokens[], const char* input, in
 	token = tokens[*i];
 	//printf("%s\n", tokenType(token));
 	//printf("children\n");
-	TrieNode* children = arrayOfArrays(i, tokens, input);
+	TrieNode* children = arrayOfArrays(i, tokens, input, token_count);
 	/*
 	printf("printing trie tree\n");
 	printTrieNodeTree(children, 0);
@@ -1070,7 +1084,7 @@ ContextState* makeContextState(int* i, jsmntok_t tokens[], const char* input, in
 	token = tokens[*i];
 	//printf("before arrayOfArrays %s\n", tokenType(token));
 
-	TrieNode* parents = arrayOfArrays(i, tokens, input);
+	TrieNode* parents = arrayOfArrays(i, tokens, input, token_count);
 	//printListOfListsOfStrings(parents);
 	/*
 	printf("printing trie tree\n");
@@ -1154,9 +1168,10 @@ char* getIthWord(NeighborNames* name, int i)
 int isMatch(char* ith_word, TrieNode* node)
 {
 	// finds out if ith_word is a neighbor of node
-
-	if(ith_word != NULL)
+	if(ith_word != NULL && node != NULL)
 	{
+		//printf("isMatch\n");
+		//printf("# of neighbors %i\n", node->neighbors_count);
 		// returns the index on the first match
 		for(int j = 0; node != NULL && j < node->neighbors_count; j++)
 		{
@@ -1164,8 +1179,10 @@ int isMatch(char* ith_word, TrieNode* node)
 			{
 				if(node->neighbors[j]->word != NULL)
 				{
+					//printf("%s == %s\n", ith_word, node->neighbors[j]->word);
 					if(strcmp(ith_word, node->neighbors[j]->word) == 0)
 					{
+						//printf("passes\n");
 						return j;
 					}
 				}
@@ -1260,6 +1277,7 @@ TrieNodePackage* findInTrie(TrieNode* root, NeighborNames* name)
 }
 TrieNodePackage2* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 {
+	// sequence_of_strings is the address of the first word in the state name
 	// sequence_of_strings attribute set
 	// word has a word stored
 	// neighbors has 1 neighbor
@@ -1268,7 +1286,9 @@ TrieNodePackage2* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 	// object = null
 	// we are returning the node where we will start appending the words remaining
 	// and the index of the first word remaining
-
+	/*
+	how does this work?
+	*/
 	/*
 	typedef struct TrieNodePackage2
 	{
@@ -1278,93 +1298,204 @@ TrieNodePackage2* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
 	}TrieNodePackage;
 	*/
 	printf("findInTrie2\n");
-	TrieNode* current = root;
-	TrieNodePackage2* package2 = malloc(sizeof(TrieNodePackage2));
-	package2->address = sequence_of_strings;
-	package2->address_is_match = 0;
-	if(current != NULL)
+
+	/*
+	typedef struct TrieNodePackage3
 	{
+		TrieNode* dict_trie_node;
+		TrieNode* context_state_attribute_trie_node;
+		bool context_state_is_found;
+		bool is_first_mismatch;
+		bool need_to_append_more_name;
+	}TrieNodePackage3;
+	*/
+	TrieNodePackage3* package3 = malloc(sizeof(TrieNodePackage3));
+
+	package3->dict_trie_node = root;
+	package3->context_state_attribute_trie_node = sequence_of_strings;
+
+	package3->context_state_is_found = NULL;
+	package3->is_first_mismatch = NULL;
+	package3->need_to_append_more_name = NULL;
+
+	//TrieNode* dict_trie_node_prev = root;  // can't be null cause isMatch may return -1
 
 
-		//prev = root;
-		//printf("root->neighbors %x\n", root->neighbors);
-		if(current->neighbors == NULL)
+	//prev = root;
+	//printf("root->neighbors %x\n", root->neighbors);
+	// replace this with something cleaner
+	/*
+
+	null, null case 1(assume both tree and input are null)
+	loop
+		
+
+		a, b (no match stop)
+
+		a, a(keep matching)
+			null, null case 2(perfect match) enumerate this (match)
+				context state doesn't exist
+				else
+					reutrn a found flag
+			*, null(input was completely found but tree still has more nodes)(match)
+				context state doesn't exist
+				else
+					return a found flag
+			
+
+			null, *(tree ran out of input first)
+
+
+	tree, input
+	a, b (no match stop)
+	a, null(input was completely found)
+	null, b(tree ran out of input first)
+	null, null case 1(assume both tree and input are null)
+
+	null, null case 2(perfect match)
+	a, a
+
+	any matching doesn't prove there is a context node or not
+	matching and checking for a context node are separate
+	*/
+	/*
+	found
+	current
+	string_tracker
+	is_partial_match
+	need_to_append_more_name
+	*/
+	if(package3->dict_trie_node == NULL || package3->context_state_attribute_trie_node == NULL)
+	{
+		// return null package
+		return NULL;
+	}
+
+	/*
+	these entries are also in the code where they are set
+	need_to_append_more_name, context_state_is_found
+	0, 0
+	0, 1
+	1, 0
+	1, 0
+	*/
+	int i = 0;
+	while(package3->dict_trie_node != NULL &&
+		  package3->context_state_attribute_trie_node != NULL)
+	{
+		//printf("%s, %s\n", package3->dict_trie_node->word, package3->context_state_attribute_trie_node->word);
+		// first time the root's neighbors are checked with the first name
+		int ith_branch = isMatch(package3->context_state_attribute_trie_node->word,
+								 package3->dict_trie_node);
+		if(ith_branch >= 0) // match
 		{
-			printf("here\n");
-			return NULL;
+			printf("perfect match\n");
+			package3->is_first_mismatch = false;
+			// stop conditiions
+			// perfect match(full match) or
+			// input was completely found but tree still has more nodes (full match)
 
-		}
-		else
-		{
-			printf("here\n");
-			// at this point there has to be at least 1 node root connects to
-			//TrieNode** neighbors = current->neighbors;
+			//null, null case 2(perfect match)
+			// *, null(input was completely found but tree still has more nodes)(match)
 
-			//current = neighbors[0];
-			// assume the name is the state name
-			// the list_of_names has only 1 list of strings
+			if(
+				(package3->context_state_attribute_trie_node->neighbors == NULL) 		||  // safety check only(not a case)
 
-			// as some point we will run out of trie nodes before we run out of names to check with
+				(package3->dict_trie_node->neighbors[ith_branch] 			== NULL &&
+			   package3->context_state_attribute_trie_node->neighbors[0] 	== NULL) 	||
 
-			// for each word in name
-				// check the word with all edges for a match
-					// if a match
-						// move to the next node and restart outer loop
-
-			// can't tell the difference between all matching and none matching
-			// count # of matches
-			// can't access the ith item in a linked list
-			// can return the pointer to the last name matched with the root tree
-			TrieNode* sequence_of_strings_tracker = sequence_of_strings;
-			if(sequence_of_strings_tracker != NULL)
+				(package3->dict_trie_node->neighbors[ith_branch] 			 != NULL &&
+			   	   package3->context_state_attribute_trie_node->neighbors[0] == NULL)
+				)
 			{
-				//TrieNode* sequence_of_strings_tracker_next = sequence_of_strings_tracker->neighbors[0];
-				// will always fail to check the last one
-				while(sequence_of_strings_tracker != NULL)
+				printf("perfect match 2\n");
+				package3->need_to_append_more_name = false;
+
+				if(package3->dict_trie_node->object != NULL)
 				{
-					// check for match with current
-					int ith_branch = isMatch(sequence_of_strings_tracker->word, current);
-					if(ith_branch > 0)
-					{
-						if(sequence_of_strings_tracker->neighbors[0] != NULL)
-						{
-							sequence_of_strings_tracker = sequence_of_strings_tracker->neighbors[0];
-							//sequence_of_strings_tracker_next = sequence_of_strings_tracker_next->neighbors[0];
-							current = current->neighbors[ith_branch];
-
-						}
-						else
-						{
-
-
-							// pointer to last item that matched
-							// return tracker and tracker_is_match = 1
-							package2->address = sequence_of_strings_tracker;
-							package2->address_is_match = 1;
-							return package2;
-						}
-
-					}
-					else  // no match or partial match
-					{
-						// pointer to first new word
-						// can also be the last item in the list
-						// return tracker and tracker_is_match = 0
-						package2->address = sequence_of_strings_tracker;
-						package2->address_is_match = 0;
-
-						return package2;
-					}
-						// if match
-							// keep going
-						// else
-							// return sequence_of_strings_tracker
+					// return a found flag
+					package3->context_state_is_found = true;	// 	0, 1
+					return package3;
+				}
+				else
+				{
+					// need to add it
+					package3->context_state_is_found = false;  // 	0, 0
+					return package3;
 				}
 			}
-			
-			return NULL;
+			// relationship with ith_branch < 0
+			/*
+			ran out of input = not present
+			mismatch == the character present is wrong 
+			*/
+			// null, *(tree ran out of input first)
+			// tree ran out of input first(partial match)
+			else if(package3->dict_trie_node->neighbors[ith_branch] 	     == NULL &&
+			   	   package3->context_state_attribute_trie_node->neighbors[0] != NULL)
+			{
+				printf("partial match\n");
+
+				// 	1, 0
+
+				// sequence of strings doesn't exists
+				package3->context_state_is_found = false;
+
+				// need to append more names to trie tree dict
+				package3->need_to_append_more_name = true;
+				return package3;
+
+				// return current and string tracker
+			}
+			// a, a(keep matching)
+			// all good, so advance
+			else
+			{
+				printf("advance\n");
+				//dict_trie_node_prev = package3->dict_trie_node;
+				package3->dict_trie_node = package3->dict_trie_node->neighbors[ith_branch];
+				package3->context_state_attribute_trie_node = package3->context_state_attribute_trie_node->neighbors[0];
+			}
+		
 		}
+		// a, b case 
+		// can't use the current versions of the trackers cause appending would have this for a future check
+		// a, b
+		// b
+		// current->neighbors == NULL should be in here
+		// 1, 0
+		else // ith_branch < 0
+		{
+			printf("mismatch\n");
+			printf("%s, %s\n", package3->dict_trie_node->word, package3->context_state_attribute_trie_node->word);
+			// need to know if it was the first mismatch
+			if(i == 0)
+			{
+				package3->is_first_mismatch = true;
+			}
+			else
+			{
+				package3->is_first_mismatch = false;
+			}
+			printf("here neighbors\n");
+			// 	NULL, 1, 0
+			// return dict_trie_node and context_state_attribute_trie_node
+			package3->context_state_is_found = false;
+			package3->need_to_append_more_name = true;
+			// package3->is_partial_match is not set cause we don't know if the first one was a mismatch or the nth one
+			// was a mismatch
+			// need to return the node in the dict path right before the mismatch occurred so the future checks looks like this
+			// [a, b] are neighbors
+			// b
+			// which will be a match next time
+			// actually did go in right place entire time(not sure why)
+			//package3->dict_trie_node = dict_trie_node_prev;
+			return package3;
+		}
+		i++;
 	}
+
+
 	return NULL;
 }
 /*
@@ -1390,12 +1521,12 @@ typedef struct NeighborNames
 }NeighborNames;
 
 */
-TrieNode* appendNode(TrieNode* node, char* ith_name)
+TrieNode* appendWord(TrieNode* node, char* ith_name)
 {
 	if(ith_name != NULL)
 	{
 		// node->neighbors_count > node->size is wrong
-		//printf("neighbors_count %i  node size %i\n", node->neighbors_count, node->size);
+		printf("neighbors_count %i  node size %i\n", node->neighbors_count, node->size);
 
 		TrieNode** neighbors = node->neighbors;
 		// 
@@ -1417,16 +1548,20 @@ TrieNode* appendNode(TrieNode* node, char* ith_name)
 				new_neighbors = malloc(sizeof_new_neighbors);
 
 			}
-
-		}
-
-
-
-
-		memcpy(new_neighbors,
+			memcpy(new_neighbors,
 			   neighbors,
 			   sizeof(TrieNode*) * node->neighbors_count);
 
+		}
+		else if(node->neighbors_count < node->size)
+		{
+			new_neighbors = neighbors;
+		}
+		// might be a problem when node->neighbors_count < node->size
+
+		//printf("here\n");
+
+		
 
 
 		// add (k+1)th word
@@ -1450,13 +1585,17 @@ TrieNode* appendNode(TrieNode* node, char* ith_name)
 		memcpy(new_neighbors[node->neighbors_count]->word,
 			   ith_name,
 			   sizeof(char) * sizeof_ith_name);
-		///
+
+		// only for copying over entire array
 		// delete node_to_put_context_state_at->neighbors
+		if(node->neighbors_count == node->size)
+		{
+			// might need to change this later
+			free(node->neighbors);
 
-		// might need to change this later
-		free(node->neighbors);
+			node->neighbors = new_neighbors;
 
-		node->neighbors = new_neighbors;
+		}
 		// will not work
 		// doesn't work if size == 0
 		if(node->neighbors_count == node->size)
@@ -1483,6 +1622,51 @@ TrieNode* appendNode(TrieNode* node, char* ith_name)
 	}
 	
 }
+TrieNode* appendTrieChain(TrieNode* root, ContextState* state, TrieNode* name)
+{
+	TrieNode* root_tracker = root;
+	TrieNode* name_tracker = name;
+	int count = 0;
+	printf("appendTrieChain\n");
+	while(name_tracker != NULL && root_tracker != NULL)
+	{
+		printf("%s\n", root->word);
+
+		printf("%i\n", count);
+		printf("%s\n", name_tracker->word);
+		printf("root_tracker %i, %i\n", root_tracker->size, root_tracker->neighbors_count);
+
+		//printf("name_tracker %x\n", name_tracker);
+		//printf("about to append\n");
+		// not updating root_tracker correctly
+
+		root_tracker = appendWord(root_tracker, name_tracker->word);
+		//printf("root_tracker %i, %i\n", root_tracker->size, root_tracker->neighbors_count);
+		//printTrieNodeTree(root, 1);
+		printf("appended\n");
+		if(name_tracker->neighbors != NULL)
+		{
+			name_tracker = name_tracker->neighbors[0];
+			// go to the last one found
+			root_tracker = root_tracker->neighbors[root_tracker->neighbors_count - 1];
+		}
+		else
+		{
+			// no more words left to add so go to the last word added
+			root_tracker = root_tracker->neighbors[root_tracker->neighbors_count - 1];
+			//printf("last word %s\n", root_tracker->word);
+
+			break;
+		}
+		count++;
+	}
+	// setting the state to the last word
+	root_tracker->object = state;
+	//printf("object %x\n", root_tracker->object);
+	// need to add indents and a thumbnail attribute so not all of the state is printed out
+
+	return root;
+}
 
 // adding a ContextState to a 
 void addToTrie(TrieNode* root, ContextState* state)
@@ -1493,244 +1677,73 @@ void addToTrie(TrieNode* root, ContextState* state)
 
 	// take the name
 	// search for name in the trienode
-	TrieNodePackage2* last_word_index_correctly_matched_package = findInTrie2(root_tracker, state->state_name);
+	TrieNodePackage3* last_word_index_correctly_matched_package = findInTrie2(root_tracker, state->state_name->neighbors[0]);
+	/*
+	typedef struct TrieNodePackage3
+	{
+		TrieNode* dict_trie_node;
+		TrieNode* context_state_attribute_trie_node;
+		bool context_state_is_found;
+		bool is_partial_match;
+		bool need_to_append_more_name;
+	}TrieNodePackage3;
+	*/
+
 	if(last_word_index_correctly_matched_package == NULL)
 	{
 		// root is empty
 		printf("root is empty\n");
-		TrieNode* name_tracker = state->state_name->neighbors[0];
-		int count = 0;
-		while(name_tracker != NULL)
-		{
+		// root_tracker = f(state, )
+		root_tracker = appendTrieChain(root_tracker, state, state->state_name->neighbors[0]);
 
-			if(name_tracker->word == NULL)
-			{
-				break;
-			}
-			//printf("%i\n", count);
-			//printf("%s\n", name_tracker->word);
-			//printf("root_tracker %i, %i\n", root_tracker->size, root_tracker->neighbors_count);
+		//printf("last word associated with state %s\n\n", root_tracker->word);
 
-			//printf("name_tracker %x\n", name_tracker);
-			//printf("about to append\n");
-			// not updating root_tracker correctly
-
-			root_tracker = appendNode(root_tracker, name_tracker->word);
-			//printf("root_tracker %i, %i\n", root_tracker->size, root_tracker->neighbors_count);
-
-			//printf("appended\n");
-			if(name_tracker->neighbors != NULL)
-			{
-				name_tracker = name_tracker->neighbors[0];
-				// go to the last one found
-				root_tracker = root_tracker->neighbors[root_tracker->neighbors_count - 1];
-			}
-			else
-			{
-				break;
-			}
-			count++;
-		}
-		root_tracker->object = state;
-		printf("last word associated with state %s\n\n", root_tracker->word);
-
-		printTrieNodes(root);
-		printContextState(root_tracker->object);
-		exit(1);
+		//printTrieNodes(root_tracker);
+		//printf("\n");
+		//printContextState(root_tracker->object);
+		//exit(1);
 		//root_tracker = appendNode(root_tracker,
 		//							  getIthWord(state->state_name, 0));
 	}
-	// last word index correctly matched
-	TrieNode* last_word_index_correctly_matched = last_word_index_correctly_matched_package->address;
 
-	bool address_is_match = last_word_index_correctly_matched_package->address_is_match;
-	int k = last_word_index_correctly_matched_package->address_is_match;
-	// need a base case
-		printf("neighbors_count %i\n", root_tracker->neighbors_count);
-
-	printf("k: %i\n", k);
-
-	// because node always exists this is moot
-	// does the node point to a ContextState?
-		// don't add
-	// else
-		// none of the words have been matched
-			// 
-		// is k at the last word matched
-			// add the context state
-		// else
-			// append (k + 1)th word to end of neighbors
-			// if there are more words
-				// loop untill k + 2 is at the last word matched 
-					// add remaining words as a linked list starting at the node the
-					// (k + 1)th word has been added
-					// the neighbor index will always be 0
-			// add the context state to the final node added
-	if(last_word_index_correctly_matched->object != NULL)
-	{
-
-	}
 	else
 	{
-		// these cases only mention about the different kinds of matching
-		// the root_tracker can have as many neighbors as there is room for
 
+		TrieNode* dict_trie_node = last_word_index_correctly_matched_package->dict_trie_node;
+		TrieNode* context_state_attribute_trie_node = last_word_index_correctly_matched_package->context_state_attribute_trie_node;
+		//printf("%x, %x\n", dict_trie_node, context_state_attribute_trie_node);
+		bool context_state_is_found = last_word_index_correctly_matched_package->context_state_is_found;
+		bool need_to_append_more_name = last_word_index_correctly_matched_package->need_to_append_more_name;
+		bool is_first_mismatch = last_word_index_correctly_matched_package->is_first_mismatch;
 
-		if(address_is_match)
+		if(!context_state_is_found)
 		{
-			// add ContextState
-		}
-		else
-		{
-			printf("got here\n");
-			// append the rest of the words starting at last_word_index_correctly_matched
-			// add ContextState
-		}
-
-		// no word in the state name matched
-
-		/*
-		if(k == -1)
-		{
-			printf("neighbors_count %i\n", root_tracker->neighbors_count);
-			// return the pointer to the last name in state_name that matches
-
-			// append the first item to the end of root_tracker's neighbors
-			root_tracker = appendNode(root_tracker,
-									  getIthWord(state->state_name, 0));
-			printf("%i\n", root_tracker->neighbors_count);
-
-			root_tracker = root_tracker->neighbors[root_tracker->neighbors_count - 1];
-			printf("%s\n", root_tracker->word);
-			//printf("%s\n", root->neighbors[2]);
-			for(int i = 1; i < state->state_name->number_of_names; i++)
+			if(need_to_append_more_name)
 			{
-				// assign 
+				if(is_first_mismatch)
+				{
+					printf("first mismatch\n");
+					root_tracker = appendTrieChain(dict_trie_node, state, state->state_name->neighbors[0]);
+
+					//printf("\n\nprint out tree\n");
+					//printTrieNodeTree(root_tracker, 1);
+				}
+				else
+				{
+					printf("2 to nth mismatch\n");
+
+					// need to add stuff
+					root_tracker = appendTrieChain(dict_trie_node, state, context_state_attribute_trie_node);
+				}
+				
+
 			}
-			// add in ContextState object
-		}*/
-		// all words in the state name matched(if this was true then the key should have already been found in first if construct)
-		/*else if(k == state->state_name->number_of_names - 1)
-		{
-
+			// add context state
+			root_tracker->object = state;
 		}
-		*/
-
-		// some words in the state name matched
-		/*else // -1 < k < state->state_name->number_of_names - 1
-		{
-			/*int neighbors_count = last_word_index_correctly_matched->neighbors_count + 1;
-			//printf("neighbors_count %i\n", neighbors_count);
-
-			int sizeof_new_neighbors = sizeof(TrieNode*) * neighbors_count;
-
-			TrieNode** new_neighbors = malloc(sizeof_new_neighbors);
-
-
-			memcpy(new_neighbors,
-				   last_word_index_correctly_matched->neighbors,
-				   sizeof(TrieNode*) * last_word_index_correctly_matched->neighbors_count);
-
-
-
-			// add (k+1)th word
-			//printf("got here\n");
-			// make a tracker pointing to the 
-			new_neighbors[neighbors_count] = malloc(sizeof(TrieNode));
-
-			new_neighbors[neighbors_count]->word = malloc(sizeof(char) *
-								(strlen(state->state_name->list_of_names[k]) + 1) );
-			//printf("reached here\n");
-
-			memcpy(new_neighbors[neighbors_count]->word,
-
-				   state->state_name->list_of_names[k],
-				   sizeof(char) * (strlen(state->state_name->list_of_names[k]) + 1 ));
-			///
-			// delete node_to_put_context_state_at->neighbors
-
-			// might need to change this later
-			free(last_word_index_correctly_matched->neighbors);
-			last_word_index_correctly_matched->neighbors = new_neighbors;
-
-			//printf("%x\n", last_word_index_correctly_matched->neighbors);
-			TrieNode** currently_saved_word = last_word_index_correctly_matched->neighbors[neighbors_count];
-			*/
-		//}
-	}
-	/*
-	if(node_to_put_context_state_at != NULL)
-	{
-		// add in at node_to_put_context_state_at
-		// make a new array with size = |old array| + 1
-		// copy old array to new array
-		// put new item at end of new array
-
-		//  next_node = addNewWord(node_to_put_context_state_at)
-		///
-		// resizing array
-		// neighbors_count is actually the last index in array
-		int neighbors_count = node_to_put_context_state_at->neighbors_count + 1;
-		printf("neighbors_count %i\n", neighbors_count);
-
-		int sizeof_new_neighbors = sizeof(TrieNode*) * neighbors_count;
-
-		TrieNode** new_neighbors = malloc(sizeof_new_neighbors);
-
-
-		memcpy(new_neighbors,
-			   node_to_put_context_state_at->neighbors,
-			   sizeof(TrieNode*) * node_to_put_context_state_at->neighbors_count);
-
-
-
-		// add (k+1)th word
-		printf("got here\n");
-		// make a tracker pointing to the 
-		new_neighbors[neighbors_count] = malloc(sizeof(TrieNode));
-
-		new_neighbors[neighbors_count]->word = malloc(sizeof(char) *
-							(strlen(state->state_name->list_of_names[k]) + 1) );
-		printf("reached here\n");
-
-		memcpy(new_neighbors[neighbors_count]->word,
-
-			   state->state_name->list_of_names[k],
-			   sizeof(char) * (strlen(state->state_name->list_of_names[k]) + 1 ));
-		///
-		// delete node_to_put_context_state_at->neighbors
-
-		// might need to change this later
-		free(node_to_put_context_state_at->neighbors);
-		node_to_put_context_state_at->neighbors = new_neighbors;
-
-		printf("%x\n", node_to_put_context_state_at->neighbors);
-		TrieNode** currently_saved_word = node_to_put_context_state_at->neighbors[neighbors_count];
-		// currently_saved_word->neighbors[0]
-		printf("%i, \n", k + 1);
 		
-		for(int i = k + 1; i < state->state_name->number_of_names; i++)
-		{
-			// add next word at new_neighbors[new_neighbors->neighbors_count]
-			//node_to_put_context_state_at = node_to_put_context_state_at->
-
-		}*/
-		// assume tracker is at the last word added
-		/*
-		make new node
-		append to end of tracker
-		tracker = new node
-		repeat untill out of words
-
-		set tracker's context state pointer to state
-		*/
-		// set it's context state pointer to state
+	}
 	
-	/*}
-	else
-	{
-		// add in after root
-	}*/
 }
 /////
 int main(int argc, char** argv)
@@ -1803,6 +1816,8 @@ int main(int argc, char** argv)
 	*/
 
 	printf("%i\n", _primitive);
+	printf("%i\n", parsing_results);
+	//exit(1);
 	for(int i = 0; i < parsing_results;)
 	{
 		int json_type = tokens[i].type;
@@ -1811,6 +1826,7 @@ int main(int argc, char** argv)
 			printf("primitive\n");
 			 i++;
 		}
+		// i == 73896
 		else if(json_type == 1)
 		{
 			//printf("object to run %i\n", i);
@@ -1819,8 +1835,19 @@ int main(int argc, char** argv)
 			ContextState* state = makeContextState(&i, tokens, parsing_graph, parsing_results);
 
 			printf("printing state\n\n");
-			printContextState(state);
-			addToTrie(root, state);
+			//printContextState(state);
+			if(root != NULL)
+			{
+				addToTrie(root, state);
+
+			}
+			if(root->neighbors != NULL)
+			{
+				printf("printing tree\n");
+				printTrieNodeTree(root, 1);
+				printf("\n");
+			}
+
 			//void addToTrie(TrieNode* root, ContextState* state)
 
 			if(i >= parsing_results)
@@ -1841,7 +1868,10 @@ int main(int argc, char** argv)
 			printf("string\n");
 			 i++;
 		}
-
+		// to ensure machines can't alter each other's data only allow the current machine to be passed to each function
+		// how can a machine indirectly alter another machine?
+		// https://stackoverflow.com/questions/2672015/hiding-members-in-a-c-struct
+		// https://mattferderer.com/what-is-the-actor-model-and-when-should-you-use-it
 		//printf("|%s|\n", collectChars(tokens[i], parsing_graph));
 	}
 	

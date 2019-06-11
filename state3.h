@@ -75,9 +75,19 @@ typedef struct TrieNodePackage
 typedef struct TrieNodePackage2
 {
 	TrieNode* address;
+	TrieNode* node_from_root;
 	bool address_is_match;
 
 }TrieNodePackage2;
+
+typedef struct TrieNodePackage3
+{
+	TrieNode* dict_trie_node;
+	TrieNode* context_state_attribute_trie_node;
+	bool context_state_is_found;
+	bool is_first_mismatch;
+	bool need_to_append_more_name;
+}TrieNodePackage3;
 
 typedef struct TrieTree
 {
@@ -133,6 +143,7 @@ typedef struct Data
 	int string_size;
 
 	float _float;
+
 }Data;
 typedef struct ContextState
 {
@@ -185,15 +196,33 @@ typedef struct ContextState
 
 		// when parts of a full name are linked to a context state object
 		// the context state object may be a dummy node
-		bool dummy_node;
+		//bool dummy_node;
 
+		// can only be a function state or a data state
 		bool (*function_pointer)(char* name, void** tree);
 		char* function_pointer_name;
 
 		Data* var_data;
+		int context_id;  // each context is enumerated
+		
+		// used by visitor function
+		// set in parser
+		bool start_children_are_parallel;
+		bool nexts_are_parallel;
+		bool is_start_child;
+		bool is_child;
+		bool is_parent;
+		bool is_start_state;
+		bool is_end_state;
+		bool is_data_state;
 
-		
-		
+		// set in visitor
+		bool is_visited;
+		int total_start_children_who_failed;
+
+		// set by an api the state function uses
+		char* debugging_log;
+
 }ContextState;
 
 
