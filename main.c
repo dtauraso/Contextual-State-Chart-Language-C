@@ -127,6 +127,7 @@ int countLines(char* input)
 {
 	int num_lines = 0;
 	unsigned input_size = strlen(input);
+	printf("%s\n", input);
 	for(int i = 0; i < input_size; i++)
 	{
 		if(input[i] == '\n')
@@ -328,116 +329,25 @@ bool tokenIsKeyWord(char* token_string)
 
 // for reading the token sequence the json parsing api provides
 
-//////////////
-
-
-// count backwards from current sequence
-// 0th items, 0
-// n-(n - 1)1th item, 0
-// n-(n-2)th item, 1
-// n-(n-3)th item, 2
-// ...
-// nth item, |delimiter_indicies|
-// call stack evaluation order
-// f(name3, (NULL, [0, 0])) => (name3, [0, 0])
-// f(name2, (name3, [0, 0])) => (name2_name3, [5, 0])
-// f(name1, (name2_name3, [5, 0])) => (name1_name2_name3, [5, 11])
-/*
-ith_call counts down
-ith_call_revers counts up
-f(nth_name, f_name_delimiter_loc, ith_call, ith_call_reverse)
-	if(f_name_delimiter_loc.f_name == NULL)
-		return (nth_name, delimiter_loc.set(zeros, size = ith_call_reverse - 1))
-	else
-		new_name = concat(nth_name, "_", f_name_delimiter_loc.f_name)
-		if(ith_call <= 1)  second to last and last calls
-			index = 0
-		else
-			index = ith_call - 1
-		f_name_delimiter_loc[index] = |nth_name| + 1
-		return(new_name, f_name_delimiter_loc))
-*/
-
-//////////
-/*
-void printListOfListsOfStrings(NeighborNames* names)
-{
-	if(names != NULL)
-	{
-		if(names->number_of_names > 0)
-		{
-			printf("printing lists\n");
-			for(int i = 0, j = 0; i < names->number_of_names; i++)
-			{
-				if(i == 0 && j == 0)
-				{
-					printf("start of list\n");
-				}
-
-				//printf("%i, %i\n", i, j);
-				if(i != 0)
-				{
-					if(i == names->start_names[j + 1])
-					{
-						j++;
-						printf("\nstart of list\n");
-
-					}
-				}
-				printf("%s\n", names->list_of_names[i]);
-
-			}
-			printf("\n\n");
-		}
-		else
-		{
-			printf("empty list\n\n");
-		}
-	}
-	else
-	{
-		printf("empty list\n");
-		printf("\n\n");
-
-	}
-}
-*/
 
 
 
-/*
 
-findInTrie(NeighborNames* name, TrieNode* node)
-{
-	current = next one after root
-	prev = root
-	if current is empty
-		return prev
-	else
 
-		for i in enumerate(name)
-			while current is not null
-
-				check all children of node
-					if a single string == name[i]
-						advance pointers
-			return prev
-			
-
-}
-*/
-
-////
-// trie tree functions
-
-/////
 int main(int argc, char** argv)
 {
 	char* input = readFile(argv[2]);
 	//printf("%s\n", input);
+	if(!input)
+	{
+		printf("can't find %s\n", argv[2]);
+		exit(1);
+	}
 	// todo
+	//printf("make tree\n");
 	// get rid of all blank lines
 	ContextState* tree = makeTree(input);
+	//printf("made tree\n");
 	//printTree(tree, 0);
 	const char* parsing_graph = readFile(argv[1]);
 	//printf("%s\n", parsing_graph);
@@ -462,6 +372,7 @@ int main(int argc, char** argv)
 			struct TrieNode** neighbors;
 			int neighbors_count;
 
+			int size;  // factor of 2
 			struct ContextState* object;
 		}TrieNodee;
 

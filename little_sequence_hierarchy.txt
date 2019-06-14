@@ -1,0 +1,68 @@
+test_data
+	input_sequence
+		1
+			Data
+			(4k56)
+		2
+			Data
+			(a12h)
+		3
+			()
+	ith_sequence
+		Data
+			0
+	i
+		Data
+			0
+-(
+	Function
+		leftParens
+	Next
+		letters_and_digits
+letters_and_digits
+	Function
+		returnTrue
+	Next
+		)
+	Children
+		digit
+			-0
+				Function
+					isDigit
+				Next
+					letters / 0
+			1
+				Function
+					isDigit
+				Next
+					digit / 2
+			2
+			3
+				Function
+					isDigit
+				Next
+					digit / 4
+			4
+				Function
+					isDigit
+				Next
+					letters / 2
+		letters
+			0
+				Function
+					isLetter
+				Next
+					digit / 1
+			-1
+				Function
+					isLetter
+				Next
+					digit / 3
+			2
+
+		-No letters and no digits
+			Function
+				noLettersAndNoDigits
+)
+	Function
+		rightParens

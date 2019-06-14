@@ -535,12 +535,13 @@ ContextState* makeTree(char* input)
 {
 	// needs the input to end on a newline after the last collectable text
 	// there can't be any lines with only indents
+	//printf("makeTree\n");
 
 	int current_indent = 0;
 	int next_indent = 0;
 	int i = 0;
 	int num_lines = countLines(input);
-
+	//printf("here\n");
 	ContextState* dummy_dummy_root = initContextState();
 	dummy_dummy_root = setName(dummy_dummy_root, "\"dummy_dummy_root\"");
 
@@ -559,7 +560,6 @@ ContextState* makeTree(char* input)
 	ContextState* parent = root;
 
 	ContextState* child;
-
 
 	doubleLink(dummy_dummy_root, dummy_root);
 
@@ -596,7 +596,7 @@ ContextState* makeTree(char* input)
 		free(word);
 
 	}
-
+	//printf("got here\n");
 
 	// input[i] should be first char of 3rd word
 	int count = 0;
@@ -891,6 +891,27 @@ ContextState* makeContextState(int* i, jsmntok_t tokens[], const char* input, in
 	printTrieNodeTree(parents, 0);
 	printf("\n\n");
 	*/
+		/*
+	{
+	    "name":           ["start"],
+	    "nexts":          [],
+	    "start_children": [["("]],
+	    "children":       [["test_data"],
+	                       ["letters_and_digits"],
+	                       [")"]],
+	    "function_name":  "returnTrue",
+	    "data":           {"nothing": "null"},
+	    "parents":        [["NONE"]],
+	    "start_children_are_parallel" : 0,
+	    "nexts_are_parallel" : 0,
+	    "is_start_child" : 0,
+	    "is_child" : 0,
+	    "is_parent" : 1,
+	    "is_start_state" : 0,
+	    "is_end_state" : 0,
+	    "is_data_state" : 0
+	  }
+  */
 
 	ContextState* current_state = makeFullContextState(
 		name,

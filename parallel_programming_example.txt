@@ -1,0 +1,114 @@
+-state 1
+	Function
+		returnFalse
+	Next
+		state 2 false
+		state 3 true
+		state 4 true
+state 2 false
+	Function
+		returnTrue
+state 3 true
+	Function
+		returnTrue
+state 4 true
+	Function
+		returnTrue
+	Next
+		------------------------------
+		state 5 true
+		state 6 true
+		------------------------------
+	Children
+		------------------------------
+		-state 11
+			Function
+				returnTrue
+			Next
+				state 12
+		state 12
+		-state 13
+			Function
+				returnTrue
+			Next
+				------------------------------
+				state 14
+				state 15
+				------------------------------	
+		state 14
+			Functin
+				returnTrue
+			Next
+				state 16
+		state 15
+			Function
+				returnTrue
+			Next
+				state 17		
+		state 16
+			Function
+				returnTrue
+			Next
+				state 17
+		state 17
+			Function
+				returnTrue
+			Next
+				state 18 false
+				state 19 true
+		state 18 false
+			Function
+				returnFalse
+		state 19 true
+
+		-state 20
+			Function
+				returnTrue
+			Next
+				state 21
+		state 21
+			Function
+				returnTrue
+			Next
+				state 22
+				state 23
+		state 22
+		state 23
+			Function
+				returnTrue
+			Next
+				state 24
+		state 24
+			Function
+				returnTrue
+			Next
+				state 25
+		state 25
+			Function
+				returnFalse
+		------------------------------
+state 5 true
+	Function
+		returnTrue
+	Next
+		state 7 false
+		state 8 false
+
+state 6 true
+	Function
+		returnTrue
+	Next
+		state 7 false
+		state 9 true
+state 7 false
+	Function
+		returnFalse
+state 8 false
+	Function
+		returnFalse
+state 9 true
+	Function
+		returnTrue
+	Next
+		state 10 true
+state 10 true
