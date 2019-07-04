@@ -127,7 +127,7 @@ int countLines(char* input)
 {
 	int num_lines = 0;
 	unsigned input_size = strlen(input);
-	printf("%s\n", input);
+	//printf("%s\n", input);
 	for(int i = 0; i < input_size; i++)
 	{
 		if(input[i] == '\n')
@@ -330,8 +330,17 @@ bool tokenIsKeyWord(char* token_string)
 // for reading the token sequence the json parsing api provides
 
 
-
-
+/// state functions for testing visitor function
+bool returnTrue(ContextState* current_state)
+{
+	printf("return true\n");
+	return true;
+}
+bool returnFalse(ContextState* current_state)
+{
+	printf("return false\n");
+	return false;
+}
 
 
 int main(int argc, char** argv)
@@ -388,7 +397,26 @@ int main(int argc, char** argv)
 	root->object = 0;
 	root->size = 0;
 
-	// 
+
+
+	TrieNode* functions_root = malloc(sizeof(TrieNode));
+	char* functions_root_word = "functions_root";
+
+	functions_root->word = malloc(sizeof(char) * 15);
+	memcpy(functions_root->word, functions_root_word, sizeof(char) * 15);
+	functions_root->neighbors = NULL;
+	functions_root->neighbors_count = 0;
+	functions_root->object = 0;
+	functions_root->size = 0;
+	// searching for the state in the trie can take n time
+	
+	// finding the right function to add to the state can take n time
+	// visitor function n^2, because n states will be visited and potentially all the state names have to be checked to reach the state for each state
+	// make a state
+	// convert function name string into a trienode pointing to trinode holding the state
+	// add the trienode chain to the state
+	// put the function pointer to the state
+	// add the state to the functions dict via functions_root
 
 	//printf("%i\n", parsing_results);
 	/*
@@ -414,6 +442,7 @@ int main(int argc, char** argv)
 	//printf("%i\n", _primitive);
 	//printf("%i\n", parsing_results);
 	//exit(1);
+	int insert_count = 0;
 	for(int i = 0; i < parsing_results;)
 	{
 		int json_type = tokens[i].type;
@@ -426,14 +455,20 @@ int main(int argc, char** argv)
 		{
 			//printf("object to run %i\n", i);
 			//printf("|%s|\n", collectChars(tokens[i], parsing_graph));
-
+			// n objects * n function names to check through = n^2
 			ContextState* state = makeContextState(&i, tokens, parsing_graph, parsing_results);
 
 			//printf("printing state\n\n");
 			//printContextState(state);
 			if(root != NULL)
 			{
-				insert(root, state);
+				if(insert_count == 17)
+				{
+					printf("\nfinished\n");
+					exit(1);
+				}
+				insert2(root, state->state_name->neighbors[0], state);
+				insert_count++;
 
 			}
 			
@@ -466,10 +501,20 @@ int main(int argc, char** argv)
 	}
 	if(root->neighbors != NULL)
 	{
+		
 		printf("printing tree\n");
 		printTrieNodeTree(root, 1);
 		printf("\n");
 	}
+	ContextState* test = makeFullContextState2(NULL, NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	returnTrue);
+	test->function_pointer(tree);
+	printf("%lu\n", sizeof(ContextState));
 	// loop untill hit object
 	// call makeContextState on object
 	/*

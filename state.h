@@ -40,14 +40,12 @@ typedef struct ContextState
 		char* name;
 		struct TrieNode* state_name;
 
-		int** neighbors;
-		int* neighbors_count;
 
 		struct TrieNode* start_children;
 
 
 		struct ContextState** parents;
-		int* parents_hash;
+
 
 		char** parents_names;
 		int parents_size;
@@ -62,7 +60,7 @@ typedef struct ContextState
 		// (current state, prev item on stack, is_indent_on)
 
 		struct ContextState** children;
-		int* children_hash;
+
 
 		char** children_names;
 		int children_size;
@@ -71,11 +69,6 @@ typedef struct ContextState
 
 
 		struct ContextState** nexts;
-		int* nexts_hash;
-
-		char** nexts_names;
-		int nexts_size;
-
 
 		struct TrieNode* nexts_;
 
@@ -89,7 +82,7 @@ typedef struct ContextState
 		//bool dummy_node;
 
 		// can only be a function state or a data state
-		bool (*function_pointer)(char* name, void** tree);
+		bool (*function_pointer)(struct ContextState* state);
 		char* function_pointer_name;
 
 		Data* var_data;
@@ -149,5 +142,23 @@ char* getNextWord(char* input, int i);
 char* collectChars(jsmntok_t token, const char* input);
 
 
+ContextState* makeFullContextState2(
+	struct TrieNode* name,
+	struct TrieNode* nexts,
+	struct TrieNode* start_children,
+	struct TrieNode* children,
+	char* function_name,
+	Data* variable_from_json_dict,
+	struct TrieNode* parents,
+	bool (*function_pointer)(struct ContextState* state));
+
+ContextState* makeFullContextState(
+	struct TrieNode* name,
+	struct TrieNode* nexts,
+	struct TrieNode* start_children,
+	struct TrieNode* children,
+	char* function_name,
+	Data* variable_from_json_dict,
+	struct TrieNode* parents);
 
 #endif

@@ -229,6 +229,7 @@ void printTrieNodeTreeFlat(TrieNode* root)
 
 void printContextState2(ContextState* node)
 {
+	printf("-> ");
 	printTrieNodeTreeFlat(node->state_name);
 }
 
@@ -245,7 +246,30 @@ ContextState* initContextState()
 
 	return test;
 }
+ContextState* makeFullContextState2(
+	TrieNode* name,
+	TrieNode* nexts,
+	TrieNode* start_children,
+	TrieNode* children,
+	char* function_name,
+	Data* variable_from_json_dict,
+	TrieNode* parents,
+	bool (*function_pointer)(struct ContextState* state))
+{
+	// printf("got here\n");
 
+	ContextState* state = makeFullContextState(
+	name,
+	 nexts,
+	 start_children,
+	 children,
+	 function_name,
+	 variable_from_json_dict,
+	 parents);
+	state->function_pointer = function_pointer;
+	return state;
+
+}
 ContextState* makeFullContextState(
 	TrieNode* name,
 	TrieNode* nexts,
@@ -256,15 +280,35 @@ ContextState* makeFullContextState(
 	TrieNode* parents)
 {
 	// name, nexts, start_children, children, parents are all dummy nodes
+	//printf("got here\n");
 
 	int sizeof_trie_node = sizeof(TrieNode);
 
 	int sizeof_context_state = sizeof(ContextState);
 
 	int sizeof_data = sizeof(Data);
+	//printf("got here\n");
 
-	int sizeof_function_name = sizeof(char) * (strlen(function_name) + 1);
+	int sizeof_function_name = 0;
+	if(function_name != NULL)
+	{
+		sizeof_function_name = sizeof(char) * (strlen(function_name) + 1);
+
+	}
 	ContextState* node 			= malloc(sizeof_context_state);
+	//printf("got here\n");
+
+	if(name == NULL &&
+		nexts == NULL &&
+		start_children == NULL &&
+		children == NULL &&
+		function_name == NULL &&
+		variable_from_json_dict == NULL &&
+		parents == NULL)
+	{
+		//printf("all null\n");
+		return node;
+	}
 	node->state_name 			= malloc(sizeof_trie_node);
 	node->nexts_ 				= NULL;
 	node->start_children 		= NULL;
@@ -483,27 +527,33 @@ void printTree(ContextState* root, int indent_level)
 	}
 	else
 	{
-		if(indent_level > 0)
+		if(root->name != NULL)
 		{
-			char* indents = makeSpaces(indent_level);
-			if(indents != NULL)
-			{
 
-				printf("%s%i %s\n\n", indents, indent_level, root->name);
+			if(indent_level > 0)
+			{
+				char* indents = makeSpaces(indent_level);
+				if(indents != NULL)
+				{
+					printf("%s%i %s\n\n", indents, indent_level, root->name);
+
+				}
+
+				free(indents);
 
 			}
+			else
+			{
+						//printf("here\n");
 
-			free(indents);
+				printf("%s\n\n", root->name);
 
+			}
 		}
 		else
 		{
-					//printf("here\n");
-
-			printf("%s\n\n", root->name);
-
+			printf("no name\n\n");
 		}
-		
 		//printf("screwed\n");
 		for(int i = 0; i < root->children_size; i++)
 		{
@@ -865,6 +915,9 @@ ContextState* makeContextState(int* i, jsmntok_t tokens[], const char* input, in
 	token = tokens[*i];
 	//printf("%s\n", tokenType(token));
 	char* function_name = collectChars(token, input);
+	// n time for this
+	// add to a trienode
+	// insert into a functions trie	
 	//printf("function name %s\n", collectChars(token, input));
 
 	*i += 1;
@@ -912,6 +965,8 @@ ContextState* makeContextState(int* i, jsmntok_t tokens[], const char* input, in
 	    "is_data_state" : 0
 	  }
   */
+	  // also should add the actual functions to the state
+	  // f(state, parent)
 
 	ContextState* current_state = makeFullContextState(
 		name,

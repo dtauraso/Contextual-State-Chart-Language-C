@@ -253,573 +253,824 @@ TrieNode* convertLispChainToTrieNodeChain(LispNode* root)
 	return NULL;
 }
 
-int isMatch(char* ith_word, TrieNode* node)
+// binary search
+// find the midpoint after the search fails
+// append to the right
+/*
+int searchInsert(vector<int>& nums, int target) {
+        
+        int low = 0;
+        int high = nums.size();
+        while(low < high)
+        {
+            int mid = (low + high) / 2;
+            if( nums[mid] == target)
+            {
+                return mid;
+            }
+            else if( target > nums[mid])
+            {
+                low = mid + 1;
+            }
+            else if( target < nums[mid])
+            {
+                high = mid - 1;
+            }
+
+
+        }
+        if(low == nums.size())
+            return nums.size();
+        if(nums[low] < target) return low + 1;
+        return low;
+    }
+*/
+
+// searching
+int computeLocation(int low,  int size,  TrieNode* node, char* target)
 {
-	// finds out if ith_word is a neighbor of node
-	if(ith_word != NULL && node != NULL)
+	//printf("computeLocation\n");
+	//printf("low %i, size %i\n", low, size);
+	// segfaults here
+	//printf("%s, %s\n", node->neighbors[low]->word, target);
+	// if low == 0 and size == 0
+	//printf("%i\n", lessThan(node->neighbors[low]->word, target));
+	//if(low == 0 && size == 0)
+	// low can't be >= size
+	if(low == size)
 	{
-		//printf("isMatch\n");
-		//printf("# of neighbors %i\n", node->neighbors_count);
-		// returns the index on the first match
-		for(int j = 0; node != NULL && j < node->neighbors_count; j++)
+		return size;
+	}
+	if(low < size)
+	{
+		// size must reflect the actual size of the array not the array before it
+		if(strcmp(target, node->neighbors[low]->word) >= 0)
 		{
-			if(node->neighbors[j] != NULL)
-			{
-				if(node->neighbors[j]->word != NULL)
-				{
-					//printf("%s == %s\n", ith_word, node->neighbors[j]->word);
-					if(strcmp(ith_word, node->neighbors[j]->word) == 0)
-					{
-						//printf("passes\n");
-						return j;
-					}
-				}
-				else
-				{
-					return -1;
-				}
-			}
-			else
-			{
-				return -1;
-			}
+			//printf("%i\n", low + 1);
+			// don't need low + 1 because mid is set to mid + 1
+			return low;
 		}
-	}	
+	}
+	
+	
+	
+	return low;
+}
+bool areNeighborsNull(TrieNode* node, TrieNode* target_chain)
+{
+	if(node != NULL && target_chain != NULL)
+	{
+		if(node->neighbors == NULL)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+bool canWeSearchWithTheDataAvaliable(TrieNode* node, TrieNode* target_chain)
+{
+	if(node != NULL && target_chain != NULL)
+	{
+		if(node->neighbors != NULL && target_chain->word != NULL)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+// binsearch edge cases for matching
+enum edgeCases{end_of_perfect_match, target_chain_has_more_words, can_keep_matching, state_already_exists};
+int matchEdgeCases(TrieNode* node, TrieNode* target_chain)
+{
+	// check ahead for the possible end conditions
+	// some will result in more searching
+	// some are termination cases
+	// can we keep going or not?
+
+	if(node != NULL && target_chain != NULL)
+	{
+		if((node->neighbors != NULL && target_chain->neighbors == NULL) ||
+		(node->neighbors == NULL && target_chain->neighbors == NULL)
+		)
+		{
+			//printf("end of perfect match\n");
+			// end of perfect match
+			// check for state existing
+			if(node->object)
+			{
+				//printf("state already exists\n");
+				return state_already_exists;
+				// if state is there
+					// return state exists
+			}
+			return end_of_perfect_match;
+		}
+		// case 1 tree has nothing left to match but target chain has more words
+
+		// canWeSearchWithTheDataAvaliable?
+		if(node->neighbors == NULL && target_chain->neighbors != NULL)
+		{
+			//printf("target chain has more words\n");
+			// target_chain_has_more_words
+			return target_chain_has_more_words;
+		}
+		else // node->neighbors != NULL && target_chain->neighbors != NULL
+		{
+			//printf("can keep matching\n");
+			if(target_chain->word != NULL)
+				// can keep matching
+				return can_keep_matching;
+		}
+	}
 	return -1;
 }
-
-TrieNodePackage* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings)
+////
+/*
+typedef struct TrieNodePackage2
 {
-
-	// sequence_of_strings is the address of the first word in the state name
-	// sequence_of_strings attribute set
-	// word has a word stored
-	// neighbors has 1 neighbor
-	// neighbors_count == 1
-	// size == 2
-	// object = null
-	// we are returning the node where we will start appending the words remaining
-	// and the index of the first word remaining
-	/*
-	how does this work?
-	*/
-	/*
-	typedef struct TrieNodePackage2
-	{
-		TrieNode* address;
-		bool address_is_match;
-
-	}TrieNodePackage;
-	*/
-	//printf("findInTrie2\n");
-
-	/*
-	typedef struct TrieNodePackage3
-	{
-		TrieNode* dict_trie_node;
-		TrieNode* context_state_attribute_trie_node;
-		bool context_state_is_found;
-		bool is_first_mismatch;
-		bool need_to_append_more_name;
-	}TrieNodePackage3;
-	*/
-	TrieNodePackage* package = malloc(sizeof(TrieNodePackage));
-
-	package->dict_trie_node = root;
-	package->context_state_attribute_trie_node = sequence_of_strings;
-
-	package->context_state_is_found = NULL;
-	package->is_first_mismatch = NULL;
-	package->need_to_append_more_name = NULL;
-
-	//TrieNode* dict_trie_node_prev = root;  // can't be null cause isMatch may return -1
-
-
-	//prev = root;
-	//printf("root->neighbors %x\n", root->neighbors);
-	// replace this with something cleaner
-	/*
-
-	null, null case 1(assume both tree and input are null)
-	loop
-		
-
-		a, b (no match stop)
-
-		a, a(keep matching)
-			null, null case 2(perfect match) enumerate this (match)
-				context state doesn't exist
-				else
-					reutrn a found flag
-			*, null(input was completely found but tree still has more nodes)(match)
-				context state doesn't exist
-				else
-					return a found flag
-			
-
-			null, *(tree ran out of input first)
-
-
-	tree, input
-	a, b (no match stop)
-	a, null(input was completely found)
-	null, b(tree ran out of input first)
-	null, null case 1(assume both tree and input are null)
-
-	null, null case 2(perfect match)
-	a, a
-
-	any matching doesn't prove there is a context node or not
-	matching and checking for a context node are separate
-	*/
-	/*
-	found
-	current
-	string_tracker
-	is_partial_match
-	need_to_append_more_name
-	*/
-	if(package->dict_trie_node == NULL || package->context_state_attribute_trie_node == NULL)
-	{
-		// return null package
-		return NULL;
-	}
-
-	/*
-	these entries are also in the code where they are set
-	need_to_append_more_name, context_state_is_found
-	0, 0
-	0, 1
-	1, 0
-	1, 0
-	*/
-	int i = 0;
-	while(package->dict_trie_node != NULL &&
-		  package->context_state_attribute_trie_node != NULL)
-	{
-		/*
-		if(package3->dict_trie_node->word != NULL &&
-		  package3->context_state_attribute_trie_node->word != NULL)
-		{
-			printf("%s, %s\n", package3->dict_trie_node->word, package3->context_state_attribute_trie_node->word);
-
-		}
-		*/
-		// first time the root's neighbors are checked with the first name
-		int ith_branch = isMatch(package->context_state_attribute_trie_node->word,
-								 package->dict_trie_node);
-		if(ith_branch >= 0) // match
-		{
-			//printf("perfect match\n");
-			package->is_first_mismatch = false;
-			// stop conditiions
-			// perfect match(full match) or
-			// input was completely found but tree still has more nodes (full match)
-
-			//null, null case 2(perfect match)
-			// *, null(input was completely found but tree still has more nodes)(match)
-
-			if(
-				(package->context_state_attribute_trie_node->neighbors == NULL) 		||  // safety check only(not a case)
-
-				(package->dict_trie_node->neighbors[ith_branch] 			== NULL &&
-			   package->context_state_attribute_trie_node->neighbors[0] 	== NULL) 	||
-
-				(package->dict_trie_node->neighbors[ith_branch] 			 != NULL &&
-			   	   package->context_state_attribute_trie_node->neighbors[0] == NULL)
-				)
-			{
-				if(
-					(package->context_state_attribute_trie_node->neighbors == NULL) 		||
-
-					(package->dict_trie_node->neighbors[ith_branch] 		!= NULL))
-				{
-					//printf("perfect match 2\n");
-
-				}
-				package->need_to_append_more_name = false;
-				//printf("%x\n", package3->dict_trie_node->neighbors[ith_branch]->object);
-
-				if(package->dict_trie_node->neighbors[ith_branch]->object != NULL)
-				{
-					// return a found flag
-					package->context_state_is_found = true;	// 	0, 1
-					return package;
-				}
-				else
-				{
-					// already existing objects are being put in here as an objectless internal node
-					//printf("can add as an internal node\n");
-					// need to add it
-					package->context_state_is_found = false;  // 	0, 0
-					if((package->context_state_attribute_trie_node->neighbors == NULL) 		||
-						(package->dict_trie_node->neighbors[ith_branch] 		!= NULL))
-					{
-						// advance the dict tracker to the next one because it already matched and will be the location of the next
-						// ContextState object
-						// the contest state attribute tracker is null because we have no new trie nodes to insert
-						package->dict_trie_node = package->dict_trie_node->neighbors[ith_branch];
-						//package3->context_state_attribute_trie_node = NULL;
-						//package3->dict_trie_node = package3->dict_trie_node->neighbors;
-
-						/*if(package3->dict_trie_node->word != NULL &&
-								  package3->context_state_attribute_trie_node->word != NULL)
-						{
-							printf("%s, %s\n", package3->dict_trie_node->word, package3->context_state_attribute_trie_node->word);
-
-						}*/
-
-					}
-					//package3->dict_trie_node = package3->dict_trie_node->neighbors[ith_branch];
-					return package;
-				}
-			}
-			// relationship with ith_branch < 0
-			/*
-			ran out of input = not present
-			mismatch == the character present is wrong 
-			*/
-			// null, *(tree ran out of input first)
-			// tree ran out of input first(partial match)
-			else if(package->dict_trie_node->neighbors[ith_branch] 	     == NULL &&
-			   	   package->context_state_attribute_trie_node->neighbors[0] != NULL)
-			{
-				//printf("partial match\n");
-
-				// 	1, 0
-
-				// sequence of strings doesn't exists
-				package->context_state_is_found = false;
-
-				// need to append more names to trie tree dict
-				package->need_to_append_more_name = true;
-				return package;
-
-				// return current and string tracker
-			}
-			// a, a(keep matching)
-			// all good, so advance
-			else
-			{
-				//printf("advance\n");
-				//dict_trie_node_prev = package3->dict_trie_node;
-				package->dict_trie_node = package->dict_trie_node->neighbors[ith_branch];
-				package->context_state_attribute_trie_node = package->context_state_attribute_trie_node->neighbors[0];
-			}
-		
-		}
-		// a, b case 
-		// can't use the current versions of the trackers cause appending would have this for a future check
-		// a, b
-		// b
-		// current->neighbors == NULL should be in here
-		// 1, 0
-		else // ith_branch < 0
-		{
-			//printf("mismatch\n");
-			//printf("%s, %s\n", package3->dict_trie_node->word, package3->context_state_attribute_trie_node->word);
-			// need to know if it was the first mismatch
-			if(i == 0)
-			{
-				package->is_first_mismatch = true;
-			}
-			else
-			{
-				package->is_first_mismatch = false;
-			}
-			//printf("here neighbors\n");
-			// 	NULL, 1, 0
-			// return dict_trie_node and context_state_attribute_trie_node
-			package->context_state_is_found = false;
-			package->need_to_append_more_name = true;
-			// package3->is_partial_match is not set cause we don't know if the first one was a mismatch or the nth one
-			// was a mismatch
-			// need to return the node in the dict path right before the mismatch occurred so the future checks looks like this
-			// [a, b] are neighbors
-			// b
-			// which will be a match next time
-			// actually did go in right place entire time(not sure why)
-			//package3->dict_trie_node = dict_trie_node_prev;
-			return package;
-		}
-		i++;
-	}
-
-
-	return NULL;
+	TrieNode* tree_pointer;
+	TrieNode* target_pointer;
+	int location;
+	bool state_there;
 }
-/*
-	typedef struct TrieNode
-	{
+*/
+TrieNodePackage2* makePackage(TrieNode* tree_pointer,
+							 TrieNode* target_pointer,
+							 int location,
+							 bool state_there,
+							 ContextState* object_found)
+{
+	TrieNodePackage2* package = malloc(sizeof(TrieNodePackage2));
+	package->tree_pointer = malloc(sizeof(TrieNode));
+	package->target_pointer = malloc(sizeof(TrieNode));
+	package->tree_pointer = tree_pointer;
+	package->target_pointer = target_pointer;
 
-		char* word;
-		struct TrieNode** neighbors;
-		int neighbors_count;
-
-		struct ContextState* object;
-	}TrieNodee;
-
+	package->location = location;
 	
-*/
-/*
-typedef struct NeighborNames
-{
-	char** list_of_names;
-	int number_of_names;
-	int* start_names;
-	int number_of_start_names;
-}NeighborNames;
-
-*/
-TrieNode* appendWord(TrieNode* node, char* ith_name)
-{
-	///printf("appendWord\n");
-	// what happens the first time?
-	// size and neighbors_count still being set by compiler
-	if(ith_name != NULL)
+	package->state_there = state_there;
+	//printf("%i %i\n", state_there, object_found);
+	if(state_there)
 	{
-		// make sure node->neighbors_count > node->size is not happening anywhere these are updated
-		// node->neighbors_count > node->size is wrong
-		//printf("before size %i, count %i\n",node->size, node->neighbors_count);
+		package->object_found = malloc(sizeof(ContextState));
+		package->object_found = object_found;
+		//memcpy(package->object_found, object_found, sizeof(ContextState));
 
-		//TrieNode** neighbors = NULL;//node->neighbors;
+	}
+	else
+	{
+		package->object_found = NULL;
+	}
+
+	return package;
+}
+TrieNodePackage2* mainBinSearch(TrieNode* node, TrieNode* target_chain)
+{
+	int low = 0;
+	int high = node->size - 1;
+	int mid = (low + high) / 2;
+	TrieNode* node_tracker = node;
+	TrieNode* target_chain_tracker = target_chain;
+	//TrieNode* mid_node = node_tracker->neighbors[mid];
+	if(node_tracker->neighbors[mid] != NULL)
+	{
+		//char* key;
+		//char* value;
+		//printf("low and high\n");
+		while(low <= high)
+		{
+			//key = mid_node->word;
+			//value = target_chain_tracker->word;
+			//printf("%i, %i\n", low, high);
+
+			int is_less_than = strcmp(target_chain_tracker->word,
+									  node_tracker->neighbors[mid]->word);
+			// key is always the same
+			// still not always finding the correct location to insert
+			//printf("target %s, tree %s\n", target_chain_tracker->word,
+			//							   node_tracker->neighbors[mid]->word);
+			//printf("%i\n", mid);
+			if(strcmp(target_chain_tracker->word,
+				      node_tracker->neighbors[mid]->word) == 0)
+			{
+				// deal with match
+				// check ahead for conditions
+				// 
+
+				int edge_case_result = matchEdgeCases(node_tracker, target_chain_tracker);
+				//printf("edge case result %i\n", edge_case_result);
+				/*
+				is the state there?
+					don't add
+				else
+					if chain is null
+						add in state
+					else
+
+						add chain in and state
+				*/
+				if(end_of_perfect_match == edge_case_result)
+				{
+					//printf("end_of_perfect_match\n");
+					// (tree_pointer, null, mid, !state_there)
+					return makePackage(node_tracker, NULL, mid, 1, node_tracker->neighbors[mid]->object);
+				}
+				else if(target_chain_has_more_words == edge_case_result)
+				{
+					//printf("target_chain_has_more_words\n");
+					//printf("mid %i\n", mid);
+					// (tree_pointer, target_pointer, mid, !state_there)
+					return makePackage(node_tracker, target_chain_tracker, mid, 0, NULL);
+				}
+				else if(can_keep_matching == edge_case_result)
+				{
+					//printf("can_keep_matching\n");
+					// update the locations
+
+					// reset the values mid, low, high
+					// advance the pointers
+					//node_tracker = mid_node;
+					node_tracker = node_tracker->neighbors[mid];
+
+					target_chain_tracker = target_chain_tracker->neighbors[0];
+					low = 0;
+					high = node_tracker->size;
+
+					mid = (low + high) / 2;
+					// low and high == 0
+
+					//key = mid_node->word;
+					//value = target_chain_tracker->word;
+
+					// can keep matching but not mid node neighbor, so target_chain_has_more_words
+					if(node_tracker == NULL || node_tracker->size == 0)
+					{
+						// return what we have
+						// (tree_pointer, target_pointer, mid, !state_there)
+						return makePackage(node_tracker, target_chain_tracker, mid, 0, NULL);
+					}
+
+					
+				}
+				else //if(state_already_exists)
+				{
+					//printf("state_already_exists\n");
+					// (tree_pointer, target_pointer, 0, state_there)
+					return makePackage(node_tracker, target_chain_tracker, 0, 1, node_tracker->neighbors[mid]->object);
+				}
+
+			}
+			else if(is_less_than < 0)
+			{
+				//printf("is_less_than\n");
+				high = mid - 1;
+				mid = (low + high) / 2;
+			}
+			else if(is_less_than >= 0)
+			{
+				//printf("!is_less_than\n");
+				low = mid + 1;
+				mid = (low + high) / 2;
+				//printf("%i, %i, %i\n", high, mid, low);
+			}
+			
+			
+			
+		}
+		//printf("finding location\n");
+		// can't use the size of the original array
+		int location_of_insert = computeLocation(low, node_tracker->size, node_tracker, target_chain->word);
+		//printf("location of insert %i\n", location_of_insert);
+		// we have the location of item
+		// can't be put before any words similar to item at location
+		// "item", "items"
+		// must go after items not item
+		// should be alot less linear search space than if binsearch is not used
+		// if mostly random then O(logn)
 		// 
-		// new item was stored at node->neighbors_count + 1 and node->neighbors_count == 0
-		//int neighbors_count = node->neighbors_count + 1;
-		//printf("neighbors_count %i\n", neighbors_count);
-		int sizeof_new_neighbors;
-		// not safely making a trinode*
-		TrieNode** new_neighbors = NULL;
-		if(node->neighbors_count == node->size)
+		if(location_of_insert < node_tracker->size)
 		{
-			if(node->size == 0)
+
+			while(strcmp(target_chain_tracker->word,
+						 node_tracker->neighbors[location_of_insert]->word) > 0)
 			{
-				sizeof_new_neighbors = sizeof(TrieNode*);
-				new_neighbors = malloc(sizeof_new_neighbors);
+				location_of_insert++;
 			}
-			else
-			{
-				sizeof_new_neighbors = sizeof(TrieNode*) * (node->size * 2);
-				new_neighbors = malloc(sizeof_new_neighbors);
-
-			}
-			memcpy(new_neighbors,
-			   node->neighbors,
-			   sizeof(TrieNode*) * node->neighbors_count);
-
 		}
-		else if(node->neighbors_count < node->size)
-		{
-			new_neighbors = node->neighbors;
-		}
-		// might be a problem when node->neighbors_count < node->size
-
-		//printf("here\n");
-
+		// return state of pointers where the new name part will be added
+		// (tree_pointer, target_pointer, location_of_insert, !state_there)
+		return makePackage(node_tracker, target_chain_tracker, location_of_insert, 0, NULL);
 		
-
-		// add (k+1)th word
-		//printf("got here\n");
-		// make a tracker pointing to the 
-		// maybe this pattern doesn't work when there was nothing originally in the array
-		new_neighbors[node->neighbors_count] = malloc(sizeof(TrieNode));
-		//printf("here now %s\n", ith_name);
-		int sizeof_ith_name = strlen(ith_name) + 1;
-
-		new_neighbors[node->neighbors_count]->word = malloc(sizeof(char) * sizeof_ith_name);
-		//printf("reached here\n");
-
-		
-
-		new_neighbors[node->neighbors_count]->neighbors = NULL;
-		new_neighbors[node->neighbors_count]->object = NULL;
-		new_neighbors[node->neighbors_count]->neighbors_count = 0;
-		new_neighbors[node->neighbors_count]->size = 0;
-
-
-
-		memcpy(new_neighbors[node->neighbors_count]->word,
-			   ith_name,
-			   sizeof(char) * sizeof_ith_name);
-
-		// only for copying over entire array
-		// delete node_to_put_context_state_at->neighbors
-		if(node->neighbors_count == node->size)
-		{
-			// might need to change this later
-			free(node->neighbors);
-
-			node->neighbors = new_neighbors;
-
-		}
-		//printf("after size %i, count %i\n",node->size, node->neighbors_count);
-
-		// will not work
-		// doesn't work if size == 0
-		if(node->neighbors_count == node->size)
-		{
-			if(node->size == 0)
-			{
-				node->size = 1;
-			}
-			else
-			{
-				node->size = node->size * 2;
-
-			}
-
-		}
-		if(node->neighbors_count < node->size)
-		{
-			node->neighbors_count += 1;
-
-		}
-		// the node appended to end of array
-		//printf("saved string %s\n", node->neighbors[node->neighbors_count - 1]->word);
-		return node;
 	}
 	else
 	{
 		return NULL;
 	}
-	
 }
-TrieNode* appendTrieChain(TrieNode* root, ContextState* state, TrieNode* name)
+TrieNodePackage2* binSearch(TrieNode* node, TrieNode* target_chain)
 {
-	TrieNode* root_tracker = root;
-	TrieNode* name_tracker = name;
-	int count = 0;
-	//printf("appendTrieChain\n");
-	//if(root->word != NULL)
-		//printf("%s\n\n", root->word);
-
-	while(name_tracker != NULL && root_tracker != NULL)
+	//printf("binSearch\n");
+	// need to record each location of the match and the size
+	// we may be able to make at least 1 match
+	// canWeSearchWithTheDataAvaliable has already been done
+	if(canWeSearchWithTheDataAvaliable(node, target_chain))
 	{
-		// sometimes the final word can't be added and segfault happens
-		//printf("%i\n", count);
-		//printf("%s   %s\n", root_tracker->word, name_tracker->word);
-		//printf("before root_tracker %i, %i\n", root_tracker->size, root_tracker->neighbors_count);
-
-		//printf("name_tracker %x\n", name_tracker);
-		//printf("about to append\n");
-		// messed up before this line
-		// messes up on the second x 
-		// not updating root_tracker correctly
-
-		// appending and then root gets ille
-		root_tracker = appendWord(root_tracker, name_tracker->word);
-		//printf("after root_tracker %i, %i\n", root_tracker->neighbors[root_tracker->neighbors_count - 1]->size, root_tracker->neighbors[root_tracker->neighbors_count - 1]->neighbors_count);
-		//printTrieNodeTree(root, 1);
-		//printf("appended\n");
-		if(name_tracker->neighbors != NULL)
+		int largest_size;
+		int location_of_insert = 0;
+		if(node->size == 0)
 		{
-			// the root has nothing to move to?
-
-			name_tracker = name_tracker->neighbors[0];
-			// go to the last one found
-
-			root_tracker = root_tracker->neighbors[root_tracker->neighbors_count - 1];
+			largest_size = 0;
 		}
 		else
 		{
-			//printf("problem\n");
-			// no more words left to add so go to the last word added
-			root_tracker = root_tracker->neighbors[root_tracker->neighbors_count - 1];
-			//printf("last word %s\n", root_tracker->word);
-
-			break;
+			largest_size = node->size;
 		}
-		count++;
+		// target < first word
+		if(strcmp(target_chain->word, node->neighbors[0]->word) < 0)
+		{
+			//printf("done 0\n");
+			location_of_insert = 0;
+			return makePackage(node,
+							   target_chain,
+							   location_of_insert,
+							   0, NULL);
+		}
+		// target > last word
+		else if(strcmp(target_chain->word,
+					   node->neighbors[largest_size - 1]->word) > 0)
+		{
+			//printf("done %i\n", node->size);
+			location_of_insert = node->size;
+			return makePackage(node,
+							   target_chain,
+							   location_of_insert,
+							   0, NULL);
+		}
+		return mainBinSearch(node, target_chain);
+		
 	}
-	// setting the state to the last word
-	root_tracker->object = state;
-	//printf("object added %x\n", root_tracker->object);
-	// need to add indents and a thumbnail attribute so not all of the state is printed out
-
-	return root;
-}
-
-// adding a ContextState to a 
-void insert(TrieNode* root, ContextState* state)
-{
-	//printf("insert\n");
-	// tracker is always pointing to root
-	TrieNode* root_tracker = root;
-	//printf("neighbors_count %i\n", root_tracker->neighbors_count);
-
-	// take the name
-	// search for name in the trienode
-	TrieNodePackage* last_word_index_correctly_matched_package = findInTrie2(root_tracker, state->state_name->neighbors[0]);
-	/*
-	typedef struct TrieNodePackage3
-	{
-		TrieNode* dict_trie_node;
-		TrieNode* context_state_attribute_trie_node;
-		bool context_state_is_found;
-		bool is_partial_match;
-		bool need_to_append_more_name;
-	}TrieNodePackage3;
-	*/
-
-	if(last_word_index_correctly_matched_package == NULL)
-	{
-		// root is empty
-		//printf("root is empty\n");
-		// root_tracker = f(state, )
-		root_tracker = appendTrieChain(root_tracker, state, state->state_name->neighbors[0]);
-
-		//printf("last word associated with state %s\n\n", root_tracker->word);
-
-		//printTrieNodes(root_tracker);
-		//printf("\n");
-		//printContextState(root_tracker->object);
-		//exit(1);
-		//root_tracker = appendNode(root_tracker,
-		//							  getIthWord(state->state_name, 0));
-	}
-
 	else
 	{
-		//printf("have node data to add\n");
-		// the trackers have already be adjusted acording to their situation
-		TrieNode* dict_trie_node = last_word_index_correctly_matched_package->dict_trie_node;
-		TrieNode* context_state_attribute_trie_node = last_word_index_correctly_matched_package->context_state_attribute_trie_node;
-		//printf("%x, %x\n", dict_trie_node, context_state_attribute_trie_node);
-		bool context_state_is_found = last_word_index_correctly_matched_package->context_state_is_found;
-		bool need_to_append_more_name = last_word_index_correctly_matched_package->need_to_append_more_name;
-		bool is_first_mismatch = last_word_index_correctly_matched_package->is_first_mismatch;
-
-		if(!context_state_is_found)
-		{
-			if(need_to_append_more_name)
-			{
-				if(is_first_mismatch)
-				{
-					//printf("first mismatch\n");
-					// wrong
-					root_tracker = appendTrieChain(dict_trie_node, state, state->state_name->neighbors[0]);
-
-					//printf("\n\nprint out tree\n");
-					//printTrieNodeTree(root_tracker, 1);
-				}
-				else
-				{
-					//printf("2 to nth mismatch\n");
-
-					// need to add stuff
-					root_tracker = appendTrieChain(dict_trie_node, state, context_state_attribute_trie_node);
-				}
-				
-
-			}
-			else
-			{
-				//printf("add as an internal node\n");
-				root_tracker = appendTrieChain(dict_trie_node, state, NULL);
-			}
-
-		}
-		
+		return NULL;
 	}
 	
 }
+// f(TrieNode* node, TrieNode* target_chain, ContextState* target_state, int insert_location)
+TrieNodePackage2* searchForInsertId(TrieNode* node,
+								    TrieNode* target_chain,
+								    ContextState* target_state)
+{
+	// made no assumptions on if the pointers are null
+	// O(longest list of strings)
+	// return 0 if can't find the state
+	// return -1 if it will not be able to insert the state
+	// return 1 if state was inserted
+
+	// what is returned
+	// tree node where any new nodes are to be inserted
+	// the target_chain pointer where the new nodes to the tree will be copied
+	// the contextstate to be added to the last tree node
+	// the index of where to insert the first new node to the neighbors
+	// is_found
+	// has_neighbors
+
+	// can we do any searching?
+		// is there anything to check the target with?
+			// no, so can't find anthing at this point
+		// is there data we can use to search?
+			// binSearch loop
+				// we can search and there are neighbors we can check on and the target word exists
+				// does the midpoint exist?
+					// is there a match?
+						// move the pointers up by 1
+						// ask if we can search and there are neighbors we can check on and the target word exists
+	// can we check the target with neighbors?
+	// can we search with the data avaliable?
+		// binSearchLoop
+			// does the midpoint exist?
+				// is there a match?
+					// can we check the target with neighbors?
+					// can we search with the data avaliable?
+	// sanity check
+		// search
+			// midpoint check
+				// if match
+					// sanity check for the next searching round
+	//TrieNode* node_tracker = node;
+	//TrieNode* target_chain_tracker = target_chain;
+	if(areNeighborsNull(node, target_chain))  // are we at base case?
+	{
+		// there are no nodes in neighbor
+		//printf("this case\n");
+		return makePackage(node, target_chain, 0, 0, NULL);
+	}
+	
+	TrieNodePackage2* result = binSearch(node, target_chain);
+
+	return result;
+
+
+
+}
+////
+// inserting
+TrieNode* setTrieNode(TrieNode* b)
+{
+	TrieNode* a = malloc(sizeof(TrieNode));
+
+	//char* word;
+	a->word = malloc(sizeof(char) * (strlen(b->word) + 1));
+	memcpy(a->word, b->word, sizeof(char) * (strlen(b->word)));
+	a->word[strlen(b->word)] = '\0';
+
+	struct TrieNode** neighbors = NULL;
+	//a->neighbors = malloc(sizeof(TrieNode*) * b->size);
+	//memcpy(a->neighbors, b->neighbors, sizeof(TrieNode*) * b->size);
+
+	//int neighbors_count;
+	a->neighbors_count = 0;//b->neighbors_count;
+	a->size = 0;//b->size;
+
+	//int size; // power of 2
+	struct ContextState* object;
+	if(b->object != NULL)
+	{
+		a->object = malloc(sizeof(ContextState));
+		memcpy(a->object, b->object, sizeof(ContextState));
+	}
+	else
+	{
+		a->object = NULL;
+	}
+	return a;
+}
+
+TrieNode* copyTrieNode(TrieNode* b)
+{
+	TrieNode* a = malloc(sizeof(TrieNode));
+
+	//char* word;
+	a->word = malloc(sizeof(char) * (strlen(b->word) + 1));
+	memcpy(a->word, b->word, sizeof(char) * (strlen(b->word)));
+	a->word[strlen(b->word)] = '\0';
+
+	struct TrieNode** neighbors;
+	a->neighbors = malloc(sizeof(TrieNode*) * b->size);
+	memcpy(a->neighbors, b->neighbors, sizeof(TrieNode*) * b->size);
+
+	//int neighbors_count;
+	a->neighbors_count = b->neighbors_count;
+	a->size = b->size;
+
+	//int size; // power of 2
+	struct ContextState* object;
+	if(b->object != NULL)
+	{
+		a->object = malloc(sizeof(ContextState));
+		memcpy(a->object, b->object, sizeof(ContextState));
+	}
+	else
+	{
+		a->object = NULL;
+	}
+	return a;
+}
+int distance(int pos, int size)
+{
+	// memcpy memory scalar
+	return size - pos;
+}
+TrieNode* newTrieNode()
+{
+	TrieNode* new_trie_node = malloc(sizeof(TrieNode));
+	new_trie_node->word = NULL;
+	new_trie_node->neighbors = NULL;
+	new_trie_node->neighbors_count = 0;
+	new_trie_node->size = 0;
+	new_trie_node->object = NULL;
+	return new_trie_node;
+}
+TrieNode** newTrieNodes(char* word, int location, int neighbor_count)
+{
+	if(neighbor_count > location)
+	{
+		TrieNode** new_neighbors = malloc(sizeof(TrieNode*) * neighbor_count);
+		for(int i = 0; i < location; i++)
+		{
+			new_neighbors[i] = newTrieNode();
+		}
+		new_neighbors[location] = malloc(sizeof(TrieNode));
+		new_neighbors[location]->word = malloc(sizeof(char) * (strlen(word) + 1) );
+		new_neighbors[location]->neighbors = NULL;
+		new_neighbors[location]->size = 0;
+		new_neighbors[location]->neighbors_count = 0;
+		new_neighbors[location]->object = NULL;
+		for(int i = location + 1; i < neighbor_count; i++)
+		{
+			new_neighbors[i] = newTrieNode();
+		}
+
+		return new_neighbors;
+	}
+	return NULL;
+	
+
+}
+TrieNode** insertItem(int pos, TrieNode* node, TrieNode* value)
+{
+	//printf("insert item nod's size %i\n", node->size);
+	int size = node->size;
+	TrieNode** new_neighbors = newTrieNodes(node->word, pos, size + 1);
+
+	// need to actually add the word in
+	// still doesn't copy the word in correctly
+	//printf("word to add %s  %lu\n", value->word, strlen(value->word));
+
+	//memcpy(new_neighbors[pos]->word,
+		//		value->word,
+		//		sizeof(char) * (strlen(value->word)));
+	//new_neighbors[pos]->word[strlen(value->word)] = '\0';
+	//printf("word added %s  %i\n", new_neighbors[pos]->word,
+	//	strlen(new_neighbors[pos]->word));
+
+	//printf("post %i, size %i\n",pos, size);
+	// make new array
+	// copy the below part from old array to new array
+	// copy left and right halves
+
+	int copy_left_size = 0;
+	int copy_right_size = 0;
+	if(pos < size)
+	{
+
+		if(size == 1)
+		{
+			// [0, size)
+			copy_right_size = distance(0, size);
+
+		}
+		else if(size > 1)
+		{
+			// [0, pos), [pos, size)
+			copy_left_size = distance(0, pos);
+			copy_right_size = distance(pos, size);
+		}
+	}
+	else if(pos == size)
+	{
+		if(size == 1)
+		{
+			//printf("base case\n");
+			// [0, 0]
+			copy_left_size = 1;//distance(0, 0);
+		}
+		else if(size > 1)
+		{
+			// [0, pos)
+			copy_left_size = distance(0, pos);
+		}
+	}
+	// may need to put more in here
+	//printf("left %i, right %i pos %i\n", copy_left_size, copy_right_size, pos);
+	// need separate cases for size== 1
+	// can't have them in the combined choices part
+	// adding in an extra item
+	if(size == 1)
+	{
+		if(copy_left_size > 0)
+		{
+			//printf("base case left\n");
+			// pos 1 was the insert location
+			new_neighbors[0] = copyTrieNode(node->neighbors[0]);
+			//memcpy(new_neighbors[0], node->neighbors[0], sizeof(TrieNode));
+
+		}
+		else if(copy_right_size > 0)
+		{
+			//printf("base case right\n");
+			// pos 0 was the insert location
+			new_neighbors[pos] = setTrieNode(value);
+
+			new_neighbors[1] = copyTrieNode(node->neighbors[0]);
+			//memcpy(new_neighbors[1], node->neighbors[0], sizeof(TrieNode));
+			//printf("word after shift %s pos %i\n", new_neighbors[pos]->word, pos);
+
+
+		}
+		//memcpy(new_neighbors[pos]->word,
+		//		value->word,
+		//		sizeof(char) * (strlen(value->word)));
+	//new_neighbors[pos]->word[strlen(value->word)] = '\0';
+
+	}
+	else
+	{
+		if(copy_left_size > 0)
+		{
+			//printf("copy left size %i\n", copy_left_size);
+			
+			for(int i = 0; i < copy_left_size; i++)
+			{
+				//printf("%i\n", i);
+				//printf("%i th object %x\n", i, new_neighbors[i]);
+				new_neighbors[i] = copyTrieNode(node->neighbors[i]);
+				//memcpy(new_neighbors[i], node->neighbors[i], sizeof(TrieNode));
+				//printf("%s\n", new_neighbors[i]->word);
+			}
+
+		}
+		new_neighbors[pos] = setTrieNode(value);
+
+		//memcpy(new_neighbors[pos]->word,
+		//		value->word,
+		//		sizeof(char) * (strlen(value->word)));
+	//new_neighbors[pos]->word[strlen(value->word)] = '\0';
+		if(copy_right_size > 0)
+		{
+			//printf("copy right size %i\n", copy_right_size);
+			
+			for(int i = copy_left_size; i < size; i++)
+			{
+				// + 1 needs to go somewhere else
+				new_neighbors[i + 1] = copyTrieNode(node->neighbors[i]);
+				//memcpy(new_neighbors[i + 1], node->neighbors[i], sizeof(TrieNode));
+				//printf("%s\n", new_neighbors[i]->word);
+
+			}
+		
+			
+		}
+
+	}
+	
+	return new_neighbors;
+}
+
+
+
+bool insert1Item(TrieNode* node, TrieNode* target_chain, int location)
+{
+	// insert a new word at node's neighbors
+	//printf("here\n");
+	if(node->neighbors == NULL)
+	{
+		
+		node->neighbors = newTrieNodes(target_chain->word, 0, 1);
+		/*malloc(sizeof(TrieNode*));
+		node->neighbors[0] = malloc(sizeof(TrieNode));
+		node->neighbors[0]->word = malloc(sizeof(char) * strlen(target_chain->word));
+		node->neighbors[0]->neighbors = NULL;
+		node->neighbors[0]->size = 0;
+		node->neighbors[0]->neighbors_count = 0;
+		node->neighbors[0]->object = NULL;
+		node->size = 1;
+		*/
+		node->size = 1;
+		
+		memcpy(node->neighbors[0]->word,
+				target_chain->word,
+				sizeof(char) * strlen(target_chain->word));
+		
+		//printf("added %s\n", node->neighbors[0]->word);
+		return true;
+	
+
+	}
+	// call insert for all remaining sizes
+	else
+	{
+		//printf("inserting items\n");
+		//printf("1 insert item nod's size %i\n", node->size);
+
+		TrieNode** new_neighbors = insertItem(location, node, target_chain);
+		//printf("word saved %s\n", new_neighbors[location]->word);
+		//printf("word saved %s\n", new_neighbors[1]->word);
+
+
+		free(node->neighbors);
+		node->neighbors = new_neighbors;
+		node->size++;
+		//printf("word saved %s\n", node->neighbors[0]->word);
+		//printf("word saved %s\n", node->neighbors[1]->word);
+
+		return true;
+	}
+	/*else if(node->size == 1)
+	{
+		printf("should add in here\n");
+		// location == 1 or 0
+	}
+	else if(node->size == 2)
+	{
+
+	}*/
+}
+// will need to look out for this function as the visitor function is made
+int insert2(TrieNode* node, TrieNode* target_chain, ContextState* target_state)
+{
+	printf("\ninserting name\n");
+	printTrieNodes(target_chain);
+	// only returns the deepest location, not all locations 
+	TrieNodePackage2* result = searchForInsertId(node, target_chain, target_state);
+	//printTrieNodes(result->target_pointer);
+	if(result != NULL)
+	{
+		//printf("got here\n");
+		if(result->state_there)
+		{
+			printf("already added\n");
+			// don't add
+		}
+		else if(result->target_pointer == NULL)
+		{
+			// add in state
+		}
+		else
+		{
+			// adding same names
+			//printf("null stuff\n");
+			/*printf("printing tree before\n");
+
+			printTrieNodeTree(node, 1);
+
+			printf("%i\n", result->tree_pointer->size);
+			*/
+			int count = 0;
+			int insert_location = result->location;
+			while(result->target_pointer != NULL)
+			{
+				//printf("count %i\n", count);
+				// save the names
+				// insert1Item will run case null at the 2nd to nth iterations
+				// result location is only meaningfull for the first round because all other inserts are increasing the size to 1
+				insert1Item(result->tree_pointer, result->target_pointer, insert_location);
+				/*printf("item has been added !!!!!\n");
+				printf("printing tree\n");
+				printTrieNodeTree(node, 1);
+				printf("\n");
+				*/
+
+				if(result->tree_pointer->neighbors != NULL &&
+					result->target_pointer->neighbors != NULL)
+				{
+					//printf("advance\n");
+					result->tree_pointer = result->tree_pointer->neighbors[insert_location];
+					result->target_pointer = result->target_pointer->neighbors[0];
+					count++;
+
+				}
+				else
+				{
+					// save the object
+					//printf("save object\n");
+					result->tree_pointer->neighbors[insert_location]->object = target_state;
+					break;
+				}
+				insert_location = 0;
+
+
+			}
+			// claims the state exists but can't find it
+			//printf("done\n");
+			TrieNodePackage2* result2 = searchForInsertId(node, target_chain, target_state);
+			if(result2 != NULL)
+			{
+				if(result2->object_found)
+				{
+					printf("found name\n");
+					printTrieNodeTreeFlat(result2->object_found->state_name);
+					printf("\n\n");
+
+					//printContextState(result2->object_found);
+				}
+				//printf("location: %i\n", result->location);
+
+			}
+			//printf("\nprinting tree\n");
+			//printf("%i %x\n",result2->state_there,  result2->object_found);
+			//printTrieNodeTree(node, 1);
+			//printf("\n");
+			
+			// add chain in and state
+			return 1;//insert1Item(result->tree_pointer, result->target_pointer, result->location);
+			//return -1;
+		}
+
+	}
+
+	
+	return -1;
+	
+	/*
+	is the state there?
+		don't add
+	else
+		if chain is null
+			add in state
+		else
+
+			add chain in and state
+	*/
+}
+//////

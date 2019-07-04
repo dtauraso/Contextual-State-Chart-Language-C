@@ -30,12 +30,29 @@ dummy node
 
 typedef struct TrieNodePackage
 {
+	// 
 	TrieNode* dict_trie_node;
 	TrieNode* context_state_attribute_trie_node;
 	bool context_state_is_found;
 	bool is_first_mismatch;
 	bool need_to_append_more_name;
 }TrieNodePackage;
+
+// locations to visit in the trie tree arrays
+typedef struct Locations
+{
+	int* locations;
+	int size;
+}Locations;
+typedef struct TrieNodePackage2
+{
+	TrieNode* tree_pointer;
+	TrieNode* target_pointer;
+	int location;
+	bool state_there;
+	struct ContextState* object_found;
+
+}TrieNodePackage2;
 
 TrieNode* initTrieNode();
 TrieNode* initTrieNodeWithNeighborCount(int number_of_possible_neighbors);
@@ -46,5 +63,46 @@ TrieNode* appendWord(TrieNode* node, char* ith_name);
 TrieNode* appendTrieChain(TrieNode* root, struct ContextState* state, TrieNode* name);
 void insert(TrieNode* root, struct ContextState* state);
 TrieNode* convertLispChainToTrieNodeChain(LispNode* root);
+
+
+int computeLocation(int low, int size,  TrieNode* node, char* target);
+
+bool areNeighborsNull(TrieNode* node, TrieNode* target_chain);
+
+bool canWeSearchWithTheDataAvaliable(TrieNode* node, TrieNode* target_chain);
+
+int matchEdgeCases(TrieNode* node, TrieNode* target_chain);
+
+TrieNodePackage2* makePackage(TrieNode* tree_pointer,
+							 TrieNode* target_pointer,
+							 int location,
+							 bool state_there,
+							 struct ContextState* object_found);
+
+TrieNodePackage2* binSearch(TrieNode* node, TrieNode* target_chain);
+
+
+
+TrieNode** insertItem(int pos, TrieNode* node, TrieNode* value);
+
+
+int distance(int pos, int size);
+
+
+TrieNode* newTrieNode();
+
+TrieNode** newTrieNodes(char* word, int location, int neighbor_count);
+
+bool insert1Item(TrieNode* node, TrieNode* target_chain, int location);
+
+
+
+TrieNodePackage2* searchForInsertId(TrieNode* node, TrieNode* target_chain, struct ContextState* target_state);
+
+int insert2(TrieNode* node, TrieNode* target_chain, struct ContextState* target_state);
+
+int lessThan(char* string_1, char* string_2);
+
+
 
 #endif

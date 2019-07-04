@@ -19,8 +19,11 @@ test:
 
 	-make state_machine.x
 	#-./state_machine.x input.txt
-	#-./state_machine.x parsing_tree.json calculator_example.txt
-	-./state_machine.x parallel_programming_example.json parallel_programming_example.txt
+	# -./state_machine.x parsing_tree_copy.json calculator_example.txt
+	#-./state_machine.x insert_test_5.json calculator_example.txt
+	-./state_machine.x parsing_tree.json calculator_example.txt
+
+	#-./state_machine.x parallel_programming_example.json parallel_programming_example.txt
 
 	#-./state_machine.x parsing_tree.json little_sequence_hierarchy.txt
 	#-./testing.x parsing_tree.json calculator_example.txt
