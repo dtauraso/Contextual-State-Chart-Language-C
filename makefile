@@ -1,8 +1,8 @@
 
 
-include_and_c_files = state.c state.h main.c jsmn.c jsmn.h lisp_node.c lisp_node.h trie_node.c trie_node.h
+include_and_c_files = state.c state.h main.c jsmn.c jsmn.h trie_node.c trie_node.h
 
-object_files = jsmn.o state.o lisp_node.o trie_node.o main.o
+object_files = jsmn.o state.o trie_node.o main.o
 
 
 
@@ -21,7 +21,10 @@ test:
 	#-./state_machine.x input.txt
 	# -./state_machine.x parsing_tree_copy.json calculator_example.txt
 	#-./state_machine.x insert_test_5.json calculator_example.txt
-	-./state_machine.x parsing_tree.json calculator_example.txt
+	#-./state_machine.x tokens_to_trie_tree_test.json calculator_example.txt
+
+	#-./state_machine.x parsing_tree.json calculator_example.txt
+	-./state_machine.x parallel_programming_example_json.json calculator_example.txt
 
 	#-./state_machine.x parallel_programming_example.json parallel_programming_example.txt
 

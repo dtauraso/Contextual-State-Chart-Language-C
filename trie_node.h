@@ -6,6 +6,17 @@
 #include "jsmn/jsmn.h"
 #include "state.h"
 
+
+typedef struct Tokens
+{
+	int i;
+	const char* input;
+	jsmntok_t* _tokens;
+	jsmntok_t current_token;
+	int total_tokens;
+
+}Tokens;
+
 // for storing the name -> ContextState map
 typedef struct TrieNode
 {
@@ -56,13 +67,12 @@ typedef struct TrieNodePackage2
 
 TrieNode* initTrieNode();
 TrieNode* initTrieNodeWithNeighborCount(int number_of_possible_neighbors);
-TrieNode* arrayOfArrays(int* i, jsmntok_t tokens[], const char* input, int token_count);
 int isMatch(char* ith_word, TrieNode* node);
 TrieNodePackage* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings);
 TrieNode* appendWord(TrieNode* node, char* ith_name);
 TrieNode* appendTrieChain(TrieNode* root, struct ContextState* state, TrieNode* name);
 void insert(TrieNode* root, struct ContextState* state);
-TrieNode* convertLispChainToTrieNodeChain(LispNode* root);
+char* copyString(char* b);
 
 
 int computeLocation(int low, int size,  TrieNode* node, char* target);
@@ -103,6 +113,21 @@ int insert2(TrieNode* node, TrieNode* target_chain, struct ContextState* target_
 
 int lessThan(char* string_1, char* string_2);
 
+
+
+void addItem(int* i, jsmntok_t tokens[], const char* input, int j, struct TrieNode* root);
+TrieNode* makeTrieTree(Tokens* my_tokens);
+
+
+
+
+Tokens* makeTokens(jsmntok_t tokens[], const char* input, int total_tokens);
+jsmntok_t getIthToken(Tokens* my_tokens, int i);
+
+jsmntok_t getToken(Tokens* my_tokens);
+bool noTokensLeft(Tokens* my_tokens);
+
+void advanceToken(Tokens* my_tokens);
 
 
 #endif

@@ -9,6 +9,15 @@
     "parents":        [["root", "0"]]
   },
     {
+    "name":           ["states", "state 2"],
+    "nexts":          [],
+    "start_children": [["names", "0"]],
+    "children":       [],
+    "function_name":  "returnTrue",
+    "data":           {},
+    "parents":        [["root", "0"]]
+  },
+    {
     "name":           ["indent_number", "0", "76542"],
     "nexts":          [],
     "start_children": [],

@@ -6,7 +6,15 @@
     "children":       [],
     "function_name":  "returnTrue",
     "data":           {},
-    "parents":        [["root", "0"]]
+    "parents":        [["root", "0"]],
+    "start_children_are_parallel" : 0,
+    "nexts_are_parallel" : 0,
+    "is_start_child" : 0,
+    "is_child" : 0,
+    "is_parent" : 1,
+    "is_start_state" : 1,
+    "is_end_state" : 0,
+    "is_data_state" : 0
   },
   {           
     "name":           ["prev_prev_indent"],
@@ -15,7 +23,15 @@
     "children":       [],
     "function_name":  "returnTrue",
     "data":           {"int": "0"},
-    "parents":        []
+    "parents":        [],
+    "start_children_are_parallel" : 0,
+    "nexts_are_parallel" : 0,
+    "is_start_child" : 0,
+    "is_child" : 0,
+    "is_parent" : 1,
+    "is_start_state" : 1,
+    "is_end_state" : 0,
+    "is_data_state" : 0
   },
   {           
     "name":           ["prev_indent"],
@@ -24,7 +40,15 @@
     "children":       [],
     "function_name":  "returnTrue",
     "data":           {"int": "0"},
-    "parents":        []
+    "parents":        [],
+    "start_children_are_parallel" : 0,
+    "nexts_are_parallel" : 0,
+    "is_start_child" : 0,
+    "is_child" : 0,
+    "is_parent" : 1,
+    "is_start_state" : 1,
+    "is_end_state" : 0,
+    "is_data_state" : 0
   },
   {
     "name":           ["prev_word"],
@@ -33,7 +57,15 @@
     "children":       [],
     "function_name":  "returnTrue",
     "data":           {"char*":"root"},
-    "parents":        []
+    "parents":        [],
+    "start_children_are_parallel" : 0,
+    "nexts_are_parallel" : 0,
+    "is_start_child" : 0,
+    "is_child" : 0,
+    "is_parent" : 1,
+    "is_start_state" : 1,
+    "is_end_state" : 0,
+    "is_data_state" : 0
   },
   {
     "name":           ["current_word"],
@@ -42,7 +74,15 @@
     "children":       [],
     "function_name":  "returnTrue",
     "data":           {"char*":""},
-    "parents":        []
+    "parents":        [],
+    "start_children_are_parallel" : 0,
+    "nexts_are_parallel" : 0,
+    "is_start_child" : 0,
+    "is_child" : 0,
+    "is_parent" : 1,
+    "is_start_state" : 1,
+    "is_end_state" : 0,
+    "is_data_state" : 0
   },
   {
     "name":           ["next_indent"],
@@ -51,7 +91,15 @@
     "children":       [],
     "function_name":  "returnTrue",
     "data":           {"char*": "0"},
-    "parents":        []
+    "parents":        [],
+    "start_children_are_parallel" : 0,
+    "nexts_are_parallel" : 0,
+    "is_start_child" : 0,
+    "is_child" : 0,
+    "is_parent" : 1,
+    "is_start_state" : 1,
+    "is_end_state" : 0,
+    "is_data_state" : 0
   },
   {
     "name":           ["level_indent_stack"],
@@ -63,7 +111,15 @@
     "children":        [],
     "function_name":  "returnTrue",
     "data":           {"int": "NULL"},
-    "parents":        []
+    "parents":        [],
+    "start_children_are_parallel" : 0,
+    "nexts_are_parallel" : 0,
+    "is_start_child" : 0,
+    "is_child" : 0,
+    "is_parent" : 1,
+    "is_start_state" : 1,
+    "is_end_state" : 0,
+    "is_data_state" : 0
   },
   {
     "name":           ["level_number", "0"],
@@ -72,7 +128,15 @@
     "children":       [],
     "function_name":  "returnTrue",
     "data":           {"int": "0"},
-    "parents":        []
+    "parents":        [],
+    "start_children_are_parallel" : 0,
+    "nexts_are_parallel" : 0,
+    "is_start_child" : 0,
+    "is_child" : 0,
+    "is_parent" : 1,
+    "is_start_state" : 1,
+    "is_end_state" : 0,
+    "is_data_state" : 0
   },
   {
     "name":           ["state_number", "0"],
@@ -81,7 +145,15 @@
     "children":       [],
     "function_name":  "returnTrue",
     "data":           {"int": "0"},
-    "parents":        []
+    "parents":        [],
+    "start_children_are_parallel" : 0,
+    "nexts_are_parallel" : 0,
+    "is_start_child" : 0,
+    "is_child" : 0,
+    "is_parent" : 1,
+    "is_start_state" : 1,
+    "is_end_state" : 0,
+    "is_data_state" : 0
   },
   {
     "name":           ["indent_number", "0", "76543"],
@@ -90,7 +162,15 @@
     "children":       [],
     "function_name":  "returnTrue",
     "data":           {"int": "123456"},
-    "parents":        []
+    "parents":        [],
+    "start_children_are_parallel" : 0,
+    "nexts_are_parallel" : 0,
+    "is_start_child" : 0,
+    "is_child" : 0,
+    "is_parent" : 1,
+    "is_start_state" : 1,
+    "is_end_state" : 0,
+    "is_data_state" : 0
   },
     
   {
@@ -100,7 +180,15 @@
     "children":       [],
     "function_name":  "returnTrue",
     "data":           {"int": "0"},
-    "parents":        []
+    "parents":        [],
+    "start_children_are_parallel" : 0,
+    "nexts_are_parallel" : 0,
+    "is_start_child" : 0,
+    "is_child" : 0,
+    "is_parent" : 1,
+    "is_start_state" : 1,
+    "is_end_state" : 0,
+    "is_data_state" : 0
   },
   {
     "name":           ["i"],
@@ -109,7 +197,15 @@
     "children":       [],
     "function_name":  "returnTrue",
     "data":           {"int": "0"},
-    "parents":        []
+    "parents":        [],
+    "start_children_are_parallel" : 0,
+    "nexts_are_parallel" : 0,
+    "is_start_child" : 0,
+    "is_child" : 0,
+    "is_parent" : 1,
+    "is_start_state" : 1,
+    "is_end_state" : 0,
+    "is_data_state" : 0
   },
   {
     "name":           ["what_is_current_word_to_pre_word"],
@@ -120,7 +216,15 @@
     "children":       [],
     "function_name":  "returnTrue",
     "data":           {},
-    "parents":        []
+    "parents":        [],
+    "start_children_are_parallel" : 0,
+    "nexts_are_parallel" : 0,
+    "is_start_child" : 0,
+    "is_child" : 0,
+    "is_parent" : 1,
+    "is_start_state" : 1,
+    "is_end_state" : 0,
+    "is_data_state" : 0
   },
     {
     "name":           ["states", "state"],
@@ -129,7 +233,15 @@
     "children":       [],
     "function_name":  "returnTrue",
     "data":           {},
-    "parents":        []
+    "parents":        [],
+    "start_children_are_parallel" : 0,
+    "nexts_are_parallel" : 0,
+    "is_start_child" : 0,
+    "is_child" : 0,
+    "is_parent" : 1,
+    "is_start_state" : 1,
+    "is_end_state" : 0,
+    "is_data_state" : 0
   },
   {
     "name":           ["states", "state"],
@@ -140,7 +252,15 @@
     "children":       [["a child"], ["another child"]],
     "function_name":  "returnTrue",
     "data":           {"int": "0"},
-    "parents":        [["root"], ["0"]]
+    "parents":        [["root"], ["0"]],
+    "start_children_are_parallel" : 0,
+    "nexts_are_parallel" : 0,
+    "is_start_child" : 0,
+    "is_child" : 0,
+    "is_parent" : 1,
+    "is_start_state" : 1,
+    "is_end_state" : 0,
+    "is_data_state" : 0
   },
   {
     "name":           ["what_is_current_word_to_pre_word"],
@@ -151,7 +271,15 @@
     "children":       [],
     "function_name":  "returnTrue",
     "data":           {},
-    "parents":        []
+    "parents":        [],
+    "start_children_are_parallel" : 0,
+    "nexts_are_parallel" : 0,
+    "is_start_child" : 0,
+    "is_child" : 0,
+    "is_parent" : 1,
+    "is_start_state" : 1,
+    "is_end_state" : 0,
+    "is_data_state" : 0
   },
   {
     "name":           ["states", "state", "other state"],
@@ -160,7 +288,15 @@
     "children":       [],
     "function_name":  "returnTrue",
     "data":           {},
-    "parents":        [["root", "0"]]
+    "parents":        [["root", "0"]],
+    "start_children_are_parallel" : 0,
+    "nexts_are_parallel" : 0,
+    "is_start_child" : 0,
+    "is_child" : 0,
+    "is_parent" : 1,
+    "is_start_state" : 1,
+    "is_end_state" : 0,
+    "is_data_state" : 0
   },
   {
     "name":           ["states", "state2", "another state"],
@@ -169,7 +305,15 @@
     "children":       [],
     "function_name":  "returnTrue",
     "data":           {},
-    "parents":        [["root", "0"]]
+    "parents":        [["root", "0"]],
+    "start_children_are_parallel" : 0,
+    "nexts_are_parallel" : 0,
+    "is_start_child" : 0,
+    "is_child" : 0,
+    "is_parent" : 1,
+    "is_start_state" : 1,
+    "is_end_state" : 0,
+    "is_data_state" : 0
   },
     {
     "name":           ["x", "x", "another state"],
@@ -178,7 +322,15 @@
     "children":       [],
     "function_name":  "returnTrue",
     "data":           {},
-    "parents":        [["root", "0"]]
+    "parents":        [["root", "0"]],
+    "start_children_are_parallel" : 0,
+    "nexts_are_parallel" : 0,
+    "is_start_child" : 0,
+    "is_child" : 0,
+    "is_parent" : 1,
+    "is_start_state" : 1,
+    "is_end_state" : 0,
+    "is_data_state" : 0
   },
     {
     "name":           ["x", "x"],
@@ -187,6 +339,14 @@
     "children":       [],
     "function_name":  "returnSomething",
     "data":           {},
-    "parents":        [["root", "0"]]
+    "parents":        [["root", "0"]],
+    "start_children_are_parallel" : 0,
+    "nexts_are_parallel" : 0,
+    "is_start_child" : 0,
+    "is_child" : 0,
+    "is_parent" : 1,
+    "is_start_state" : 1,
+    "is_end_state" : 0,
+    "is_data_state" : 0
   }
 ]

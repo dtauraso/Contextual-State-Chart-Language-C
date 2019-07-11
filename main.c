@@ -1,5 +1,4 @@
 #include "state.h"
-#include "lisp_node.h"
 #include "trie_node.h"
 #include <stdio.h>
 #include <string.h>
@@ -7,19 +6,13 @@
 //https://zserge.com/jsmn.html
 #include "jsmn/jsmn.h"
 
-void deleteLispNodes(LispNode* root);
 
 void printState(ContextState* node);
 enum token_types {_primitive, _object, _array, _string};
-LispNode* makeLispNode();
-LispNode* setValueToList(LispNode* list_a, LispNode* list_b);
-LispNode* setValueToString(LispNode* list, char* word);
-LispNode* appendList(LispNode* root, LispNode* list_a, LispNode* list_b);
 enum data_types{is_list, is_string, is_empty_case};
-LispNode* cons(void* data, void* link, int data_type, int count, int call_count);
-void printLispNodes(LispNode* root, int indent_level);
-TrieNode* convertLispChainToTrieNodeChain(LispNode* root);
-void deleteLispNodes(LispNode* root);
+
+bool returnTrue(ContextState* a);
+bool returnFalse(ContextState* a);
 
 ContextState* makeFullContextState(
 	TrieNode* name,
@@ -28,8 +21,24 @@ ContextState* makeFullContextState(
 	TrieNode* children,
 	char* function_name,
 	Data* variable_from_json_dict,
-	TrieNode* parents);
+	TrieNode* parents,
+	bool start_children_are_parallel,
+	bool nexts_are_parallel,
+	bool is_start_child,
+	bool is_child,
+	bool is_parent,
+	bool is_start_state,
+	bool is_end_state,
+	bool is_data_state);
 ContextState* makeTree(char* input);
+
+char* copyString(char* b)
+{
+	int size = sizeof(char) * (strlen(b) + 1);
+	char* a = malloc(size);
+	memcpy(a, b, size);
+	return a;
+}
 
 
 char* getNextWord(char* input, int i)
@@ -330,17 +339,6 @@ bool tokenIsKeyWord(char* token_string)
 // for reading the token sequence the json parsing api provides
 
 
-/// state functions for testing visitor function
-bool returnTrue(ContextState* current_state)
-{
-	printf("return true\n");
-	return true;
-}
-bool returnFalse(ContextState* current_state)
-{
-	printf("return false\n");
-	return false;
-}
 
 
 int main(int argc, char** argv)
@@ -361,7 +359,7 @@ int main(int argc, char** argv)
 	const char* parsing_graph = readFile(argv[1]);
 	//printf("%s\n", parsing_graph);
 	// the parser code appears to compile
-	const int number_of_tokens = 1000;
+	const int number_of_tokens = 10000;
 	jsmn_parser parser;
 	jsmntok_t tokens[number_of_tokens];
 
@@ -440,58 +438,69 @@ int main(int argc, char** argv)
 	*/
 
 	//printf("%i\n", _primitive);
-	//printf("%i\n", parsing_results);
+	printf("%i\n", parsing_results);
 	//exit(1);
+	Tokens* my_tokens = makeTokens(tokens, parsing_graph, parsing_results);
+
 	int insert_count = 0;
-	for(int i = 0; i < parsing_results;)
+	while(!noTokensLeft(my_tokens))
 	{
-		int json_type = tokens[i].type;
+
+	//	printf("%i\n", i);
+		int json_type = getToken(my_tokens).type;
 		if(json_type == 0)
 		{
-			//printf("primitive\n");
-			 i++;
+			printf("primitive\n");
+			 //i++;
+			 advanceToken(my_tokens);
 		}
 		else if(json_type == 1)
 		{
-			//printf("object to run %i\n", i);
-			//printf("|%s|\n", collectChars(tokens[i], parsing_graph));
-			// n objects * n function names to check through = n^2
-			ContextState* state = makeContextState(&i, tokens, parsing_graph, parsing_results);
 
-			//printf("printing state\n\n");
-			//printContextState(state);
-			if(root != NULL)
+			// how do I know when I'm on the last token?
+			if(!noTokensLeft(my_tokens))
 			{
-				if(insert_count == 17)
-				{
-					printf("\nfinished\n");
-					exit(1);
-				}
-				insert2(root, state->state_name->neighbors[0], state);
-				insert_count++;
+				//printf("object to run %i\n", getI(my_tokens));
 
+				//printf("|%s|\n", collectChars(tokens[i], parsing_graph));
+				// n objects * n function names to check through = n^2
+				ContextState* state = makeContextState(/*&i, tokens, parsing_graph*/my_tokens, parsing_results);
+				//exit(1);
+				//printf("printing state\n\n");
+				//printContextState(state);
+				if(root != NULL)
+				{
+					
+					
+					insert2(root, state->state_name->neighbors[0], state);
+					insert_count++;
+					//printf("here\n");
+				}
+				
+
+				//void addToTrie(TrieNode* root, ContextState* state)
+				//advanceToken(my_tokens);
+				
 			}
 			
-
-			//void addToTrie(TrieNode* root, ContextState* state)
-
-			if(i >= parsing_results)
-			{
-				break;
-			}
-
 			//exit(2);
 
 		}
 		else if(json_type == 2)
 		{
-			//printf("array\n");
-			 i++;
+			printf("array\n");
+			 //i++;
+
+ 			 advanceToken(my_tokens);
+
 		}
 		else if(json_type == 3)
 		{
-			//printf("string\n");
-			 i++;
+			printf("string\n");
+			 //i++;
+
+ 			 advanceToken(my_tokens);
+
 		}
 		// to ensure machines can't alter each other's data only allow the current machine to be passed to each function
 		// how can a machine indirectly alter another machine?
@@ -506,13 +515,22 @@ int main(int argc, char** argv)
 		printTrieNodeTree(root, 1);
 		printf("\n");
 	}
+	printf("done\n");
 	ContextState* test = makeFullContextState2(NULL, NULL,
 	NULL,
 	NULL,
 	NULL,
 	NULL,
 	NULL,
-	returnTrue);
+	returnTrue,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0);
 	test->function_pointer(tree);
 	printf("%lu\n", sizeof(ContextState));
 	// loop untill hit object

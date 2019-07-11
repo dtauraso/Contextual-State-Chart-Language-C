@@ -4,14 +4,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "lisp_node.h"
 #include "trie_node.h"
 
 
 //enum stack_types{char_p_p, struct_context_state_p_p};
 
 
-
+struct Tokens;
 
 struct TrieNode;
 
@@ -118,8 +117,8 @@ int isMatch(char* ith_word, struct TrieNode* node);
 struct TrieNode* appendNode(struct TrieNode* node, char* ith_name);
 void addToTrie(struct TrieNode* root, ContextState* state);
 char* lispNodeType(int type_value);
-void printLispNodes(LispNode* root, int indent_level);
-void deleteLispNodes(LispNode* root);
+
+char* copyString(char* b);
 
 void printData(Data* var_data);
 void printTrieNodeTree(struct TrieNode* root, int indent);
@@ -128,7 +127,7 @@ void printTrieNodes(struct TrieNode* trie_node_sequence);
 void printTrieNodeTreeFlat(struct TrieNode* root);
 ContextState* duplicate(ContextState* item);
 ContextState* initContextState();
-ContextState* makeContextState(int* i, jsmntok_t tokens[], const char* input, int token_count);
+ContextState* makeContextState(/*int* i, jsmntok_t tokens[], const char* input*/struct Tokens* my_tokens, int token_count);
 
 int countTabs(char* input, int i);
 char* makeSpaces(int indent_level);
@@ -150,7 +149,15 @@ ContextState* makeFullContextState2(
 	char* function_name,
 	Data* variable_from_json_dict,
 	struct TrieNode* parents,
-	bool (*function_pointer)(struct ContextState* state));
+	bool (*function_pointer)(struct ContextState* state),
+	bool start_children_are_parallel,
+	bool nexts_are_parallel,
+	bool is_start_child,
+	bool is_child,
+	bool is_parent,
+	bool is_start_state,
+	bool is_end_state,
+	bool is_data_state);
 
 ContextState* makeFullContextState(
 	struct TrieNode* name,
@@ -159,6 +166,14 @@ ContextState* makeFullContextState(
 	struct TrieNode* children,
 	char* function_name,
 	Data* variable_from_json_dict,
-	struct TrieNode* parents);
+	struct TrieNode* parents,
+	bool start_children_are_parallel,
+	bool nexts_are_parallel,
+	bool is_start_child,
+	bool is_child,
+	bool is_parent,
+	bool is_start_state,
+	bool is_end_state,
+	bool is_data_state);
 
 #endif

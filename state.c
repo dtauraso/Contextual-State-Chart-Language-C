@@ -1,8 +1,10 @@
 #include "state.h"
-#include "lisp_node.h"
 #include "jsmn/jsmn.h"
 
 char* makeSpaces(int indent_level);
+
+const char* getInput(Tokens* my_tokens);
+int getI(Tokens* my_tokens);
 
 enum data_types{is_list, is_string, is_empty_case};
 enum token_types {_primitive, _object, _array, _string};
@@ -66,6 +68,9 @@ void printTrieNodeTree(TrieNode* root, int indent)
 		{
 			printf("%s%s\n", makeSpaces(indent), root_tracker->word);
 		}
+		//printf("%x\n", root_tracker->neighbors);
+		//printf("%x\n", root_tracker->object);
+
 		if(root_tracker->neighbors != NULL)
 		{
 			if(root_tracker->object != NULL)
@@ -76,6 +81,7 @@ void printTrieNodeTree(TrieNode* root, int indent)
 
 			}
 			//printf("# of neighbors %i\n", root_tracker->neighbors_count);
+			//printf("size %i\n", root_tracker->size);
 			for(int i = 0; i < root_tracker->size; i++)
 			{
 				if(root_tracker->neighbors[i] != NULL)
@@ -142,8 +148,37 @@ void printContextState(ContextState* node)
 	printTrieNodeTree(node->parents_, 0);
 	printf("\n");
 
-	
+	printf("start_children_are_parallel\n");
+	printf("%i\n", node->start_children_are_parallel);
+	printf("\n");
 
+	printf("nexts_are_parallel\n");
+	printf("%i\n", node->nexts_are_parallel);
+	printf("\n");
+	
+	printf("is_start_child\n");
+	printf("%i\n", node->is_start_child);
+	printf("\n");
+	
+	printf("is_child\n");
+	printf("%i\n", node->is_child);
+	printf("\n");
+	
+	printf("is_parent\n");
+	printf("%i\n", node->is_parent);
+	printf("\n");
+
+	printf("is_start_state\n");
+	printf("%i\n", node->is_start_state);
+	printf("\n");
+
+	printf("is_end_state\n");
+	printf("%i\n", node->is_end_state);
+	printf("\n");
+	
+	printf("is_data_state\n");
+	printf("%i\n", node->is_data_state);
+	printf("\n");
 
 
 
@@ -182,7 +217,7 @@ void printTrieNodes(TrieNode* trie_node_sequence)
 void printTrieNodeTreeFlat(TrieNode* root)
 {
 	// printContextState2 calls this
-	//printf("printing\n");
+	//printf("printing flat name\n");
 
 	TrieNode* root_tracker = root;
 	if(root_tracker != NULL)
@@ -229,8 +264,18 @@ void printTrieNodeTreeFlat(TrieNode* root)
 
 void printContextState2(ContextState* node)
 {
-	printf("-> ");
-	printTrieNodeTreeFlat(node->state_name);
+
+	if(node != NULL)
+	{
+		if(node->state_name != NULL)
+		{
+
+			printf("-> ");
+			printTrieNodeTreeFlat(node->state_name->neighbors[0]);
+
+		}
+
+	}
 }
 
 
@@ -254,18 +299,34 @@ ContextState* makeFullContextState2(
 	char* function_name,
 	Data* variable_from_json_dict,
 	TrieNode* parents,
-	bool (*function_pointer)(struct ContextState* state))
+	bool (*function_pointer)(struct ContextState* state),
+	bool start_children_are_parallel,
+	bool nexts_are_parallel,
+	bool is_start_child,
+	bool is_child,
+	bool is_parent,
+	bool is_start_state,
+	bool is_end_state,
+	bool is_data_state)
 {
 	// printf("got here\n");
 
 	ContextState* state = makeFullContextState(
 	name,
-	 nexts,
-	 start_children,
-	 children,
-	 function_name,
-	 variable_from_json_dict,
-	 parents);
+	nexts,
+	start_children,
+	children,
+	function_name,
+	variable_from_json_dict,
+	parents,
+	start_children_are_parallel,
+	nexts_are_parallel,
+	is_start_child,
+	is_child,
+	is_parent,
+	is_start_state,
+	is_end_state,
+	is_data_state);
 	state->function_pointer = function_pointer;
 	return state;
 
@@ -277,7 +338,15 @@ ContextState* makeFullContextState(
 	TrieNode* children,
 	char* function_name,
 	Data* variable_from_json_dict,
-	TrieNode* parents)
+	TrieNode* parents,
+	bool start_children_are_parallel,
+	bool nexts_are_parallel,
+	bool is_start_child,
+	bool is_child,
+	bool is_parent,
+	bool is_start_state,
+	bool is_end_state,
+	bool is_data_state)
 {
 	// name, nexts, start_children, children, parents are all dummy nodes
 	//printf("got here\n");
@@ -383,6 +452,16 @@ ContextState* makeFullContextState(
 			   variable_from_json_dict,
 			   sizeof_data);
 	}
+
+	
+	node->start_children_are_parallel = start_children_are_parallel;
+	node->nexts_are_parallel = nexts_are_parallel;
+	node->is_start_child = is_start_child;
+	node->is_child = is_child;
+	node->is_parent = is_parent;
+	node->is_start_state = is_start_state;
+	node->is_end_state = is_end_state;
+	node->is_data_state = is_data_state;
 	return node;
 
 }
@@ -728,13 +807,12 @@ ContextState* makeTree(char* input)
 
 	return 0;
 }
-Data* variable(int* i, jsmntok_t tokens[], const char* input)
+Data* variable(Tokens* my_tokens)
 {
-	jsmntok_t token = tokens[*i];
-	if(token.type != _object) exit(1);
+	if(getToken(my_tokens).type != _object) exit(1);
 	//printf("%s\n", tokenType(token));
 	//printf("%s\n", collectChars(token, input));
-	char* token_string = collectChars(token, input);
+	char* token_string = collectChars(getToken(my_tokens), getInput(my_tokens));
 	/*
 	typedef struct Data
 	{
@@ -753,22 +831,26 @@ Data* variable(int* i, jsmntok_t tokens[], const char* input)
 	if(strcmp(token_string, "\"{}\"") == 0)
 	{
 
-		*i += 1;
+		//*i += 1;
+		advanceToken(my_tokens);
 		variable = NULL;
 	}
 	else
 	{
 
-		*i += 1;
-		token = tokens[*i];
-		char* type_name = collectChars(token, input);
+		//*i += 1;
+		advanceToken(my_tokens);
+		//token = tokens[*i];
+		char* type_name = collectChars(getToken(my_tokens), getInput(my_tokens));
 
 
-		*i += 1;
-		token = tokens[*i];
-		char* data = collectChars(token, input);
+		//*i += 1;
+		//token = tokens[*i];
+		advanceToken(my_tokens);
+		char* data = collectChars(getToken(my_tokens), getInput(my_tokens));
 
-		*i += 1;
+		//*i += 1;
+		advanceToken(my_tokens);
 		if(strcmp(data, "\"NULL\"") == 0)
 		{
 			variable = NULL;
@@ -816,23 +898,53 @@ Data* variable(int* i, jsmntok_t tokens[], const char* input)
 	return variable;
 
 }
-ContextState* makeContextState(int* i, jsmntok_t tokens[], const char* input, int token_count)
+bool getBinaryValue(char* json_value)
+{
+	if(strcmp(json_value, "0"))
+	{
+		return 0;
+	}
+	else if(strcmp(json_value, "1"))
+	{
+		return 1;
+	}
+	else
+	{
+		printf("not a valid binary value\n");
+		exit(1);
+	}
+}
+ContextState* makeContextState(/*int* i, jsmntok_t tokens[], const char* input*/Tokens* my_tokens, int token_count)
 {
 	//printf("object to run |%s|\n", collectChars(tokens[*i], input));
 	//TrieTree* name_context_state = makeDict();
-	jsmntok_t token = tokens[*i];
+	//jsmntok_t token = tokens[*i];
+	//printf("%s\n", tokenType(getToken(my_tokens).type));
+	//printf("object to run\n");
+	//printf("%s\n", collectChars(getToken(my_tokens), getInput(my_tokens)));
+
+	if(getToken(my_tokens).type != _object) exit(1);
+	//printf("%s\n", collectChars(getToken(my_tokens), getInput(my_tokens)));
+
+	//*i += 1;
+	//token = tokens[*i];
+	advanceToken(my_tokens);
 	//printf("%s\n", tokenType(token));
-	if(token.type != _object) exit(1);
-	*i += 1;
-	token = tokens[*i];
-	//printf("%s\n", tokenType(token));
-	if(token.type != _string) exit(1);
-	*i += 1;
-	token = tokens[*i];
-	//printf("%s\n", tokenType(token));
+	if(getToken(my_tokens).type != _string) exit(1);
+	//*i += 1;
+	//token = tokens[*i];
+	advanceToken(my_tokens);
+	//printf("%s\n", tokenType(getToken(my_tokens)));
 	//printf("name\n");
-	TrieNode* name = arrayOfArrays(i, tokens, input, token_count);
+	//printf("%s\n", collectChars(getToken(my_tokens), getInput(my_tokens)));
+
+	//TrieNode* makeTrieTree(int i, jsmntok_t tokens[], const char* input)
+	//printf("%i\n", getI(my_tokens));
+	TrieNode* name = makeTrieTree(my_tokens);//arrayOfArrays(i, tokens, input, token_count);
 	//printTrieNodeTreeFlat(name);
+	//	printf("%i\n", getI(my_tokens));
+	//printf("%s\n", collectChars(getToken(my_tokens), getInput(my_tokens)));
+
 	/*
 	printf("printing trie tree\n");
 	printTrieNodeTree(name, 0);
@@ -854,7 +966,7 @@ ContextState* makeContextState(int* i, jsmntok_t tokens[], const char* input, in
 	//printf("got here\n");
 
 	// tokens[i] == "nexts"
-	token = tokens[*i];
+	//token = tokens[*i];
 
 	//printf("%s\n", collectChars(token, input));
 	//printf("%s\n", tokenType(token));
@@ -862,27 +974,33 @@ ContextState* makeContextState(int* i, jsmntok_t tokens[], const char* input, in
 	//printf("%s\n", collectChars(token, input));
 
 	// at keyword now
-	*i += 1;
-	token = tokens[*i];
+	//*i += 1;
+	advanceToken(my_tokens);
+	//token = tokens[*i];
+	//printf("%s\n", collectChars(token, input));
+
 	//printf("%s\n", tokenType(token));
 	//printf("nexts\n");
-	TrieNode* nexts = arrayOfArrays(i, tokens, input, token_count);
+	TrieNode* nexts = makeTrieTree(my_tokens);//arrayOfArrays(i, tokens, input, token_count);
 	/*
 	printf("printing trie tree\n");
 	printTrieNodeTree(nexts, 0);
 	printf("\n\n");
 	*/
 	//printListOfListsOfStrings(nexts);
-	token = tokens[*i];
+	//token = tokens[*i];
 
 	//printf("%s\n", collectChars(token, input));
 	//printf("%s\n", collectChars(token, input));
+	//printf("%s\n", collectChars(getToken(my_tokens), getInput(my_tokens)));
+
 	// at keyword now
-	*i += 1;
-	token = tokens[*i];
+	advanceToken(my_tokens);
+	//*i += 1;
+	//token = tokens[*i];
 	//printf("%s\n", tokenType(token));
 	//printf("start children\n");
-	TrieNode* start_children = arrayOfArrays(i, tokens, input, token_count);
+	TrieNode* start_children = makeTrieTree(my_tokens);//arrayOfArrays(i, tokens, input, token_count);
 	/*
 	printf("printing trie tree\n");
 	printTrieNodeTree(start_children, 0);
@@ -890,55 +1008,149 @@ ContextState* makeContextState(int* i, jsmntok_t tokens[], const char* input, in
 	*/
 	//printListOfListsOfStrings(start_children);
 
-	token = tokens[*i];
+	//token = tokens[*i];
 
 	//printf("%s\n", collectChars(token, input));
 	//printf("%s\n", collectChars(token, input));
+	//printf("%s\n", collectChars(getToken(my_tokens), getInput(my_tokens)));
+
 	// at keyword now
-	*i += 1;
-	token = tokens[*i];
+	advanceToken(my_tokens);
+	//*i += 1;
+	//token = tokens[*i];
 	//printf("%s\n", tokenType(token));
 	//printf("children\n");
-	TrieNode* children = arrayOfArrays(i, tokens, input, token_count);
+	TrieNode* children = makeTrieTree(my_tokens);//arrayOfArrays(i, tokens, input, token_count);
 	/*
 	printf("printing trie tree\n");
 	printTrieNodeTree(children, 0);
 	printf("\n\n");
 	*/
 	//printListOfListsOfStrings(children);
-	token = tokens[*i];
+	//token = tokens[*i];
 	//printf("%s\n", tokenType(token));
 	//printf("%s\n", collectChars(token, input));
 
-
-	*i += 1;
-	token = tokens[*i];
+	//printf("%s\n", collectChars(getToken(my_tokens), getInput(my_tokens)));
+	advanceToken(my_tokens);
+	//*i += 1;
+	//token = tokens[*i];
 	//printf("%s\n", tokenType(token));
-	char* function_name = collectChars(token, input);
+	char* function_name = collectChars(getToken(my_tokens), getInput(my_tokens));
 	// n time for this
 	// add to a trienode
 	// insert into a functions trie	
-	//printf("function name %s\n", collectChars(token, input));
+	//printf("function name %s\n", function_name);
+	advanceToken(my_tokens);
 
-	*i += 1;
-	token = tokens[*i];
+	//printf("%s\n", collectChars(getToken(my_tokens), getInput(my_tokens)));
+	advanceToken(my_tokens);
+
+	//*i += 1;
+	//token = tokens[*i];
 	//printf("%s\n", tokenType(token));
 	//printf("%s\n", collectChars(token, input));
 
-	*i += 1;
-	token = tokens[*i];
-	Data* variable_from_json_dict = variable(i, tokens, input);
+	//*i += 1;
+	//token = tokens[*i];
+	Data* variable_from_json_dict = variable(my_tokens);
 	//printf("variable\n");
 	//printData(variable_from_json_dict);
-	token = tokens[*i];
+	//token = tokens[*i];
 	//printf("%s\n", collectChars(token, input));
 
-	*i += 1;
-	token = tokens[*i];
+	//printf("%s\n", collectChars(getToken(my_tokens), getInput(my_tokens)));
+	advanceToken(my_tokens);
+
+	//*i += 1;
+	//token = tokens[*i];
 	//printf("before arrayOfArrays %s\n", tokenType(token));
 
-	TrieNode* parents = arrayOfArrays(i, tokens, input, token_count);
+	TrieNode* parents = makeTrieTree(my_tokens);//arrayOfArrays(i, tokens, input, token_count);
 	//printListOfListsOfStrings(parents);
+	//*i += 1;
+
+	//printf("%s\n", collectChars(getToken(my_tokens), getInput(my_tokens)));
+	advanceToken(my_tokens);
+	//printf("%s\n", collectChars(tokens[*i], input));
+	bool start_children_are_parallel = getBinaryValue(collectChars(getToken(my_tokens), getInput(my_tokens)));
+	//printf("%i\n", start_children_are_parallel);
+	advanceToken(my_tokens);
+
+
+
+	//*i += 1;
+
+	//printf("%s\n", collectChars(getToken(my_tokens), getInput(my_tokens)));
+	advanceToken(my_tokens);
+
+	//printf("%s\n", collectChars(getToken(my_tokens), getInput(my_tokens)));
+
+	bool nexts_are_parallel = getBinaryValue(collectChars(getToken(my_tokens), getInput(my_tokens)));
+	advanceToken(my_tokens);
+	//printf("%i\n", nexts_are_parallel);
+
+
+
+	//	*i += 1;
+
+
+	//printf("%s\n", collectChars(getToken(my_tokens), getInput(my_tokens)));
+	advanceToken(my_tokens);
+
+	bool is_start_child = getBinaryValue(collectChars(getToken(my_tokens), getInput(my_tokens)));
+	//printf("%i\n", is_start_child);
+	advanceToken(my_tokens);
+
+	//	*i += 1;
+
+	//printf("%s\n", collectChars(getToken(my_tokens), getInput(my_tokens)));
+	advanceToken(my_tokens);
+	bool is_child = getBinaryValue(collectChars(getToken(my_tokens), getInput(my_tokens)));
+	//printf("%i\n", is_child);
+	advanceToken(my_tokens);
+
+	//	*i += 1;
+
+
+
+	//printf("%s\n", collectChars(getToken(my_tokens), getInput(my_tokens)));
+	advanceToken(my_tokens);
+	bool is_parent = getBinaryValue(collectChars(getToken(my_tokens), getInput(my_tokens)));
+	//printf("%i\n", is_parent);
+	advanceToken(my_tokens);
+
+
+	//	*i += 1;
+	//printf("%s\n", collectChars(getToken(my_tokens), getInput(my_tokens)));
+	advanceToken(my_tokens);
+
+	bool is_start_state = getBinaryValue(collectChars(getToken(my_tokens), getInput(my_tokens)));
+	//printf("%i\n", is_start_state);
+	advanceToken(my_tokens);
+	//	*i += 1;
+
+
+
+	//printf("%s\n", collectChars(getToken(my_tokens), getInput(my_tokens)));
+	advanceToken(my_tokens);
+
+	bool is_end_state = getBinaryValue(collectChars(getToken(my_tokens), getInput(my_tokens)));
+	//printf("%i\n", is_end_state);
+	advanceToken(my_tokens);
+	//	*i += 1;
+
+
+	//printf("%s\n", collectChars(getToken(my_tokens), getInput(my_tokens)));
+	advanceToken(my_tokens);
+
+
+	bool is_data_state = getBinaryValue(collectChars(getToken(my_tokens), getInput(my_tokens)));
+
+	//printf("%i\n", is_data_state);
+	advanceToken(my_tokens);
+	//printf("\n\n\n\n");
+	//exit(1);
 	/*
 	printf("printing trie tree\n");
 	printTrieNodeTree(parents, 0);
@@ -967,7 +1179,7 @@ ContextState* makeContextState(int* i, jsmntok_t tokens[], const char* input, in
   */
 	  // also should add the actual functions to the state
 	  // f(state, parent)
-
+	
 	ContextState* current_state = makeFullContextState(
 		name,
 		nexts,
@@ -975,8 +1187,16 @@ ContextState* makeContextState(int* i, jsmntok_t tokens[], const char* input, in
 		children,
 		function_name,
 		variable_from_json_dict,
-		parents);
-
+		parents,
+		start_children_are_parallel,
+		nexts_are_parallel,
+		is_start_child,
+		is_child,
+		is_parent,
+		is_start_state,
+		is_end_state,
+		is_data_state);
+	
 	//printf("printing state\n\n");
 	//printContextState(current_state);
 	// now we are at the next object
@@ -984,12 +1204,13 @@ ContextState* makeContextState(int* i, jsmntok_t tokens[], const char* input, in
 	//exit(1);
 
 	// may be out of tokens
+	/*
 	if(*i < token_count)
 	{
 		token = tokens[*i];
 		//printf("done\n");
 		return current_state;
-	}
+	}*/
 	return current_state;
 	
 }
