@@ -1,5 +1,10 @@
-root
+
+
+first node
+
+
 	Function
+
 		returnTrue
 	Children
 		variables
@@ -45,7 +50,7 @@ root
 							size
 								Data
 									0
-							first contex
+							first context
 								Data
 									"input"
 					output
@@ -58,7 +63,7 @@ root
 									0
 							first contex
 								Data
-									"output"	
+									"output"
 					expression
 						input
 							12345
@@ -161,8 +166,15 @@ root
 						Function
 							validOp
 						Next
+
+
 							op
 				reset_for_next_round_of_input
+
+
+
+
+				
 					Function
 						resetForNextRound
 					Next

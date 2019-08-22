@@ -20,16 +20,16 @@ start state
 			Function
 				returnTrue
 			Next
-				------------------------------g
+				------------------------------
 				state 5 true
 				state 6 true
-				------------------------------g
+				------------------------------
 			Children
 			make dummy states so backtracking can be tested
 
 
 									
-				-----------------------------g
+				-----------------------------
 				-state 11
 					Function
 						returnTrue
@@ -40,10 +40,10 @@ start state
 					Function
 						returnTrue
 					Next
-						------------------------------g
+						------------------------------
 						state 14
 						state 15
-						------------------------------g
+						------------------------------
 				state 14
 					Function
 						returnTrue
@@ -63,8 +63,8 @@ start state
 					Function
 						returnTrue
 					Next
-						state 19 true
 						state 18 false
+						state 19 true
 				state 18 false
 					Function
 						returnFalse
@@ -95,7 +95,7 @@ start state
 				state 25
 					Function
 						returnFalse
-				------------------------------g
+				------------------------------
 		state 5 true
 			Function
 				returnTrue
