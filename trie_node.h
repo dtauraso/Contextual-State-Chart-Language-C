@@ -17,6 +17,12 @@ typedef struct Tokens
 
 }Tokens;
 
+typedef struct StateName
+{
+	char** names;
+	int size;
+}StateName;
+
 // for storing the name -> ContextState map
 typedef struct TrieNode
 {
@@ -60,13 +66,13 @@ typedef struct TrieNodePackage2
 	TrieNode* tree_pointer;
 	TrieNode* target_pointer;
 	int location;
-	bool state_there;
-	struct ContextState* object_found;
+	bool is_perfect_match;
 
 }TrieNodePackage2;
 
 TrieNode* initTrieNode();
 TrieNode* initTrieNodeWithNeighborCount(int number_of_possible_neighbors);
+// search
 int isMatch(char* ith_word, TrieNode* node);
 TrieNodePackage* findInTrie2(TrieNode* root, TrieNode* sequence_of_strings);
 TrieNode* appendWord(TrieNode* node, char* ith_name);
@@ -86,12 +92,21 @@ int matchEdgeCases(TrieNode* node, TrieNode* target_chain);
 TrieNodePackage2* makePackage(TrieNode* tree_pointer,
 							 TrieNode* target_pointer,
 							 int location,
-							 bool state_there,
-							 struct ContextState* object_found);
+							 bool is_perfect_match);
 
 TrieNodePackage2* binSearch(TrieNode* node, TrieNode* target_chain);
 
+//   posLessThanSizeAndSizeGreaterThan1
+bool posLessThanSizeAndSizeIs1(int pos, int size);
 
+bool posLessThanSizeAndSizeGreaterThan1(int pos, int size);
+
+bool posEqualToSizeAndSizeIsOne(int pos, int size);
+bool posEqualToSizeAndSizeGreaterThanOne(int pos, int size);
+bool sizeIs1AndCopyLeftSizeGreaterThan0(int size, int copy_left_size);
+bool sizeIs1AndCopyRightSizeGreaterThan0(int size, int copy_right_size);
+bool sizeGreaterThan1AndCopyLeftSizeGreaterThan0(int size, int copy_left_size);
+bool sizeGreaterThan1AndCopyRightSizeGreaterThan0(int size, int copy_right_size);
 
 TrieNode** insertItem(int pos, TrieNode* node, TrieNode* value);
 
@@ -107,7 +122,7 @@ bool insert1Item(TrieNode* node, TrieNode* target_chain, int location);
 
 
 
-TrieNodePackage2* searchForInsertId(TrieNode* node, TrieNode* target_chain, struct ContextState* target_state);
+TrieNodePackage2* searchForInsertId(TrieNode* node, TrieNode* target_chain);
 
 int insert2(TrieNode* node, TrieNode* target_chain, struct ContextState* target_state);
 
@@ -119,6 +134,8 @@ void addItem(int* i, jsmntok_t tokens[], const char* input, int j, struct TrieNo
 TrieNode* makeTrieTree(Tokens* my_tokens);
 
 
+int intervaleDistance(int low, int high);
+TrieNode** grabBlockOfNeighbors(TrieNode** neighbors, int offset, int interval_distance);
 
 
 Tokens* makeTokens(jsmntok_t tokens[], const char* input, int total_tokens);
@@ -128,6 +145,23 @@ jsmntok_t getToken(Tokens* my_tokens);
 bool noTokensLeft(Tokens* my_tokens);
 
 void advanceToken(Tokens* my_tokens);
+
+void deleteTrieNode(TrieNode* node);
+
+void printStateName(TrieNode* root);
+
+StateName* makeStateName1(char* name);
+
+
+StateName* makeStateName2(char* name1, char* name2);
+
+StateName* makeStateName3(char* name1, char* name2, char* name3);
+
+
+bool addToDict(TrieNode* dict, StateName* name);
+
+
+void visitor(TrieNode* dict, struct ContextState* start, struct ContextState* end);
 
 
 #endif

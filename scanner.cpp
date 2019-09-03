@@ -12,16 +12,23 @@ persistent is the set of variables who don't change on each level
 	persistent:
 		# tabs, word
 		the word is the text sequence on each line comming after the tabs
-2 lines
+2 lines:
 	we are processing 2 lines at a time
 	persistent:
 		2 words, 3 nodes
-		first round 2 lines are linked using parent and child nodes and a temp node
+		first round 2 lines are linked using parent and child nodes and a temp child
 		then second line becomes the first and the next second line is scanned
 		this chain scans in all the lines
 
+		after 3 nodes are set, we determine using the tab counts what the relationship is beween the parent and the temp child
+		tab_count_1 > tab_count_2
+			child's next child is temp child
+		tab_count_1 < tab_count_2
+			move parent up the tree so it is the parent of temp child
+		tab_count_1 = tab_count_2
+			parent's next child is temp child
 
-entire file
+entire file:
 	we are running a 2 lines process for the entire file
 	persistent:
 		1 tree, 2 dummy nodes above root
@@ -94,8 +101,7 @@ TwoLines* initTwoLines()
 	two_lines->temp_word = "";
 
 	two_lines->temp_number_of_tabs = 0;
-	two_lines->parent = initMultiwayLinesNode();
-	two_lines->child = initMultiwayLinesNode();
+
 
 	return two_lines;
 
@@ -106,8 +112,7 @@ bool deleteTwoLines(TwoLines* two_lines)
 	deleteOneLine(two_lines->second_line);
 
 
-	deleteMultiwayLinesNode(two_lines->parent);
-	deleteMultiwayLinesNode(two_lines->child);
+
 	free(two_lines);
 	two_lines = NULL;
 	return true;
@@ -134,14 +139,11 @@ Scanner* initScanner(string input)
 		my_scanner->input = input;
 
 
-		my_scanner->first_line = "";
-		my_scanner->second_line = "";
+
 		my_scanner->first_two_lines = true;
 		my_scanner->done_reading_data = false;
 
-		my_scanner->lines_graph = initMultiwayLinesNode();
 
-		my_scanner->child = initMultiwayLinesNode();
 		return my_scanner;
 
 	}
@@ -153,8 +155,6 @@ bool deleteScanner(Scanner* my_scanner)
 {
 	if(my_scanner != NULL)
 	{
-		deleteMultiwayLinesNode(my_scanner->lines_graph);
-		deleteMultiwayLinesNode(my_scanner->child);
 
 		free(my_scanner);
 		my_scanner = NULL;
@@ -197,7 +197,7 @@ void setNeighbors(int* next_states, int state, int child_0, int child_1, 	int ch
 
 StateMachine* setupMachineForMakeTree()
 {
-		// similar to a contextual state chart(no children, only nexts)
+		// contextual state chart
 		// each state name is a contextual state
 		// the state chart is the groups of states per level
 		int number_of_states = 21;
@@ -389,35 +389,24 @@ string getNextWord1(string input, int i)
  	// this function gets the next word
 	int j = 0;
 	int count = 0;
-	//printf("%i, %i\n", i, input.size());
-	if(i >= input.size())
+	int size = input.size();
+
+	if(i >= size)
 	{
 		return "out of range";
 	}
 	while(input[i + j] != '\n')
 	{
-		//printf("%c ", input[i + j]);
 		// can't trust the input
-		/*if((i + j) >= strlen(input))
+		if((i + j) >= size)
 		{
 			j--;
 			break;
-		}*/
+		}
 		j++;
 		count++;
 	}
-	//printf("character count %i\n", count);
 	string word = input.substr(i, j);
-	//char* word = malloc(sizeof(char) * j );
-	//printf("%i\n", j);
-	//memcpy(word, input + i, j);
-	//word[j] = '\0';
-	//printf("|%s|\n", word);
-	//printf("chars in word %lu\n", strlen(word));
-	/*
-	collect the word
-	return word
-	*/
 	return word;
 }
 bool errorFunction(Scanner* my_scanner)
@@ -816,17 +805,17 @@ bool nonBlankLine(Scanner* my_scanner)
 
 			
 
-				my_scanner->two_lines->temp_number_of_tabs = countTabs(current_word, 0);
+			my_scanner->two_lines->temp_number_of_tabs = countTabs(current_word, 0);
 
 
-				int size2 = current_word.size() + 1 - my_scanner->two_lines->temp_number_of_tabs;
+			int size2 = current_word.size() + 1 - my_scanner->two_lines->temp_number_of_tabs;
 
-				my_scanner->two_lines->temp_word = current_word.substr(my_scanner->two_lines->temp_number_of_tabs, size2);
+			my_scanner->two_lines->temp_word = current_word.substr(my_scanner->two_lines->temp_number_of_tabs, size2);
 
-				current_word = "";
+			current_word = "";
 
-				// save current_word as first_line
-				return true;
+			// save current_word as first_line
+			return true;
 			
 
 		}
@@ -844,15 +833,22 @@ bool nonBlankLine(Scanner* my_scanner)
 void deleteMachineForMakeTree(StateMachine* machine)
 {
 	
-	/*int* next_states;
+	/*
+	int* next_states;
 	int current_state;
 	int max_neighbors;
 	int next_states_size;
 	int ith_recursive_call;
 	int error_state;
 	int end_state;
-	char** state_names_strings;
+	int number_of_states_per_level;
+	int level_number;
+	int first_neighbor_to_test;
+	int* parent_status;
+	vector<string>* state_names_strings;
+	vector<string>* function_names;
 	int number_of_states;
+
 	*/
 	if(machine != NULL)
 	{
@@ -1100,9 +1096,10 @@ bool makeTreeStateMachine(Scanner* my_scanner)
 		int level = 0;
 		int counter = 0;
 		int* counter_ptr = &counter;
-		runMachine(machine, my_scanner, level, counter_ptr);
+		int debug_states_run = -1;
+		int* debug_states_run_ptr = &debug_states_run;
+		runMachine(machine, my_scanner, level, counter_ptr, debug_states_run_ptr);
 		//printMultiwayLinesNodesInContainer(my_scanner->_lines_graph);
-		printTree2(my_scanner->_lines_graph, 2, 0);
 
 		//machine->current_state = current_state
 		deleteMachineForMakeTree(machine);

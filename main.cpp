@@ -1,5 +1,6 @@
 #include "standard_headers.h"
-//#include "state.h"
+#include "state.h"
+#include "vector.h"
 //#include "trie_node.h"
 
 #include "scanner.h"
@@ -7,6 +8,7 @@
 //#include "jsmn/jsmn.h"
 //#include <string>
 //using namespace std;
+
 
 //void printState(ContextState* node);
 enum token_types {_primitive, _object, _array, _string};
@@ -443,7 +445,6 @@ int main(int argc, char** argv)
 	//printf("make tree\n");
 	// get rid of all blank lines
 	//test();
-	
 	string trimmed_input = trimEndOfInput(input);
 	if(trimmed_input.size() > 0)
 	{
@@ -454,9 +455,94 @@ int main(int argc, char** argv)
 		
 		Scanner* my_scanner = initScanner(trimmed_input);
 		//printf("here\n");
+
 		makeTreeStateMachine(my_scanner);
+		//printTree2(my_scanner->_lines_graph, 2, 0);
 
 	}
+	/*
+	bool insertState1(	Vector** name, // strings
+					Vector*** start_children,  // array of strings
+					Vector*** children, // array of strings
+					Vector*** next_states, // array of strings
+					Data* value) // primitive
+
+*/
+	/*
+	parsing machine
+
+	*/
+	/*
+	use parsing states as state graph input to test
+	get all the state names first
+
+	get the links and function names second
+		if reference is not already found
+			deal with error
+		if any next link is on a level above the current state
+			deal with error
+		start child links always go to a lower level
+		
+		
+
+		
+		start
+			next
+				(current_state children_flag | current_state next_flag)
+		nth state that passes
+		current_state
+			children_flag
+				init
+					next
+						setup first set of next states
+				first_state
+					next
+						try one
+				nth_state
+
+		setup first set of next states
+			next
+				is there anything in the set, run the set of next states
+		is there anything in the set
+			next
+				run the set of next states
+		run the set of next states
+			children
+				variables
+					children
+						pass_counter
+						total_next_states
+						kind of next states
+							data
+								"nexts"
+				-parallel
+					next
+						(try one | current run fails)
+				try one
+					next
+						(first_state_tried | nth_state_tried)
+				first_state_tried
+					next
+						current_state children_flag first_state
+				nth_state_tried
+					next
+						current_state.children_flag nth_state
+				current run fails
+					nexts
+						(not all failed | all fail)
+					function
+				not all failed
+					nexts
+						try one
+				all fail
+				-non-parallel
+
+	.append
+
+	makeVectorOfVectors2(vector_1, vector_2)
+	*/
+	// init DynamicMachine
+	// make and run the machine with 1 api call
 		/*
 	object collector -> n objects
 	object builder -> 1 object
@@ -464,7 +550,150 @@ int main(int argc, char** argv)
 	design top down
 
 	*/
+	/*
+	start
+		nexts
+		current_state children_flag
+		current_state next_flag
+		children
+		null
+	*/
+
+
+	Vector* list_of_lists_of_strings = combineVectors(
+										addStringToVector2("current_state", "children_flag"),
+										addStringToVector2("current_state", "next_flag"));
 	
+	for(int i = 0; i < list_of_lists_of_strings->population; i++)
+	{
+		printStrings((Vector*) list_of_lists_of_strings->values[i]);
+		printf("\n");
+
+	}
+
+	StateMachine* my_machine = setupMachine(/*_search*/1, /*empty*/0);
+	DynamicMachine* my_dynamic_machine = initDynamicMachine(my_machine);
+
+
+	// testing no existing object and we are already at the last word
+
+	// no prior data
+	my_dynamic_machine->trie_tree_dict = insertState1(
+		my_dynamic_machine->trie_tree_dict,
+		addStringToVector3("start", "start 1", "start 2"),
+					NULL,
+					NULL,
+					combineVectors(
+							addStringToVector2("current_state", "children_flag"),
+							addStringToVector2("current_state", "next_flag")),
+					makeDataInt(50));
+	/*
+	my_dynamic_machine->trie_tree_dict = insertState1(
+		my_dynamic_machine->trie_tree_dict,
+		addStringToVector2("another start", "2"),
+					NULL,
+					NULL,
+					combineVectors(
+							addStringToVector2("current_state", "children_flag"),
+							addStringToVector2("current_state", "next_flag")),
+					makeDataInt(50));
+	*/
+	printTrie(my_dynamic_machine->trie_tree_dict);
+
+	// has data, partial match
+	my_dynamic_machine->trie_tree_dict = insertState1(
+		my_dynamic_machine->trie_tree_dict,
+		addStringToVector3("start", "start 1", "2"),
+					NULL,
+					NULL,
+					combineVectors(
+							addStringToVector2("current_state", "children_flag"),
+							addStringToVector2("current_state", "next_flag")),
+					makeDataInt(50));
+
+	printTrie(my_dynamic_machine->trie_tree_dict);
+	// has data, complete match 1
+	my_dynamic_machine->trie_tree_dict = insertState1(
+		my_dynamic_machine->trie_tree_dict,
+		addStringToVector3("start", "start 1", "2"),
+					NULL,
+					NULL,
+					combineVectors(
+							addStringToVector2("current_state", "children_flag"),
+							addStringToVector2("current_state", "next_flag")),
+					makeDataInt(50));
+		printTrie(my_dynamic_machine->trie_tree_dict);
+
+	// has data, complete match 2
+	my_dynamic_machine->trie_tree_dict = insertState1(
+		my_dynamic_machine->trie_tree_dict,
+		addStringToVector3("start", "start 1", "2"),
+					NULL,
+					NULL,
+					combineVectors(
+							addStringToVector2("current_state", "children_flag"),
+							addStringToVector2("current_state", "next_flag")),
+					makeDataInt(50));
+		printTrie(my_dynamic_machine->trie_tree_dict);
+	// counterexample for making new contexts
+	my_dynamic_machine->trie_tree_dict = insertState1(
+		my_dynamic_machine->trie_tree_dict,
+		addStringToVector1("start"),
+					NULL,
+					NULL,
+					combineVectors(
+							addStringToVector2("current_state", "children_flag"),
+							addStringToVector2("current_state", "next_flag")),
+					makeDataInt(50));
+		printTrie(my_dynamic_machine->trie_tree_dict);
+
+	// has data, but completely different path
+	// has data, input string is a subpath
+	// has data, input string is longer than any subpath
+
+	/*
+	my_dynamic_machine = insertState1(
+		my_dynamic_machine,
+		addStringToVector2("start 3", "2"),
+					NULL,
+					NULL,
+					combineVectors(
+							addStringToVector2("current_state2", "children_flag2"),
+							addStringToVector2("current_state2", "next_flag2")),
+					makeDataFloat(9.6));
+	*/
+	/*
+	my_dynamic_machine = insertState1(
+		my_dynamic_machine,
+		addStringToVector1("start"),
+					NULL,
+					NULL,
+					combineVectors(
+							addStringToVector2("current_state2", "children_flag2"),
+							addStringToVector2("current_state2", "next_flag2")),
+					makeDataFloat(9.7));
+	*/
+	// test unique states
+	// test unique state edges
+	// calculator simulator
+	/*
+	take in text
+
+	output the value
+
+	1)
+		convert the text to a list of units
+	2)
+		run order of operations on the list of units in place
+
+
+	*/
+	/*bool insertState1(	Vector* name, // strings
+					Vector** start_children,  // array of strings
+					Vector** children, // array of strings
+					Vector** next_states, // array of strings
+					Data* value) // primitive
+	*/
 	//printf("%s\n", my_scanner->input);
 	//ContextState* tree = makeTree(input);
 	//printf("made tree\n");

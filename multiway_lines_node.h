@@ -1,6 +1,8 @@
 #ifndef MULTIWAY_LINES_NODE
 #define MULTIWAY_LINES_NODE
 #include "standard_headers.h"
+#include "vector.h"
+/*
 typedef struct Vector
 {
 	void** values;
@@ -21,7 +23,7 @@ void append(Vector* container, void* element);
 bool deleteItem(Vector* container, int index);
 
 void test();
-
+*/
 
 typedef struct MultiwayLinesNode
 {

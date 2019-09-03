@@ -1,8 +1,8 @@
 
 
-include_and_c_files =  main.c state_machine.cpp state_machine.h multiway_lines_node.cpp multiway_lines_node.h scanner.cpp scanner.h  standard_includes.h
+include_and_c_files =  main.cpp vector.cpp vector.h trie_tree.h trie_tree.cpp state_machine.cpp state_machine.h multiway_lines_node.cpp multiway_lines_node.h scanner.cpp scanner.h state.cpp state.h standard_includes.h
 
-object_files =  main.o state_machine.o multiway_lines_node.o scanner.o
+object_files =  main.o vector.o trie_tree.o state_machine.o multiway_lines_node.o scanner.o state.o
 
 
 
@@ -25,11 +25,11 @@ test:
 
 	#-./state_machine.x parsing_tree.json calculator_example.txt
 	#-./state_machine.x parsing_tree.json parallel_programming_example.txt
-	-./state_machine.x parsing_tree.json parallel_programming_example2.txt
+	#-./state_machine.x parsing_tree.json parallel_programming_example2.txt
 
 	#-./state_machine.x parsing_tree.json start.txt
 
-	#-./state_machine.x parallel_programming_example_json.json calculator_example.txt
+	-./state_machine.x parallel_programming_example_json.json calculator_example.txt
 
 	#-./state_machine.x parallel_programming_example.json parallel_programming_example.txt
 

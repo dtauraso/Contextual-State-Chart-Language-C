@@ -9,7 +9,7 @@ typedef struct Vector
 
 
 }Vector;
-*/
+
 
 Vector* initVector()
 {
@@ -185,7 +185,7 @@ void test()
 
 	deleteItem(my_vector, 0);
 	Print(my_vector);	
-	/*
+	
 	for(int i = 0; i < 5; i++)
 	{
 		printf("inserting %i\n", i);
@@ -204,11 +204,11 @@ void test()
 		void* a = my_vector->values[i];
 		int* b = (int*) a;
 		printf("%i\n", *b);
-	}*/
+	}
 
 	// erase a list of numbers
 }
-
+*/
 /*
 typedef struct MultiwayLinesNode
 {

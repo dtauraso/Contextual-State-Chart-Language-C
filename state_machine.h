@@ -1,12 +1,9 @@
 #ifndef STATE_MACHINE
 #define STATE_MACHINE
 #include "standard_headers.h"
+#include "state.h"
 
-typedef struct State
-{
-	int state_id;
-	bool (*function)(void*);
-}State;
+
 typedef struct StateMachine
 {
 	int* next_states;
@@ -37,6 +34,15 @@ StateMachine* stateMachine(int* next_states,
 						   int number_of_strings,
 						   int* parent_status,
 						   vector<string>* function_names);
+StateMachine* stateMachine2(int* next_states,
+						   int size,
+						   int max_neighbors,
+						   vector<string>* state_names_strings,
+						   int number_of_strings,
+						   int* parent_status,
+						   vector<string>* function_names,
+						   int start_state,
+						   int end_state);
 
 // all next states are not NULL state
 bool keepGoing(StateMachine* machine);
@@ -51,7 +57,9 @@ int getFirstChild(StateMachine* machine, int winning_state);
 
 int getFirstNextStates(StateMachine* machine, int winning_state);
 
-void runMachine(StateMachine* machine, void* object/*Scanner* my_scanner*/, int level, int* counter);
+void runMachine(StateMachine* machine, void* object/*Scanner* my_scanner*/, int level, int* counter, int* debug_states_run);
+
+void runMachine2(StateMachine* machine, void* object/*Scanner* my_scanner*/, int level, int* counter, int* debug_states_run);
 
 // construction, destruction, tests(not from input files) docstrings for functions and structs, translation
 // standard solutions

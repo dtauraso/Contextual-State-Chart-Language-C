@@ -113,6 +113,50 @@ StateMachine* stateMachine(int* next_states,
 	return NULL;
 }
 
+StateMachine* stateMachine2(int* next_states,
+						   int size,
+						   int max_neighbors,
+						   vector<string>* state_names_strings,
+						   int number_of_strings,
+						   int* parent_status,
+						   vector<string>* function_names,
+						   int start_state,
+						   int end_state)
+{
+	if(next_states != NULL)
+	{
+		StateMachine* new_machine = (StateMachine*) malloc(sizeof(StateMachine));
+		new_machine->next_states = (int*) malloc(sizeof(int) * size);
+		memcpy(new_machine->next_states, next_states, sizeof(int) * size);
+		new_machine->next_states_size = size;
+		new_machine->max_neighbors = max_neighbors;
+		new_machine->current_state = start_state;
+		new_machine->error_state = end_state;
+		//new_machine->end_state = end_state;
+		new_machine->level_number = 1;
+
+		new_machine->ith_recursive_call = 0;
+		new_machine->first_neighbor_to_test = max_neighbors + max_neighbors;
+		new_machine->state_names_strings = state_names_strings;//(char**) malloc(sizeof(char*) * number_of_strings);
+
+		//memcpy(new_machine->state_names_strings, state_names_strings, sizeof(char*) * number_of_strings);
+
+		new_machine->function_names = function_names;//(char**) malloc(sizeof(char*) * number_of_strings);
+
+		//memcpy(new_machine->function_names, function_names, sizeof(char**) * number_of_strings);
+
+
+
+		new_machine->parent_status = (int*) malloc(sizeof(int) * number_of_strings);
+
+		memcpy(new_machine->parent_status, parent_status, sizeof(int) * number_of_strings);
+
+		return new_machine;
+
+	}
+	return NULL;
+}
+
 bool keepGoing(StateMachine* machine)
 {
 	/*
@@ -380,7 +424,7 @@ int getFirstNextStates(StateMachine* machine, int winning_state)
 	return getFirstChild(machine, winning_state) + machine->max_neighbors;
 }
 
-void runMachine(StateMachine* machine, void* object/*Scanner* my_scanner*/, int level, int* counter)
+void runMachine(StateMachine* machine, void* object/*Scanner* my_scanner*/, int level, int* counter, int* debug_states_run)
 {
 	//int counter = 0;
 	machine->first_neighbor_to_test = getFirstChild(machine, machine->current_state);
@@ -393,14 +437,16 @@ void runMachine(StateMachine* machine, void* object/*Scanner* my_scanner*/, int 
 		// last working time is 950
 		//printf("%i\n", counter);
 		// 304
-		/*
-		if(counter == 310)
+		if(*debug_states_run > -1)
 		{
-			printf("ran too many states\n");
+			if(*counter == *debug_states_run)
+			{
+				printf("ran too many states\n");
 
-			exit(1);
+				exit(1);
+			}
 		}
-		*/
+
 		//printf("counter %i\n", *counter);
 		int current_state = machine->current_state;
 		// loop all next states and try them
@@ -426,7 +472,7 @@ void runMachine(StateMachine* machine, void* object/*Scanner* my_scanner*/, int 
 				//printf("running children\n");
 				if(keepGoing(machine))
 				{
-					/*success = */runMachine(machine, object, level + 3, counter);
+					/*success = */runMachine(machine, object, level + 3, counter, debug_states_run);
 					//printf("running next states after submachine %i\n", success);
 
 				}
@@ -453,6 +499,85 @@ void runMachine(StateMachine* machine, void* object/*Scanner* my_scanner*/, int 
 		
 		(*counter)++;
 	}
+	//return true;
+
+}
+void runMachine2(StateMachine* machine, void* object/*Scanner* my_scanner*/, int level, int* counter, int* debug_states_run)
+{
+	//int counter = 0;
+	machine->first_neighbor_to_test = getFirstChild(machine, machine->current_state);
+
+	// quitting machine if this is false
+	while(keepGoing(machine))
+	{
+		
+		// failing at 455
+		// last working time is 950
+		//printf("%i\n", counter);
+		// 304
+		if(*debug_states_run > -1)
+		{
+			if(*counter == *debug_states_run)
+			{
+				printf("ran too many states\n");
+
+				exit(1);
+			}
+		}
+
+		//printf("counter %i\n", *counter);
+		int current_state = machine->current_state;
+		// loop all next states and try them
+		// if there are children to run
+		// run children
+		// (machine->current_state * (machine->max_neighbors + machine->max_neighbors)) + offset_to_next
+		int winning_state = runState(machine,
+								  machine->first_neighbor_to_test,
+							 	  object,
+							 	  level);
+
+		bool success = false;
+		if(winning_state)
+		{
+			//printf("%s%s (f=%s)\n", makeSpaces(level).c_str(), machine->state_names_strings->at(winning_state).c_str(), machine->function_names->at(winning_state).c_str());
+
+			updateCurrentState(machine, winning_state);
+
+			if(machine->parent_status[winning_state])
+			{
+
+				machine->first_neighbor_to_test = getFirstChild(machine, winning_state);
+				//printf("running children\n");
+				if(keepGoing(machine))
+				{
+					/*success = */runMachine(machine, object, level + 3, counter, debug_states_run);
+					//printf("running next states after submachine %i\n", success);
+
+				}
+
+			}
+			
+			machine->first_neighbor_to_test = getFirstNextStates(machine, winning_state);
+		}
+		/*else if(!winning_state && machine->next_states[location_of_first_next_states] == empty)
+		{
+			return false;
+		}*/
+		else if(!winning_state && machine->next_states[machine->first_neighbor_to_test] != 0/*empty*/)
+		{
+			printf("the below states failed\n\n");
+			for(int k = 0; k < machine->max_neighbors; k++)
+			{
+				printf("   %s\n", machine->state_names_strings->at( machine->next_states[machine->first_neighbor_to_test + k] ).c_str() );
+			}
+			exit(1);
+			//return false;
+		}
+
+		
+		(*counter)++;
+	}
+	printf("machine is done\n");
 	//return true;
 
 }

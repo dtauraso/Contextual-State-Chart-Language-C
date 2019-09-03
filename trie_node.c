@@ -4,6 +4,9 @@
 enum token_types {_primitive, _object, _array, _string};
 enum data_types{is_list, is_string, is_empty_case};
 /// state functions for testing visitor function
+void deleteContextState(ContextState* state);
+char* surroundByQuotes(char* word_from_input);
+
 bool returnTrue(ContextState* current_state)
 {
 	printf("return true\n");
@@ -49,6 +52,86 @@ TrieNode* initTrieNodeWithNeighborCount(int number_of_possible_neighbors)
 
 	return node;
 
+}
+void deleteTrieNode(TrieNode* node)
+{
+	printf("deleteTrieNode %x\n", (unsigned int) node);
+	// the node still has a presence but it's size is not accessible
+	// it might not exist in the heap
+	if(node != NULL)
+	{
+		printf("neighbors size\n");
+		printf("%i\n", node->size);
+		if(node->size > 0)
+		{
+			for(int i = 0; i < node->size; i++)
+			{
+				printf("%i\n", i);
+				if(node->neighbors[i] != NULL)
+				{
+					deleteTrieNode(node->neighbors[i]);
+
+				}
+			}
+		}
+		if(node->neighbors != NULL)
+		{
+			// we are in trouble
+			// size should correspond to the actual size of node->neighbors
+		}
+		if(node->word)
+		{
+			printf("about to delete name\n%s\n", node->word);
+			free(node->word);
+			node->word = NULL;
+
+		}
+		if(node->object)
+		{
+			deleteContextState(node->object);
+			node->object = NULL;
+
+		}
+		free(node);
+		node = NULL;
+		printf("done deleting TrieNode\n");
+	}
+	else
+	{
+		printf("done deleting TrieNode\n");
+
+	}
+
+	
+}
+void printStateName(TrieNode* root)
+{
+
+	TrieNode* tracker = root;
+	//printf("root size %i\n", root->size);
+	//printf("first one \n %x\n", root->neighbors[j]->word);
+	for(int m = 0; m < root->size; m++)
+	{
+		TrieNode* finger_tracker = tracker->neighbors[m];
+		printf("printing finger|\n");
+
+		while(finger_tracker != NULL)
+		{
+			printf("%s\n", finger_tracker->word);
+			if(finger_tracker->neighbors != NULL)
+			{
+				finger_tracker = finger_tracker->neighbors[0];
+
+			}
+			else
+			{
+				finger_tracker = NULL;
+			}
+		}
+		printf("--------\n");
+	}
+	
+	printf("|\n");
 }
 
 // each function consuming tokens advance the index
@@ -117,17 +200,7 @@ int computeLocation(int low,  int size,  TrieNode* node, char* target)
 	
 	return low;
 }
-bool areNeighborsNull(TrieNode* node, TrieNode* target_chain)
-{
-	if(node != NULL && target_chain != NULL)
-	{
-		if(node->neighbors == NULL)
-		{
-			return true;
-		}
-	}
-	return false;
-}
+
 bool canWeSearchWithTheDataAvaliable(TrieNode* node, TrieNode* target_chain)
 {
 	if(node != NULL && target_chain != NULL)
@@ -141,7 +214,7 @@ bool canWeSearchWithTheDataAvaliable(TrieNode* node, TrieNode* target_chain)
 }
 
 // binsearch edge cases for matching
-enum edgeCases{end_of_perfect_match, target_chain_has_more_words, can_keep_matching, state_already_exists};
+enum edgeCases{end_of_perfect_match, target_chain_has_more_words, can_keep_matching};
 int matchEdgeCases(TrieNode* node, TrieNode* target_chain)
 {
 	// check ahead for the possible end conditions
@@ -158,13 +231,6 @@ int matchEdgeCases(TrieNode* node, TrieNode* target_chain)
 			//printf("end of perfect match\n");
 			// end of perfect match
 			// check for state existing
-			if(node->object)
-			{
-				//printf("state already exists\n");
-				return state_already_exists;
-				// if state is there
-					// return state exists
-			}
 			return end_of_perfect_match;
 		}
 		// case 1 tree has nothing left to match but target chain has more words
@@ -199,8 +265,7 @@ typedef struct TrieNodePackage2
 TrieNodePackage2* makePackage(TrieNode* tree_pointer,
 							 TrieNode* target_pointer,
 							 int location,
-							 bool state_there,
-							 ContextState* object_found)
+							 bool is_perfect_match)
 {
 	TrieNodePackage2* package = malloc(sizeof(TrieNodePackage2));
 	package->tree_pointer = malloc(sizeof(TrieNode));
@@ -210,24 +275,14 @@ TrieNodePackage2* makePackage(TrieNode* tree_pointer,
 
 	package->location = location;
 	
-	package->state_there = state_there;
+	package->is_perfect_match = is_perfect_match;
 	//printf("%i %i\n", state_there, object_found);
-	if(state_there)
-	{
-		package->object_found = malloc(sizeof(ContextState));
-		package->object_found = object_found;
-		//memcpy(package->object_found, object_found, sizeof(ContextState));
-
-	}
-	else
-	{
-		package->object_found = NULL;
-	}
 
 	return package;
 }
 TrieNodePackage2* mainBinSearch(TrieNode* node, TrieNode* target_chain)
 {
+	//printf("mainBinSearch\n");
 	int low = 0;
 	int high = node->size - 1;
 	int mid = (low + high) / 2;
@@ -239,11 +294,15 @@ TrieNodePackage2* mainBinSearch(TrieNode* node, TrieNode* target_chain)
 		//char* key;
 		//char* value;
 		//printf("low and high\n");
-		while(low <= high)
+
+		/* prevents the next midpoint from overaccessing*/
+		while(low <= high && mid < node_tracker->size)
 		{
 			//key = mid_node->word;
 			//value = target_chain_tracker->word;
 			//printf("%i, %i\n", low, high);
+
+			//printf("%i, %i\n", mid, node->size);
 
 			int is_less_than = strcmp(target_chain_tracker->word,
 									  node_tracker->neighbors[mid]->word);
@@ -271,18 +330,22 @@ TrieNodePackage2* mainBinSearch(TrieNode* node, TrieNode* target_chain)
 
 						add chain in and state
 				*/
+				// (tree_pointer, name_pointer, location, if_perfect_match)
 				if(end_of_perfect_match == edge_case_result)
 				{
 					//printf("end_of_perfect_match\n");
+					// only care about getting to the node with the final match
+					// the contents of the state is not relevant 
 					// (tree_pointer, null, mid, !state_there)
-					return makePackage(node_tracker, NULL, mid, 1, node_tracker->neighbors[mid]->object);
+					// more accurate to what is going on but a problem(can add but can't find)
+					return makePackage(node_tracker, NULL, mid, 1);
 				}
 				else if(target_chain_has_more_words == edge_case_result)
 				{
 					//printf("target_chain_has_more_words\n");
 					//printf("mid %i\n", mid);
 					// (tree_pointer, target_pointer, mid, !state_there)
-					return makePackage(node_tracker, target_chain_tracker, mid, 0, NULL);
+					return makePackage(node_tracker, target_chain_tracker, mid, 0);
 				}
 				else if(can_keep_matching == edge_case_result)
 				{
@@ -309,16 +372,10 @@ TrieNodePackage2* mainBinSearch(TrieNode* node, TrieNode* target_chain)
 					{
 						// return what we have
 						// (tree_pointer, target_pointer, mid, !state_there)
-						return makePackage(node_tracker, target_chain_tracker, mid, 0, NULL);
+						return makePackage(node_tracker, target_chain_tracker, mid, 0);
 					}
 
 					
-				}
-				else //if(state_already_exists)
-				{
-					//printf("state_already_exists\n");
-					// (tree_pointer, target_pointer, 0, state_there)
-					return makePackage(node_tracker, target_chain_tracker, 0, 1, node_tracker->neighbors[mid]->object);
 				}
 
 			}
@@ -350,6 +407,7 @@ TrieNodePackage2* mainBinSearch(TrieNode* node, TrieNode* target_chain)
 		// should be alot less linear search space than if binsearch is not used
 		// if mostly random then O(logn)
 		// 
+		// take to the last word that would match so the insert is ahead of all words less than the target
 		if(location_of_insert < node_tracker->size)
 		{
 
@@ -361,7 +419,7 @@ TrieNodePackage2* mainBinSearch(TrieNode* node, TrieNode* target_chain)
 		}
 		// return state of pointers where the new name part will be added
 		// (tree_pointer, target_pointer, location_of_insert, !state_there)
-		return makePackage(node_tracker, target_chain_tracker, location_of_insert, 0, NULL);
+		return makePackage(node_tracker, target_chain_tracker, location_of_insert, 0);
 		
 	}
 	else
@@ -377,6 +435,7 @@ TrieNodePackage2* binSearch(TrieNode* node, TrieNode* target_chain)
 	// canWeSearchWithTheDataAvaliable has already been done
 	if(canWeSearchWithTheDataAvaliable(node, target_chain))
 	{
+
 		int largest_size;
 		int location_of_insert = 0;
 		if(node->size == 0)
@@ -387,6 +446,9 @@ TrieNodePackage2* binSearch(TrieNode* node, TrieNode* target_chain)
 		{
 			largest_size = node->size;
 		}
+		//printf("search word %s\n", target_chain->word);
+
+		//printf("largest word %s\n", node->neighbors[largest_size - 1]->word);
 		// target < first word
 		if(strcmp(target_chain->word, node->neighbors[0]->word) < 0)
 		{
@@ -395,7 +457,7 @@ TrieNodePackage2* binSearch(TrieNode* node, TrieNode* target_chain)
 			return makePackage(node,
 							   target_chain,
 							   location_of_insert,
-							   0, NULL);
+							   0);
 		}
 		// target > last word
 		else if(strcmp(target_chain->word,
@@ -406,8 +468,9 @@ TrieNodePackage2* binSearch(TrieNode* node, TrieNode* target_chain)
 			return makePackage(node,
 							   target_chain,
 							   location_of_insert,
-							   0, NULL);
+							   0);
 		}
+		//printf("got here\n");
 		return mainBinSearch(node, target_chain);
 		
 	}
@@ -417,11 +480,23 @@ TrieNodePackage2* binSearch(TrieNode* node, TrieNode* target_chain)
 	}
 	
 }
+bool areNeighborsNull(TrieNode* node, TrieNode* target_chain)
+{
+	if(node != NULL && target_chain != NULL)
+	{
+		if(node->neighbors == NULL)
+		{
+			return true;
+		}
+	}
+	return false;
+}
 // f(TrieNode* node, TrieNode* target_chain, ContextState* target_state, int insert_location)
 TrieNodePackage2* searchForInsertId(TrieNode* node,
-								    TrieNode* target_chain,
-								    ContextState* target_state)
+								    TrieNode* target_chain)
 {
+
+
 	// made no assumptions on if the pointers are null
 	// O(longest list of strings)
 	// return 0 if can't find the state
@@ -464,9 +539,8 @@ TrieNodePackage2* searchForInsertId(TrieNode* node,
 	{
 		// there are no nodes in neighbor
 		//printf("this case\n");
-		return makePackage(node, target_chain, 0, 0, NULL);
+		return makePackage(node, target_chain, 0, 0);
 	}
-	
 	TrieNodePackage2* result = binSearch(node, target_chain);
 
 	return result;
@@ -570,7 +644,7 @@ TrieNode** newTrieNodes(char* word, int location, int neighbor_count)
 			new_neighbors[i] = newTrieNode();
 		}
 		new_neighbors[location] = malloc(sizeof(TrieNode));
-		new_neighbors[location]->word = NULL;//malloc(sizeof(char) * (strlen(word) + 1) );
+		new_neighbors[location]->word = NULL;// malloc(sizeof(char) * (strlen(word) + 1) ) will be used elsewhere
 		new_neighbors[location]->neighbors = NULL;
 		new_neighbors[location]->size = 0;
 		new_neighbors[location]->neighbors_count = 0;
@@ -586,6 +660,292 @@ TrieNode** newTrieNodes(char* word, int location, int neighbor_count)
 	
 
 }
+/*
+delete
+	size == 1
+		erase element and object
+	size > 1
+		element is at left side
+			shift remainder of array 1 to the left
+
+		element is at right side
+			make new array 1 shorter
+
+		element is in middle
+			shift remainder of array 1 to the left
+
+*/
+int intervaleDistance(int low, int high)
+{
+	if(low == 0)
+		return high - low + 1;
+	return high - low;
+}
+
+TrieNode** grabBlockOfNeighbors(TrieNode** neighbors, int offset, int interval_distance)
+{
+	int size_to_grab = sizeof(TrieNode*) * interval_distance;
+	//printf("size %i\n", size_to_grab/sizeof(TrieNode*));
+	TrieNode** new_neighbors = malloc(size_to_grab);
+	memcpy(new_neighbors, neighbors + offset, size_to_grab);
+	return new_neighbors;
+}
+void deleteNeighbors(TrieNode* node)
+{
+	for(int i = 0; i < node->neighbors_count; i++)
+	{
+		deleteTrieNode(node->neighbors[i]);
+	}
+	free(node->neighbors);
+	node->neighbors = NULL;
+}
+void deleteElement(TrieNode* node, int pos)
+{
+
+	// deletes node->neighbors[pos]
+	TrieNode* element = node->neighbors[pos];
+
+	int number_of_elements = node->size;
+	if(number_of_elements == 1)
+	{
+		// erase element
+		deleteTrieNode(element);
+		free(node->neighbors);
+		node->neighbors = NULL;
+		node->size = 0;
+		node->neighbors_count = 0;
+	}
+	else
+	{
+		int end = number_of_elements - 1;
+		// need to delete the object too(need a delete for context state)
+		// call delete(object)
+		// element is at pos == 0
+		if(pos == 0)
+		{
+			int sizeof_A = intervaleDistance(1, end + 1);
+			//printf("%i %i, %i\n", 1, end, sizeof_A);
+			TrieNode** new_neighbors = grabBlockOfNeighbors(node->neighbors, 1, sizeof_A);
+			/*
+			printf("neighbors A left\n");
+			for(int i = 0; i < sizeof_A; i++)
+			{
+				printf("%s\n", new_neighbors[i]->word);
+			}
+			*/
+			deleteNeighbors(node);
+			node->neighbors = NULL;
+			node->neighbors = malloc(sizeof(TrieNode*) * (number_of_elements - 1));
+			for(int i = 0; i < sizeof_A; i++)
+			{
+				node->neighbors[i] = new_neighbors[i];
+			}
+			node->size -= 1;
+			node->neighbors_count -= 1;
+			//node->neighbors = new_neighbors;
+		}
+		/*
+			make copy of neighbors 1 length shorter(pos 1 to end)
+			erase current neighbors
+		*/
+		// element is at pos == end
+		else if(pos == end)
+		{
+			int sizeof_A = intervaleDistance(pos, end - 1);
+
+			TrieNode** new_neighbors = grabBlockOfNeighbors(node->neighbors, pos, sizeof_A);
+			deleteNeighbors(node);
+			node->neighbors = NULL;
+			node->neighbors = malloc(sizeof(TrieNode*) * (number_of_elements - 1));
+			for(int i = 0; i < sizeof_A; i++)
+			{
+				node->neighbors[i] = new_neighbors[i];
+			}
+			node->size -= 1;
+			node->neighbors_count -= 1;
+
+		}
+		/*
+			make copy of neighbors 1 length shorter(start to end - 1)
+			erase current neighbors
+
+		*/
+		// else
+		else
+		{
+			// it actually erased something but it was not the name picked to erase
+			// ranges appear to be wrong
+			// first slice appears to be right
+			int sizeof_A = intervaleDistance(0, pos - 1);
+
+			//printf("%i %i, %i\n", 0, pos - 1, sizeof_A);
+			int sizeof_B = intervaleDistance(pos + 1, end + 1);
+
+			//printf("%i %i, %i\n", pos + 1, end, sizeof_B);
+			TrieNode* test_node = initTrieNode();
+			TrieNode** new_neighbors_A = grabBlockOfNeighbors(node->neighbors, 0, sizeof_A);
+			/*
+			printf("neighbors A\n");
+			for(int i = 0; i < sizeof_A; i++)
+			{
+				printf("%s\n", new_neighbors_A[i]->word);
+			}
+			*/
+			//printf("%s\n", new_neighbors_A[9]->word);
+
+			test_node->neighbors = new_neighbors_A;
+
+
+
+			TrieNode** new_neighbors_B = grabBlockOfNeighbors(node->neighbors, pos + 1, sizeof_B);
+			/*
+			printf("neighbors B\n");
+			for(int i = 0; i < sizeof_B; i++)
+			{
+				printf("%s\n", new_neighbors_B[i]->word);
+			}
+			*/
+			deleteNeighbors(node);
+			node->neighbors = NULL;
+			//printf("neighbors left %i\n", node->neighbors);
+			node->neighbors = malloc(sizeof(TrieNode*) * (number_of_elements - 1));
+			for(int i = 0; i < sizeof_A; i++)
+			{
+				node->neighbors[i] = new_neighbors_A[i];
+			}
+			//memcpy(node->neighbors, new_neighbors_A, sizeof_A);
+			
+			/*
+			printf("neighbors A left\n");
+			for(int i = 0; i < sizeof_A; i++)
+			{
+				printf("%s\n", new_neighbors_A[i]->word);
+			}
+			
+
+			printf("neighbors B left\n");
+
+			for(int i = 0; i < sizeof_B; i++)
+			{
+
+				printf("%i%s\n", i, new_neighbors_B[i]->word);
+			}
+			*/
+			for(int i = 0; i < sizeof_B; i++)
+			{
+				node->neighbors[i + sizeof_A] = new_neighbors_B[i];
+			}
+
+			//memcpy(node->neighbors + sizeof_A, new_neighbors_B, sizeof(TrieNode*) * sizeof_B);
+			/*
+			printf("%i\n", number_of_elements - 1);
+			for(int i = 0; i < number_of_elements - 1; i++)
+			{
+				printf("%s\n", node->neighbors[i]->word);
+
+			}
+			*/
+			node->size -= 1;
+			node->neighbors_count -= 1;
+			//printf("test_node\n");
+			//printTrieNodes(test_node);
+
+			//printf("\n\n");
+		}
+		/*
+			make copy of neighbors from pos + 1 to end(B)(save size)
+			make copy of neighbors from start to pos - 1(A)(save size)
+			erase current neighbors
+
+			merge A and B with new neighbors of size = old size - 1
+		*/
+
+	}
+	
+}
+
+//delete2(dict, state->state_name->neighbors[0], state)
+int delete2(TrieNode* node, TrieNode* target_chain, ContextState* target_state)
+{
+	// ContextState* target_state only used to set to the state after being found or made
+	printf("deleting name\n");
+	printTrieNodes(target_state->state_name->neighbors[0]);
+	TrieNodePackage2* result = searchForInsertId(node, target_chain);
+	//printTrieNodes(result->target_pointer);
+	if(result != NULL)
+	{
+
+		//printf("got here\n");
+		if(result->is_perfect_match)
+		{
+			if(result->tree_pointer != NULL)
+			{
+				TrieNode* node1 = result->tree_pointer;
+				int mid = result->location;
+				TrieNode* neighbor = node1->neighbors[mid];
+				if(neighbor != NULL)
+				{
+					// delete neighbor
+					deleteElement(node1, mid);
+					return 1;
+				}
+				else
+				{
+					// can't do anything
+				}
+				//printf("already added\n");
+				// don't add
+			}
+			
+		}
+	}
+	
+	return 0;
+	
+}
+
+
+
+
+// cases for slicing operations
+//enum slicing_cases{};
+// do I need separate cases for insert vs delete?
+// perhaps a enum state machine?
+
+bool posLessThanSizeAndSizeIs1(int pos, int size)
+{
+	return pos < size && size == 1;
+}
+bool posLessThanSizeAndSizeGreaterThan1(int pos, int size)
+{
+	return pos < size && size > 1;
+}
+bool posEqualToSizeAndSizeIsOne(int pos, int size)
+{
+	return pos == size && size == 1;
+}
+bool posEqualToSizeAndSizeGreaterThanOne(int pos, int size)
+{
+	return pos == size && size > 1;
+}
+bool sizeIs1AndCopyLeftSizeGreaterThan0(int size, int copy_left_size)
+{
+	return size == 1 && copy_left_size > 0;
+}
+bool sizeIs1AndCopyRightSizeGreaterThan0(int size, int copy_right_size)
+{
+	return size == 1 && copy_right_size > 0;
+}
+
+bool sizeGreaterThan1AndCopyLeftSizeGreaterThan0(int size, int copy_left_size)
+{
+	return size > 1 && copy_left_size > 0;
+}
+bool sizeGreaterThan1AndCopyRightSizeGreaterThan0(int size, int copy_right_size)
+{
+	return size > 1 && copy_right_size > 0;
+}
+
 TrieNode** insertItem(int pos, TrieNode* node, TrieNode* value)
 {
 	//printf("insert item nod's size %i\n", node->size);
@@ -610,111 +970,84 @@ TrieNode** insertItem(int pos, TrieNode* node, TrieNode* value)
 
 	int copy_left_size = 0;
 	int copy_right_size = 0;
-	if(pos < size)
-	{
 
-		if(size == 1)
-		{
-			// [0, size)
-			copy_right_size = distance(0, size);
-
-		}
-		else if(size > 1)
-		{
-			// [0, pos), [pos, size)
-			copy_left_size = distance(0, pos);
-			copy_right_size = distance(pos, size);
-		}
-	}
-	else if(pos == size)
+	if(posLessThanSizeAndSizeIs1(pos, size))
 	{
-		if(size == 1)
-		{
-			//printf("base case\n");
-			// [0, 0]
-			copy_left_size = 1;//distance(0, 0);
-		}
-		else if(size > 1)
-		{
-			// [0, pos)
-			copy_left_size = distance(0, pos);
-		}
+		// [0, size)
+		copy_right_size = distance(0, size);
 	}
+	else if(posLessThanSizeAndSizeGreaterThan1(pos, size))
+	{
+		// [0, pos), [pos, size)
+		copy_left_size = distance(0, pos);
+		copy_right_size = distance(pos, size);
+	}
+	else if(posEqualToSizeAndSizeIsOne(pos, size))
+	{
+		// [0, 0]
+		copy_left_size = 1;
+
+	}
+	else if(posEqualToSizeAndSizeGreaterThanOne(pos, size))
+	{
+		// [0, pos)
+		copy_left_size = distance(0, pos);
+
+	}
+	
 	// may need to put more in here
 	//printf("left %i, right %i pos %i\n", copy_left_size, copy_right_size, pos);
 	// need separate cases for size== 1
 	// can't have them in the combined choices part
 	// adding in an extra item
-	if(size == 1)
+	if(sizeIs1AndCopyLeftSizeGreaterThan0(size, copy_left_size))
 	{
-		if(copy_left_size > 0)
-		{
-			//printf("base case left\n");
-			// pos 1 was the insert location
-			new_neighbors[0] = copyTrieNode(node->neighbors[0]);
-			new_neighbors[1] = setTrieNode(value);
-			//memcpy(new_neighbors[0], node->neighbors[0], sizeof(TrieNode));
-
-		}
-		else if(copy_right_size > 0)
-		{
-			//printf("base case right\n");
-			// pos 0 was the insert location
-			new_neighbors[pos] = setTrieNode(value);
-
-			new_neighbors[1] = copyTrieNode(node->neighbors[0]);
-			//memcpy(new_neighbors[1], node->neighbors[0], sizeof(TrieNode));
-			//printf("word after shift %s pos %i\n", new_neighbors[pos]->word, pos);
-
-
-		}
-		//memcpy(new_neighbors[pos]->word,
-		//		value->word,
-		//		sizeof(char) * (strlen(value->word)));
-	//new_neighbors[pos]->word[strlen(value->word)] = '\0';
-
+		new_neighbors[0] = copyTrieNode(node->neighbors[0]);
+		new_neighbors[1] = setTrieNode(value);
+		//memcpy(new_neighbors[0], node->neighbors[0], sizeof(TrieNode));
+		return new_neighbors;
 	}
-	else
+	else if(sizeIs1AndCopyRightSizeGreaterThan0(size, copy_right_size))
 	{
-		if(copy_left_size > 0)
-		{
-			//printf("copy left size %i\n", copy_left_size);
-			
-			for(int i = 0; i < copy_left_size; i++)
-			{
-				//printf("%i\n", i);
-				//printf("%i th object %x\n", i, new_neighbors[i]);
-				new_neighbors[i] = copyTrieNode(node->neighbors[i]);
-				//memcpy(new_neighbors[i], node->neighbors[i], sizeof(TrieNode));
-				//printf("%s\n", new_neighbors[i]->word);
-			}
-
-		}
 		new_neighbors[pos] = setTrieNode(value);
+		new_neighbors[1] = copyTrieNode(node->neighbors[0]);
+		//memcpy(new_neighbors[1], node->neighbors[0], sizeof(TrieNode));
+		//printf("word after shift %s pos %i\n", new_neighbors[pos]->word, pos);
 
-		//memcpy(new_neighbors[pos]->word,
-		//		value->word,
-		//		sizeof(char) * (strlen(value->word)));
-	//new_neighbors[pos]->word[strlen(value->word)] = '\0';
-		if(copy_right_size > 0)
-		{
-			//printf("copy right size %i\n", copy_right_size);
-			
-			for(int i = copy_left_size; i < size; i++)
-			{
-				// + 1 needs to go somewhere else
-				new_neighbors[i + 1] = copyTrieNode(node->neighbors[i]);
-				//memcpy(new_neighbors[i + 1], node->neighbors[i], sizeof(TrieNode));
-				//printf("%s\n", new_neighbors[i]->word);
-
-			}
-		
-			
-		}
-
+		return new_neighbors;
 	}
 	
+	if(sizeGreaterThan1AndCopyLeftSizeGreaterThan0(size, copy_left_size))
+	{
+		for(int i = 0; i < copy_left_size; i++)
+		{
+			//printf("%i\n", i);
+			//printf("%i th object %x\n", i, new_neighbors[i]);
+			new_neighbors[i] = copyTrieNode(node->neighbors[i]);
+			//memcpy(new_neighbors[i], node->neighbors[i], sizeof(TrieNode));
+			//printf("%s\n", new_neighbors[i]->word);
+		}
+	}
+	new_neighbors[pos] = setTrieNode(value);
+
+	//memcpy(new_neighbors[pos]->word,
+	//		value->word,
+	//		sizeof(char) * (strlen(value->word)));
+	//new_neighbors[pos]->word[strlen(value->word)] = '\0';
+	if(sizeGreaterThan1AndCopyRightSizeGreaterThan0(size, copy_right_size))
+	{
+		for(int i = copy_left_size; i < size; i++)
+		{
+			// + 1 needs to go somewhere else
+			new_neighbors[i + 1] = copyTrieNode(node->neighbors[i]);
+			//memcpy(new_neighbors[i + 1], node->neighbors[i], sizeof(TrieNode));
+			//printf("%s\n", new_neighbors[i]->word);
+
+		}
+	}
+
 	return new_neighbors;
+	
 }
 
 
@@ -759,7 +1092,11 @@ bool insert1Item(TrieNode* node, TrieNode* target_chain, int location)
 		//printf("word saved %s\n", new_neighbors[location]->word);
 		//printf("word saved %s\n", new_neighbors[1]->word);
 
+		for(int i = 0; i < node->size; i++)
+		{
+			free(node->neighbors[i]);
 
+		}
 		free(node->neighbors);
 		node->neighbors = new_neighbors;
 		node->size++;
@@ -798,25 +1135,43 @@ void setFunction(ContextState* state)
 // will need to look out for this function as the visitor function is made
 int insert2(TrieNode* node, TrieNode* target_chain, ContextState* target_state)
 {
+	// ContextState* target_state only used to set to the state after being found or made
 	printf("\ninserting name\n");
 	printTrieNodes(target_state->state_name->neighbors[0]);
-	// only returns the deepest location, not all locations 
-	TrieNodePackage2* result = searchForInsertId(node, target_chain, target_state);
+	TrieNodePackage2* result = searchForInsertId(node, target_chain);
 	//printTrieNodes(result->target_pointer);
 	if(result != NULL)
 	{
+
 		//printf("got here\n");
-		if(result->state_there)
+		if(result->is_perfect_match)
 		{
-			printf("already added\n");
+			TrieNode* node = result->tree_pointer;
+			int mid = result->location;
+			TrieNode* neighbor = node->neighbors[mid];
+			if(neighbor != NULL)
+			{
+				if(neighbor->object != NULL)
+				{
+					//printf("already added\n");
+
+				}
+				else
+				{
+					// add in state
+				}
+			}
+			else
+			{
+				// can't do anything
+			}
+			//printf("already added\n");
 			// don't add
-		}
-		else if(result->target_pointer == NULL)
-		{
-			// add in state
 		}
 		else
 		{
+			// add in the names remaining
+			printf("adding name\n");
 			// adding same names
 			//printf("null stuff\n");
 			/*printf("printing tree before\n");
@@ -852,12 +1207,13 @@ int insert2(TrieNode* node, TrieNode* target_chain, ContextState* target_state)
 				else
 				{
 					// save the object
-					printf("save object\n");
+					//printf("save object\n");
 					result->tree_pointer->neighbors[insert_location]->object = target_state;
 					//printTrieNodeTreeFlat(result->tree_pointer->neighbors[insert_location]->object->state_name->neighbors[0]);
-
 					setFunction(result->tree_pointer->neighbors[insert_location]->object);
-					result->tree_pointer->neighbors[insert_location]->object->function_pointer(target_state);
+					//printf("saved object\n");
+
+					//result->tree_pointer->neighbors[insert_location]->object->function_pointer(target_state);
 					break;
 				}
 				insert_location = 0;
@@ -866,20 +1222,25 @@ int insert2(TrieNode* node, TrieNode* target_chain, ContextState* target_state)
 			}
 			// claims the state exists but can't find it
 			//printf("done\n");
-			TrieNodePackage2* result2 = searchForInsertId(node, target_chain, target_state);
+			
+			TrieNodePackage2* result2 = searchForInsertId(node, target_chain);
+			/*
 			if(result2 != NULL)
 			{
 				if(result2->object_found)
 				{
 					printf("found name\n");
-					printTrieNodeTreeFlat(result2->object_found->state_name->neighbors[0]);
-					printf("\n\n");
+					printStateName(result2->object_found->state_name);
+
+					//printTrieNodeTreeFlat(result2->object_found->state_name->neighbors[0]);
+					//printf("\n\n");
 
 					//printContextState(result2->object_found);
 				}
 				//printf("location: %i\n", result->location);
 
-			}
+			}*/
+			
 			//printf("\nprinting tree\n");
 			//printf("%i %x\n",result2->state_there,  result2->object_found);
 			//printTrieNodeTree(node, 1);
@@ -1002,7 +1363,9 @@ void stringFinger(Tokens* my_tokens,
 	// 1 string finger
 	root->neighbors[j] = initTrieNode();
 	root->neighbors[j]->size = 1;
+	root->neighbors[j]->neighbors_count = 1;
 	root->object = NULL;
+
 	TrieNode* current = root->neighbors[j];
 	//printf("# of strings %i\n", second_size);
 	for(int i = 0; i < second_size; i++)
@@ -1038,6 +1401,7 @@ void stringFinger(Tokens* my_tokens,
 		TrieNode* next = malloc(sizeof(TrieNode));
 		next->size = 1;
 		next->object = NULL;
+		next->neighbors_count = 1;
 		//printf("here 3\n");
 
 		current->neighbors = malloc(sizeof(TrieNode*));
@@ -1120,6 +1484,9 @@ TrieNode* makeTrieTree(Tokens* my_tokens)
 			{
 				root->neighbors[i] = initTrieNode();
 				root->neighbors[i]->size = 1;
+				root->neighbors[i]->neighbors_count = 1;
+				root->neighbors_count += 1;
+
 				int second_size = getToken(my_tokens).size;
 				//printf("string finger\n");
 				advanceToken(my_tokens);
@@ -1160,9 +1527,339 @@ TrieNode* makeTrieTree(Tokens* my_tokens)
 		
 	}
 }
-//////
-void visitor(ContextState* start, ContextState* end)
+/*
+char** makeName1(char* name)
 {
+
+}
+*/
+/*
+new syntax plan
+      P --> ( P ) | P P | epsilon
+	p
+		next paths
+			(. p. )
+			-------	
+			p. p
+			-------
+			epsilon
+
+	state
+		another name
+			next paths
+				------------------------------------------
+				a name. another name. a secondary name
+				an overflowing name. another name. a secondary name
+				-------	
+				calculator context. a different name
+				-------
+				null
+				------------------------------------------
+*/
+/*
+typedef StateName
+{
+	char** names;
+	int size;
+}StateName;*/
+/// preprocessing for the visitor function
+// all strings saved into trie tree have double quotes around them
+StateName* makeStateName1(char* name)
+{
+	StateName* full_state_name = malloc(sizeof(StateName));
+	full_state_name->names = malloc(sizeof(char*));
+	full_state_name->names[0] = surroundByQuotes(copyString(name));
+
+	full_state_name->size = 1;
+	return full_state_name;
+}
+StateName* makeStateName2(char* name_1, char* name_2)
+{
+	StateName* full_state_name = malloc(sizeof(StateName));
+	full_state_name->names = malloc(sizeof(char*) * 2);
+	
+	full_state_name->names[0] = surroundByQuotes(copyString(name_1));
+
+	full_state_name->names[1] = surroundByQuotes(copyString(name_2));
+
+
+	full_state_name->size = 2;
+
+	return full_state_name;
+}
+
+StateName* makeStateName3(char* name_1, char* name_2, char* name_3)
+{
+	StateName* full_state_name = malloc(sizeof(StateName));
+	full_state_name->names = malloc(sizeof(char*) * 3);
+	
+	full_state_name->names[0] = surroundByQuotes(copyString(name_1));
+
+
+	full_state_name->names[1] = surroundByQuotes(copyString(name_2));
+
+	full_state_name->names[2] = surroundByQuotes(copyString(name_3));
+
+
+	full_state_name->size = 3;
+
+	return full_state_name;
+
+}
+TrieNode* makeFullStateName(StateName* name)
+{
+	// doesn't make any dummy nodes
+	int size = name->size;
+	//printf("%i\n", size);
+	// make finger
+	//printf("%s\n", name->names[0]);
+	TrieNode* root = malloc(sizeof(TrieNode));
+	// init neighbors
+	root->neighbors = malloc(sizeof(TrieNode*));
+	root->neighbors[0] = initTrieNode();
+	root->neighbors[0]->size = 1;
+	root->neighbors[0]->neighbors_count = 1;
+
+	root->object = NULL;
+	root->size = 1;
+	root->neighbors_count = 1;
+
+
+	TrieNode* current = root->neighbors[0];
+	//printf("# of strings %i\n", size);
+	for(int i = 0; i < size; i++)
+	{
+		/*
+		add item to current
+		advance token
+		make new slot
+		set current->neighbors[0]
+		set new slot to current->neighbors[0]
+		current = current->neighbors[0]
+		*/
+		//printf("%i\n", i);
+
+		// addItem(name->names[i], current)
+		current->word = copyString(name->names[i]);
+
+		//addTrieNodeItem(my_tokens, current);
+		//printf("%s\n", root->neighbors[j]->word);
+		//printf("%s\n", current->word);
+		//printf("here rr\n");
+		//printf("token before: %s\n", collectChars(getToken(my_tokens), getInput(my_tokens)));
+		//printf("saved %s\n", current->word);
+		//advanceToken(my_tokens);
+		//		printf("here\n");
+		if(i == size - 1)
+		{
+			//printf("done\n");
+			current->neighbors = NULL;
+			current->size = 0;
+
+			current->neighbors_count = 0;
+			break;
+		}
+		//printf("should not be here\n");
+		//printf("token after: %s\n", collectChars(getToken(my_tokens), getInput(my_tokens)));
+
+		TrieNode* next = malloc(sizeof(TrieNode));
+		next->size = 1;
+		next->object = NULL;
+		next->neighbors_count = 1;
+		//printf("here 3\n");
+
+		current->neighbors = malloc(sizeof(TrieNode*));
+		current->neighbors[0] = next;
+		//		printf("here 4\n");
+
+		current = current->neighbors[0];
+	}
+	return root;
+}
+ContextState* makeVariable(StateName* name, Data* value)
+{
+	TrieNode* full_state_name = makeFullStateName(name);
+	printStateName(full_state_name);
+	ContextState* state = makeFullContextState2(
+		full_state_name,
+		NULL,
+		NULL,
+		NULL,
+		"\"returnTrue\"",
+		value,
+		NULL,
+		returnTrue,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL);
+	return state;
+
+}
+bool addVariableToDict(TrieNode* dict, ContextState* state)
+{
+
+	//printf("data value %i\n", state->var_data->_int);	
+	// insert2(root, state->state_name->neighbors[0], state);
+	insert2(dict, state->state_name->neighbors[0], state);
+	return true;
+	// return success
+}
+
+/*
+bool addToDict2(TrieNode* dict, char* name1, char* name2)
+{
+	// make finger
+
+	// add to dict
+	// return success
+}
+
+bool addToDict3(TrieNode* dict, char* name1, char* name2, char* name3)
+{
+	// make finger
+
+	// add to dict
+	// return success
+}
+*/
+TrieNode* makeSearchName(StateName* name)
+{
+	// when searching need to start with the first node that has a name
+	// the TrieNode* names stored in the dict have a dummy node first
+	return makeFullStateName(name)->neighbors[0];
+	// makeSearchName("name", "another name", "a third name")
+}
+
+ContextState* obtainState(TrieNodePackage2* result)
+{
+	//printf("%i\n", result->is_perfect_match);
+	if(result->is_perfect_match)
+	{
+		TrieNode* node = result->tree_pointer;
+		int mid = result->location;
+		//printf("%i\n", mid);
+		TrieNode* neighbor = node->neighbors[mid];
+		if(neighbor != NULL)
+		{
+			if(neighbor->object != NULL)
+			{
+				//printf("already added\n");
+				return neighbor->object;
+			}
+		}
+	}
+	return NULL;
+}
+//////
+/// methods for visitor function
+///
+void visitor(TrieNode* dict, ContextState* start, ContextState* end)
+{
+
+	/*
+	need a dict holding the bottom state trackers and the tree they trace out
+	loop while end is not in the set of next states
+		do the following for each state in the bottom state trackers
+
+			if the next states are parallel
+				run each next state
+				add the successfull ones to the bottom state trackers
+				each passing state in [2, n] are assumed to be branches
+				if last state failed set dead state flag
+			else
+				run each next state
+				add the first successfull one to the bottom state trackers
+				save the index of the first passing state into the bottom state trackers
+				if last state failed set dead state flag
+		after loop
+		scan the bottom state trackers
+			if the state is an end state
+				go up the state tracker tree till we get to the top or next set of next states
+			if the state is a dead state
+				go up the state tracker tree till we get to the top or the next set of next states starting from where that level last stoped(submaching was false, but the parent state was true, therefore the parent state is false)
+
+	*/
+
+	TrieNode* bottom_tracker = initTrieNode();
+	// each state is a start attribute
+	/*
+		trees
+			bottom tracker
+				(var_name, level_number, current_branch)
+			main graph
+				control flow
+
+			system tree
+				each child
+					(level_number, max_branch value)
+
+	*/
+
+	//ContextState* var = makeVariable(makeStateName3("name", "another name", "a third name"), makeDataInt(3456));
+	//addVariableToDict(bottom_tracker, var);
+	//printf("printing tree\n");
+	//printTrieNodeTree(bottom_tracker, 1);
+	//printf("\n");
+	/*
+TrieNodePackage2* searchForInsertId(TrieNode* node,
+								    TrieNode* target_chain,
+								    ContextState* target_state)
+
+	*/
+	//TrieNodePackage2* result = searchForInsertId(bottom_tracker, makeSearchName(makeStateName3("name", "another name", "a third name")));
+	//ContextState* x = obtainState(result);
+	// need a way to enumerate all states
+	//printf("%x\n", result->object_found);
+	//printf("%i\n", x->var_data->_int);
+	// what's next?
+	// delete(dict, state)
+	// delete(dict, state, attribute_name, (state_namme))
+	/*
+	just a little part of the plan
+
+	*/
+	//if(result->object_found)
+	//{
+		//printf("%x\n", result->object_found);	
+		//int var = 
+	//}
+	TrieNode* user_control_flow = initTrieNode();
+	TrieNode* bottom_tracker_tracker = initTrieNode();
+	TrieNode* history = initTrieNode();  // add the last passing state to the tree
+	printf("deleting prev_word\n");
+	//delete2(dict, state->state_name->neighbors[0], state)
+	//printf("%s\n", makeStateName1("prev_word")->names[0]);
+	//printf("%s\n", makeFullStateName(makeStateName1("prev_word"))->neighbors[0]->word);
+	//makeStateName1("prev_word");
+
+	//printf("%s\n", makeSearchName(makeStateName1("prev_word"))->word);
+	ContextState* item_to_erase = obtainState(searchForInsertId(dict, makeSearchName(makeStateName1("prev_word"))));
+	//printf("%s\n", item_to_erase->state_name->neighbors[0]->word);
+	//printf("about to delete\n");
+	//printf("%x\n", item_to_erase);
+	delete2(dict, item_to_erase->state_name->neighbors[0], item_to_erase);
+	printTrieNodeTree(dict, 1);
+	//printf("\n");
+	ContextState* item_to_erase2 = obtainState(searchForInsertId(dict, makeSearchName(makeStateName1("current_word"))));
+
+	delete2(dict, item_to_erase2->state_name->neighbors[0], item_to_erase2);
+	printTrieNodeTree(dict, 1);
+
+
+	// erase 1 in the middle with 2 names
+	ContextState* item_to_erase3 = obtainState(searchForInsertId(dict, makeSearchName(makeStateName2("level_number", "0"))));
+
+	delete2(dict, item_to_erase3->state_name->neighbors[0], item_to_erase3);
+	printTrieNodeTree(dict, 1);
+
+	// erase 1 at the end with 2 names
+
+
 
 
 }
