@@ -206,6 +206,14 @@ void printArrayOfStrings(Vector* array_of_strings, int indent_level);
 void printState(DynamicState* my_state, int indent_level);
 int computeIndex(int offset, int state_name);
 
+TrieTree* searchState1(
+					TrieTree* my_trie_tree,
+					Vector* name, // strings
+					Vector* start_children,  // array of strings
+					Vector* children, // array of strings
+					Vector* next_states, // array of strings
+					Data* value); // primitive
+
 TrieTree* insertState1(
 					TrieTree* my_trie_tree,
 					Vector* name, // strings

@@ -1,6 +1,7 @@
 #include "standard_headers.h"
 #include "state.h"
-#include "vector.h"
+//#include "vector.h"
+#include "trie_tree.h"
 //#include "trie_node.h"
 
 #include "scanner.h"
@@ -8,7 +9,8 @@
 //#include "jsmn/jsmn.h"
 //#include <string>
 //using namespace std;
-
+struct Vector;
+Vector* insertWords(TrieTree* my_trie_tree, Vector* name /* strings*/);
 
 //void printState(ContextState* node);
 enum token_types {_primitive, _object, _array, _string};
@@ -559,7 +561,7 @@ int main(int argc, char** argv)
 		null
 	*/
 
-
+	/*
 	Vector* list_of_lists_of_strings = combineVectors(
 										addStringToVector2("current_state", "children_flag"),
 										addStringToVector2("current_state", "next_flag"));
@@ -570,60 +572,86 @@ int main(int argc, char** argv)
 		printf("\n");
 
 	}
+	*/
+	printf("\n");
 
 	StateMachine* my_machine = setupMachine(/*_search*/1, /*empty*/0);
 	DynamicMachine* my_dynamic_machine = initDynamicMachine(my_machine);
 
 
 	// testing no existing object and we are already at the last word
-
+	// testing has only been what was inserted, not what was returned
 	// no prior data
-	my_dynamic_machine->trie_tree_dict = insertState1(
-		my_dynamic_machine->trie_tree_dict,
-		addStringToVector3("start", "start 1", "start 2"),
-					NULL,
-					NULL,
-					combineVectors(
-							addStringToVector2("current_state", "children_flag"),
-							addStringToVector2("current_state", "next_flag")),
-					makeDataInt(50));
+	Vector* name1 = addStringToVector3("start", "start 1", "start 2");
+	name1 = insertWords(my_dynamic_machine->trie_tree_dict, name1);
+	printStrings(name1);
+
 	/*
-	my_dynamic_machine->trie_tree_dict = insertState1(
-		my_dynamic_machine->trie_tree_dict,
-		addStringToVector2("another start", "2"),
-					NULL,
-					NULL,
-					combineVectors(
-							addStringToVector2("current_state", "children_flag"),
-							addStringToVector2("current_state", "next_flag")),
-					makeDataInt(50));
+	start
+		start 1
+			start 2
 	*/
-	printTrie(my_dynamic_machine->trie_tree_dict);
+	// passes
+	//printTrie(my_dynamic_machine->trie_tree_dict);
+	//exit(1);
+	Vector* name2 = addStringToVector1("another start");
+	name2 = insertWords(my_dynamic_machine->trie_tree_dict, name2);
+	printStrings(name2);
 
+	/*
+	start
+		start 1
+			start 2
+	another start
+		2
+	*/
+	// passes
+	//printTrie(my_dynamic_machine->trie_tree_dict);
+	//exit(1);
 	// has data, partial match
-	my_dynamic_machine->trie_tree_dict = insertState1(
-		my_dynamic_machine->trie_tree_dict,
-		addStringToVector3("start", "start 1", "2"),
-					NULL,
-					NULL,
-					combineVectors(
-							addStringToVector2("current_state", "children_flag"),
-							addStringToVector2("current_state", "next_flag")),
-					makeDataInt(50));
+	Vector* name3 = addStringToVector2("start", "start 1");
+	name3 = insertWords(my_dynamic_machine->trie_tree_dict, name3);
+	printStrings(name3);
 
-	printTrie(my_dynamic_machine->trie_tree_dict);
+	/*
+	start
+		start 1
+			start 2
+			2
+	another start
+		2
+	*/
+	// passes
+	//printTrie(my_dynamic_machine->trie_tree_dict);
+	//exit(1);
 	// has data, complete match 1
-	my_dynamic_machine->trie_tree_dict = insertState1(
-		my_dynamic_machine->trie_tree_dict,
-		addStringToVector3("start", "start 1", "2"),
-					NULL,
-					NULL,
-					combineVectors(
-							addStringToVector2("current_state", "children_flag"),
-							addStringToVector2("current_state", "next_flag")),
-					makeDataInt(50));
-		printTrie(my_dynamic_machine->trie_tree_dict);
+	Vector* name4 = addStringToVector3("start", "start 1", "2");
+	name4 = insertWords(my_dynamic_machine->trie_tree_dict, name4);
+	printStrings(name4);
+	/*
+	start
+		start 1
+			start 2
+			2
+				0
+	another start
+		2
+	*/
+	// passes
+	printTrie(my_dynamic_machine->trie_tree_dict);
+	printTrieRecursive(my_dynamic_machine->trie_tree_dict, 0, " ");
+	int key = deleteWords(my_dynamic_machine->trie_tree_dict, addStringToVector2("start", "start 1"));
+	printf("key found %i\n", key);
 
+	key = deleteWords(my_dynamic_machine->trie_tree_dict, addStringToVector1("another start"));
+	printf("key found %i\n", key);
+	printTrie(my_dynamic_machine->trie_tree_dict);
+
+	printTrieRecursive(my_dynamic_machine->trie_tree_dict, 0, " ");
+
+
+	//exit(1);
+	/*
 	// has data, complete match 2
 	my_dynamic_machine->trie_tree_dict = insertState1(
 		my_dynamic_machine->trie_tree_dict,
@@ -635,6 +663,18 @@ int main(int argc, char** argv)
 							addStringToVector2("current_state", "next_flag")),
 					makeDataInt(50));
 		printTrie(my_dynamic_machine->trie_tree_dict);
+	
+	start
+		start 1
+			start 2
+			2
+				0
+				1
+	another start
+		2
+
+	
+		
 	// counterexample for making new contexts
 	my_dynamic_machine->trie_tree_dict = insertState1(
 		my_dynamic_machine->trie_tree_dict,
@@ -646,12 +686,24 @@ int main(int argc, char** argv)
 							addStringToVector2("current_state", "next_flag")),
 					makeDataInt(50));
 		printTrie(my_dynamic_machine->trie_tree_dict);
+	
+	
+	start
+		start 1
+			start 2
+			2
+				0
+				1
+		1
+	another start
+		2
 
+	
 	// has data, but completely different path
 	// has data, input string is a subpath
 	// has data, input string is longer than any subpath
 
-	/*
+	
 	my_dynamic_machine = insertState1(
 		my_dynamic_machine,
 		addStringToVector2("start 3", "2"),
@@ -661,8 +713,8 @@ int main(int argc, char** argv)
 							addStringToVector2("current_state2", "children_flag2"),
 							addStringToVector2("current_state2", "next_flag2")),
 					makeDataFloat(9.6));
-	*/
-	/*
+	
+	
 	my_dynamic_machine = insertState1(
 		my_dynamic_machine,
 		addStringToVector1("start"),
@@ -672,11 +724,11 @@ int main(int argc, char** argv)
 							addStringToVector2("current_state2", "children_flag2"),
 							addStringToVector2("current_state2", "next_flag2")),
 					makeDataFloat(9.7));
-	*/
+	
 	// test unique states
 	// test unique state edges
 	// calculator simulator
-	/*
+	
 	take in text
 
 	output the value

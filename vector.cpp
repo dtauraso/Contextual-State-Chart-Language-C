@@ -10,6 +10,8 @@ typedef struct Vector
 }Vector;
 */enum types{integer, _string, trie_node_2};
 
+struct TrieNode2;
+void* getValue(TrieNode2* node);
 
 Vector* initVector()
 {
@@ -56,6 +58,19 @@ void* getItem(Vector* container, int i)
 	{
 		//printf("out of bounds\n");
 		return NULL;
+	}
+}
+void setItemToNull(Vector* container, int i)
+{
+	if(i < container->population && i >= 0)
+	{
+		//printf("item |%x|\n", container->values[i]);
+		container->values[i] = NULL;
+	}
+	else
+	{
+		//printf("out of bounds\n");
+		return;
 	}
 }
 int getPopulation(Vector* container)
@@ -107,11 +122,16 @@ void append(Vector* container, void* element)
 }
 bool deleteItem(Vector* container, int index)
 {
+	// needs a special delete function for the object type
 	//printf("delete at %i\n", index);
 	// set container[index] to null
 	// shift all values from [index + 1, end] to the left by 1
 	if(container != NULL)
 	{
+		//printf("%i\n", container->population);
+		//printf("%i\n", index);
+		//int* x = (int*) container->values[index];
+		//printf("%i\n", *x);
 		free(container->values[index]);
 		container->values[index] = NULL;
 		if(index < container->population)
@@ -129,20 +149,56 @@ bool deleteItem(Vector* container, int index)
 	}
 	return false;
 }
+bool deleteAllItems(Vector* container)
+{
+	// assuems all elements are primitives
+	if(container != NULL)
+	{
+		for(int i = 0; i < container->population; i++)
+		{
+			free(container->values[i]);
+			container->values[i] = NULL;
+		}
+	}
+	free(container->values);
+	container->values = NULL;
+	free(container);
+	container = NULL;
+	return true;
+}
+void shiftItems(Vector* container, int index)
+{
+	if(container != NULL)
+	{
+		if(index < container->population)
+		{
+			for(int i = index + 1; i < container->population; i++)
+			{
+				container->values[i - 1] = container->values[i];
+
+				container->values[i] = NULL;
+
+			}
+			container->population--;
+		}
+	}
+	
+}
 
 void shiftLeft(Vector* container, int start, int end)
 {
 	//printf("insert location bounds %i %i\n", start, end);
-
+	// assume start >= end
 	// assume container size > start+1
 	for(int i = start + 1; i >= end; i--)
 	{
 		container->values[i] = container->values[i - 1];
 
 	}
-	container->values[end] = NULL;
+	container->values[start] = NULL;
 }
 // inserts as if vector is sorted
+/*
 bool insertItem(Vector* container, void* element, int type)
 {
 	// assume container is storted
@@ -192,7 +248,8 @@ bool insertItem(Vector* container, void* element, int type)
 		
 	}
 	return true;
-}
+}*/
+
 /*
 typedef struct Match
 {
@@ -263,7 +320,7 @@ bool isLessThanString(void* a, void* b)
 	return false;
 
 }
-Match* searchItem(Vector* container, void* element, int type)
+int searchItem(Vector* container, void* element, int type)
 {
 	// needs to return wether item was found
 	if(container != NULL)
@@ -284,7 +341,7 @@ Match* searchItem(Vector* container, void* element, int type)
 									// ((objec*) dict_container->values[edges->values[mid]])->value)
 					if(isEqualInt(element, container->values[mid]))
 					{
-						return initMatch(mid, 1);
+						return mid;
 					}
 					is_less_than = isLessThanInt(element, container->values[mid]);
 					//printf("here %i\n", is_less_than);
@@ -295,7 +352,7 @@ Match* searchItem(Vector* container, void* element, int type)
 				{
 					if(isEqualString(element, container->values[mid]))
 					{
-						return initMatch(mid, 1);
+						return mid;
 					}
 					is_less_than = isLessThanString(element, container->values[mid]);
 					break;
@@ -319,6 +376,7 @@ Match* searchItem(Vector* container, void* element, int type)
 		}
 		//printf("item not found %i\n", low);
 		// item didn't get found
+		/*
 		if(low == container->population)
 		{
 			return initMatch(container->population, 0);
@@ -346,12 +404,13 @@ Match* searchItem(Vector* container, void* element, int type)
 
 				}
 			}
-		}
-		return initMatch(low, 0);
+		}*/
+		return -1;//initMatch(low, 0);
 	}
-	return NULL;
+	return -1;
 	
 }
+/*
 void* findItem(Vector* container, void* element, int type)
 {
 	if(container != NULL)
@@ -366,7 +425,8 @@ void* findItem(Vector* container, void* element, int type)
 		}
 	}
 	return NULL;
-}
+}*/
+	/*
 bool removeItem(Vector* container, void* element, int type)
 {
 	if(container != NULL)
@@ -383,7 +443,7 @@ bool removeItem(Vector* container, void* element, int type)
 		}
 	}
 	return false;
-}
+}*/
 Match* searchItemTrieDict(Vector* trie_tree_dict, Vector* edges, void* element, int type, int dict_type)
 {
 	//printf("we are searching the trie %i, %i, %x\n", type, dict_type, edges);
@@ -421,16 +481,20 @@ Match* searchItemTrieDict(Vector* trie_tree_dict, Vector* edges, void* element, 
 							//( (string*) ((TrieNode2*) trie_tree_dict->values[   *((int*) edges->values[mid]) ])->value)->c_str()  );
 							if(isEqualString(element,
 
-								((TrieNode2*) trie_tree_dict->values[
-
-														*((int*) edges->values[mid])
-
-														])->value
+					getValue((TrieNode2*) trie_tree_dict->values[   *((int*) edges->values[mid])  ])
 								))
 							{
-								//printf("found it\n");
+								printf("found it\n");
 								return initMatch(*((int*) edges->values[mid]), 1);
 							}
+							is_less_than = isLessThanInt(element,
+					getValue((TrieNode2*) trie_tree_dict->values[ 	*((int*) edges->values[mid]) 	])
+
+
+
+
+								);
+
 							break;
 						}
 						default:
@@ -509,6 +573,110 @@ Match* searchItemTrieDict(Vector* trie_tree_dict, Vector* edges, void* element, 
 		return initMatch(low, 0);
 	}
 	return NULL;
+	
+}
+
+int searchItemTrieDict2(Vector* trie_tree_dict, Vector* edges, void* element, int type, int dict_type)
+{
+	//printf("we are searching the trie %i, %i, %x\n", type, dict_type, edges);
+
+	// needs to return wether item was found
+	if(edges != NULL)
+	{
+		int low = 0;
+		int high = edges->population;
+		//printf("high %i\n", high);
+		if(high == 0)
+		{
+			return -1;
+		}
+		// if no items return a no match and items doesn't exists
+		int mid = (low + high) / 2;
+		//printf("%i, %i\n", integer, _string);
+		while((low <= high) && (mid < edges->population))
+		{
+			//printf("%i, %i, %i\n", low, high, mid);
+			bool is_less_than = false;
+			// type of edge
+			switch(type)
+			{
+				case integer:
+				{
+
+					switch(dict_type)
+					{
+						case trie_node_2:
+						{
+							//printf("got here\n");
+							//printf("%s, %s\n", ((string*) element)->c_str(),
+
+							//( (string*) ((TrieNode2*) trie_tree_dict->values[   *((int*) edges->values[mid]) ])->value)->c_str()  );
+							if(isEqualString(element,
+
+					getValue((TrieNode2*) trie_tree_dict->values[    *((int*) edges->values[mid])  ])
+								))
+							{
+								//printf("found it\n");
+								return *((int*) edges->values[mid]);
+							}
+							is_less_than = isLessThanInt(element,
+					getValue((TrieNode2*) trie_tree_dict->values[ 	*((int*) edges->values[mid]) 	])
+
+
+
+
+								);
+
+							break;
+						}
+						default:
+						{
+
+						}
+					}
+					// isEqualString( element,
+									// ((objec*) dict_container->values[edges->values[mid]])->value)
+					//if(isEqualInt(element, container->values[mid]))
+					//{
+					//	return initMatch(mid, 1);
+					//}
+					//is_less_than = isLessThanInt(element, container->values[mid]);
+					//printf("here %i\n", is_less_than);
+
+					break;
+				}
+				//case _string:
+				//{
+				//	if(isEqualString(element, container->values[mid]))
+				//	{
+				//		return initMatch(mid, 1);
+				//	}
+				//	is_less_than = isLessThanString(element, container->values[mid]);
+				//	break;
+				//}
+				default:
+				{
+
+				}
+			}
+			if(is_less_than)
+			{
+				high = mid - 1;
+			}
+			else
+			{
+				low = mid + 1;
+			}
+			mid = (low + high) / 2;
+
+
+		}
+		//printf("item not found %i\n", low);
+		// item didn't get found
+		
+		return -1;
+	}
+	return -1;
 	
 }
 void Print(Vector* container)
@@ -623,7 +791,7 @@ void test()
 	// erase a list of numbers
 }
 
-
+/*
 void testSorted()
 {
 	// make a vector
@@ -764,7 +932,7 @@ void testSorted()
 	removeItem(my_vector, r, 0);
 
 	Print(my_vector);
-	/*
+	
 	deleteItem(my_vector, 1);
 	Print(my_vector);
 	deleteItem(my_vector, 2);
@@ -775,8 +943,8 @@ void testSorted()
 
 	deleteItem(my_vector, 0);
 	Print(my_vector);
-	*/	
-	/*
+	*
+	
 	for(int i = 0; i < 5; i++)
 	{
 		printf("inserting %i\n", i);
@@ -795,10 +963,10 @@ void testSorted()
 		void* a = my_vector->values[i];
 		int* b = (int*) a;
 		printf("%i\n", *b);
-	}*/
+	}
 
 	// erase a list of numbers
-}
+}*/
 /*
 void printMultiwayLinesNodesInContainer(Vector* container)
 {

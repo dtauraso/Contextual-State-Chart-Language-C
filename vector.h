@@ -1,7 +1,7 @@
 #ifndef VECTOR
 #define VECTOR
 #include "standard_headers.h"
-#include "trie_tree.h"
+//#include "trie_tree.h"
 
 typedef struct Match
 {
@@ -25,19 +25,25 @@ Vector* initVectorSize(int size);
 bool deleteVector(Vector* container);
 int getLastIndex(Vector* container);
 void* getItem(Vector* container, int i);
+void setItemToNull(Vector* container, int i);
+
 int getPopulation(Vector* container);
 
 void append(Vector* container, void* element);
 bool deleteItem(Vector* container, int index);
+bool deleteAllItems(Vector* container);
+void shiftItems(Vector* container, int index);
+
+
 void shiftLeft(Vector* container, int start, int end);
-bool insertItem(Vector* container, void* element, int type);
+//bool insertItem(Vector* container, void* element, int type);
 bool isEqualInt(void* a, void* b);
 bool isEqualString(void* a, void* b);
 bool isGreaterThanOrEqualInt(void* a, void* b);
 bool isGreaterThanOrEqualString(void* a, void* b);
 bool isLessThanInt(void* a, void* b);
 bool isLessThanString(void* a, void* b);
-Match* searchItem(Vector* container, void* element, int type);
+int searchItem(Vector* container, void* element, int type);
 
 
 
@@ -47,6 +53,7 @@ void testSorted();
 void* findItem(Vector* container, void* element, int type);
 Match* searchItemTrieDict(Vector* trie_tree_dict, Vector* edges, void* element, int type, int dict_type);
 
+int searchItemTrieDict2(Vector* trie_tree_dict, Vector* edges, void* element, int type, int dict_type);
 
 
 void Print(Vector* container);
