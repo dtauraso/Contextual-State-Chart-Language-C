@@ -41,6 +41,10 @@ bool isEqualInt(void* a, void* b);
 bool isEqualString(void* a, void* b);
 bool isGreaterThanOrEqualInt(void* a, void* b);
 bool isGreaterThanOrEqualString(void* a, void* b);
+bool isGreaterThanInt(void* a, void* b);
+bool isGreaterThanString(void* a, void* b);
+
+
 bool isLessThanInt(void* a, void* b);
 bool isLessThanString(void* a, void* b);
 int searchItem(Vector* container, void* element, int type);

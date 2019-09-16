@@ -42,10 +42,18 @@ typedef struct TrieTree
 }TrieTree;
 TrieTree* initTrieTree();
 
-void insertString(TrieTree* my_trie_tree, string element, bool is_last_word);
-void insertWord(TrieTree* my_trie_tree, string* new_number_ptr, TrieNode2* node_found2, bool is_last_word);
+Vector* innerSearchForString(TrieTree* my_trie_tree, Vector* name /* strings*/);
+
+void insertString(TrieTree* my_trie_tree, string element, int state_id);
+void insertWord(TrieTree* my_trie_tree, string* new_number_ptr, TrieNode2* node_found2, int state_id);
 Vector* insertWords(TrieTree* my_trie_tree, Vector* name /* strings*/);
 int updateId(TrieTree* my_trie_tree, int old_id);
+
+void cutLinkToFirstNodeInPath(	TrieTree* my_trie_tree,
+								Vector* name,
+								int* lower_bound_ptr,
+								int start_node,
+								int ith_string_in_input);
 
 int deleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/);
 

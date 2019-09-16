@@ -302,6 +302,24 @@ bool isGreaterThanOrEqualString(void* a, void* b)
 	return false;
 
 }
+bool isGreaterThanInt(void* a, void* b)
+{
+	if(a != NULL && b != NULL)
+	{
+		return *((int*) a) > *((int*) b);
+	}
+	return false;
+
+}
+bool isGreaterThanString(void* a, void* b)
+{
+	if(a != NULL && b != NULL)
+	{
+		return *((string*) a) > *((string*) b);
+	}
+	return false;
+
+}
 bool isLessThanInt(void* a, void* b)
 {
 	if(a != NULL && b != NULL)
@@ -374,12 +392,18 @@ int searchItem(Vector* container, void* element, int type)
 
 
 		}
+
 		//printf("item not found %i\n", low);
 		// item didn't get found
 		/*
+		if(low == container->population )
+            return -1 * container->population;
+        if(nums[low] < target) return -(low + 1);
+        return -(low);
+		*/
 		if(low == container->population)
 		{
-			return initMatch(container->population, 0);
+			return -1 * container->population;
 		}
 		else if(low < container->population)
 		{
@@ -387,16 +411,16 @@ int searchItem(Vector* container, void* element, int type)
 			{
 				case integer:
 				{
-					if(isGreaterThanOrEqualInt(element, container->values[low]))
+					if(isGreaterThanInt(element, container->values[low]))
 					{
-						return initMatch(low, 0);
+						return -1 * (low + 1);
 					}
 				}
 				case _string:
 				{
-					if(isGreaterThanOrEqualString(element, container->values[low]))
+					if(isGreaterThanString(element, container->values[low]))
 					{
-						return initMatch(low, 0);
+						return -1 * (low + 1);
 					}
 				}
 				default:
@@ -404,10 +428,11 @@ int searchItem(Vector* container, void* element, int type)
 
 				}
 			}
-		}*/
-		return -1;//initMatch(low, 0);
+		}
+
+		return -1 * low;
 	}
-	return -1;
+	return -200;
 	
 }
 /*
@@ -588,14 +613,14 @@ int searchItemTrieDict2(Vector* trie_tree_dict, Vector* edges, void* element, in
 		//printf("high %i\n", high);
 		if(high == 0)
 		{
-			return -1;
+			return 0;
 		}
 		// if no items return a no match and items doesn't exists
 		int mid = (low + high) / 2;
 		//printf("%i, %i\n", integer, _string);
 		while((low <= high) && (mid < edges->population))
 		{
-			//printf("%i, %i, %i\n", low, high, mid);
+			printf("%i, %i, %i\n", low, high, mid);
 			bool is_less_than = false;
 			// type of edge
 			switch(type)
@@ -607,25 +632,18 @@ int searchItemTrieDict2(Vector* trie_tree_dict, Vector* edges, void* element, in
 					{
 						case trie_node_2:
 						{
-							//printf("got here\n");
-							//printf("%s, %s\n", ((string*) element)->c_str(),
+							printf("got here\n");
+							int word_id = *((int*) edges->values[mid]);
+							void* value_from_trie_node_2 = getValue((TrieNode2*) trie_tree_dict->values[    word_id  ]);
+							string string_from_trie_node_2 = *(string*) value_from_trie_node_2;
+							printf("%s, %s\n", ((string*) element)->c_str(), string_from_trie_node_2.c_str()  );
 
-							//( (string*) ((TrieNode2*) trie_tree_dict->values[   *((int*) edges->values[mid]) ])->value)->c_str()  );
-							if(isEqualString(element,
-
-					getValue((TrieNode2*) trie_tree_dict->values[    *((int*) edges->values[mid])  ])
-								))
+							if(isEqualString(element, value_from_trie_node_2))
 							{
-								//printf("found it\n");
+								printf("found it\n");
 								return *((int*) edges->values[mid]);
 							}
-							is_less_than = isLessThanInt(element,
-					getValue((TrieNode2*) trie_tree_dict->values[ 	*((int*) edges->values[mid]) 	])
-
-
-
-
-								);
+							is_less_than = isLessThanInt(element, value_from_trie_node_2);
 
 							break;
 						}
@@ -671,12 +689,53 @@ int searchItemTrieDict2(Vector* trie_tree_dict, Vector* edges, void* element, in
 
 
 		}
-		//printf("item not found %i\n", low);
+		// the entries are sorted, but not the items they point to
+		// the entries should be in the order that the items they point to are in sorted order
+		printf("item not found %i\n", low);
 		// item didn't get found
 		
-		return -1;
+		/*
+		if(low == container->population )
+            return -1 * container->population;
+        if(nums[low] < target) return -(low + 1);
+        return -(low);
+		*/
+		// the trie tree or the edges?
+		if(low == edges->population)
+		{
+			return -1 * edges->population;
+		}
+		else if(low < edges->population)
+		{
+			int word_id = *((int*) edges->values[low]);
+			void* value_from_trie_node_2 = getValue((TrieNode2*) trie_tree_dict->values[    word_id  ]);
+
+			switch(type)
+			{
+				case integer:
+				{
+					if(isGreaterThanInt(element, value_from_trie_node_2))
+					{
+						return -1 * (low + 1);
+					}
+				}
+				case _string:
+				{
+					if(isGreaterThanString(element, value_from_trie_node_2))
+					{
+						return -1 * (low + 1);
+					}
+				}
+				default:
+				{
+
+				}
+			}
+		}
+
+		return -1 * low;
 	}
-	return -1;
+	return -200;
 	
 }
 void Print(Vector* container)

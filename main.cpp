@@ -585,6 +585,7 @@ int main(int argc, char** argv)
 	Vector* name1 = addStringToVector3("start", "start 1", "start 2");
 	name1 = insertWords(my_dynamic_machine->trie_tree_dict, name1);
 	printStrings(name1);
+	printf("\n");
 
 	/*
 	start
@@ -594,10 +595,11 @@ int main(int argc, char** argv)
 	// passes
 	//printTrie(my_dynamic_machine->trie_tree_dict);
 	//exit(1);
-	Vector* name2 = addStringToVector1("another start");
+	Vector* name2 = addStringToVector2("another start", "2");
 	name2 = insertWords(my_dynamic_machine->trie_tree_dict, name2);
 	printStrings(name2);
-
+	printf("\n");
+	exit(1);
 	/*
 	start
 		start 1
@@ -612,6 +614,7 @@ int main(int argc, char** argv)
 	Vector* name3 = addStringToVector2("start", "start 1");
 	name3 = insertWords(my_dynamic_machine->trie_tree_dict, name3);
 	printStrings(name3);
+	printf("\n");
 
 	/*
 	start
@@ -625,9 +628,27 @@ int main(int argc, char** argv)
 	//printTrie(my_dynamic_machine->trie_tree_dict);
 	//exit(1);
 	// has data, complete match 1
+	// failed
 	Vector* name4 = addStringToVector3("start", "start 1", "2");
 	name4 = insertWords(my_dynamic_machine->trie_tree_dict, name4);
 	printStrings(name4);
+	printf("\n");
+
+
+	Vector* name5 = addStringToVector3("start", "start 1", "start 2");
+	name5 = insertWords(my_dynamic_machine->trie_tree_dict, name5);
+	printStrings(name5);
+	printf("\n");
+
+
+
+
+	printTrie(my_dynamic_machine->trie_tree_dict);
+
+	printTrieRecursive(my_dynamic_machine->trie_tree_dict, 0, " ");
+
+	exit(1);
+
 	/*
 	start
 		start 1
@@ -643,7 +664,7 @@ int main(int argc, char** argv)
 	int key = deleteWords(my_dynamic_machine->trie_tree_dict, addStringToVector2("start", "start 1"));
 	printf("key found %i\n", key);
 
-	key = deleteWords(my_dynamic_machine->trie_tree_dict, addStringToVector1("another start"));
+	key = deleteWords(my_dynamic_machine->trie_tree_dict, addStringToVector2("another start", "2"));
 	printf("key found %i\n", key);
 	printTrie(my_dynamic_machine->trie_tree_dict);
 
