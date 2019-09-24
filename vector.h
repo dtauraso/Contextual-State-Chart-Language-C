@@ -30,6 +30,9 @@ void setItemToNull(Vector* container, int i);
 int getPopulation(Vector* container);
 
 void append(Vector* container, void* element);
+bool popItem(Vector* container);
+void incrementTopInt(Vector* container);
+
 bool deleteItem(Vector* container, int index);
 bool deleteAllItems(Vector* container);
 void shiftItems(Vector* container, int index);
@@ -37,6 +40,8 @@ void shiftItems(Vector* container, int index);
 
 void shiftLeft(Vector* container, int start, int end);
 //bool insertItem(Vector* container, void* element, int type);
+bool insertItem(Vector* container, void* element, int insert_location, int type);
+
 bool isEqualInt(void* a, void* b);
 bool isEqualString(void* a, void* b);
 bool isGreaterThanOrEqualInt(void* a, void* b);

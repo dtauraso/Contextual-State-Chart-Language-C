@@ -133,7 +133,8 @@ string makeSpaces(int indent_level)
 		return ' ';
 	}*/
 	//printf("making indents\n");
-	indent_level++;
+	// this might mess up the reading in graph algorithm
+	//indent_level++;
 	//printf("here\n");
 
 	//string indents2;
@@ -584,8 +585,20 @@ int main(int argc, char** argv)
 	// no prior data
 	Vector* name1 = addStringToVector3("start", "start 1", "start 2");
 	name1 = insertWords(my_dynamic_machine->trie_tree_dict, name1);
-	printStrings(name1);
+	// name must be able to be altered
+	//printStrings(name1);
 	printf("\n");
+	printTrie(my_dynamic_machine->trie_tree_dict);
+	printWordTrie(my_dynamic_machine->trie_tree_dict);
+
+	//exit(1);
+
+	printTrieWords(my_dynamic_machine->trie_tree_dict);
+
+
+	//printTrieRecursive(my_dynamic_machine->trie_tree_dict, 0, " ");
+
+	//exit(1);
 
 	/*
 	start
@@ -595,10 +608,15 @@ int main(int argc, char** argv)
 	// passes
 	//printTrie(my_dynamic_machine->trie_tree_dict);
 	//exit(1);
-	Vector* name2 = addStringToVector2("another start", "2");
+	Vector* name2 = addStringToVector2("start2", "2");
 	name2 = insertWords(my_dynamic_machine->trie_tree_dict, name2);
 	printStrings(name2);
 	printf("\n");
+	printTrie(my_dynamic_machine->trie_tree_dict);
+	printWordTrie(my_dynamic_machine->trie_tree_dict);
+
+	printTrieWords(my_dynamic_machine->trie_tree_dict);
+
 	exit(1);
 	/*
 	start
@@ -616,6 +634,11 @@ int main(int argc, char** argv)
 	printStrings(name3);
 	printf("\n");
 
+	printTrie(my_dynamic_machine->trie_tree_dict);
+
+	printTrieWords(my_dynamic_machine->trie_tree_dict);
+
+	//exit(1);
 	/*
 	start
 		start 1
@@ -633,7 +656,11 @@ int main(int argc, char** argv)
 	name4 = insertWords(my_dynamic_machine->trie_tree_dict, name4);
 	printStrings(name4);
 	printf("\n");
+	printTrie(my_dynamic_machine->trie_tree_dict);
 
+	printTrieWords(my_dynamic_machine->trie_tree_dict);
+
+	//exit(1);
 
 	Vector* name5 = addStringToVector3("start", "start 1", "start 2");
 	name5 = insertWords(my_dynamic_machine->trie_tree_dict, name5);
@@ -645,10 +672,10 @@ int main(int argc, char** argv)
 
 	printTrie(my_dynamic_machine->trie_tree_dict);
 
-	printTrieRecursive(my_dynamic_machine->trie_tree_dict, 0, " ");
+	printTrieWords(my_dynamic_machine->trie_tree_dict);
 
 	exit(1);
-
+	// delete what I have
 	/*
 	start
 		start 1

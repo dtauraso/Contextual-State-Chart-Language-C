@@ -16,15 +16,24 @@ typedef struct TrieMatch
 typedef struct TrieNode2
 {
 	// the links are integers
+	// don't use this variable
 	void* value; // has been a string*
+	char my_value;
 	// will be unsorted
 	Vector* links;  // ints
+	int char_links[256];
+	Vector* chars_from_edges;
 	// will be sorted
 	//Vector* sorted_link_indecies; // ints
+
+	Vector* word_letters; // for word tree
 	int value_type;
 	// 0 -> int
 	// 1 -> string
 	int state_id; // location of state in state vector
+
+	int word_counterpart; // set in the last character of the word to the word node
+	bool start_of_word;
 
 }TrieNode2;
 TrieNode2* initTrieNode2();
@@ -36,7 +45,11 @@ typedef struct TrieTree
 {
 	int root;
 	// will be unsorted
+	// trie tree of characters
 	Vector* trie_tree;
+
+	// trie tree of words(just a tree refering to the character trie)
+	Vector* word_tree;
 	int max_state_id;
 
 }TrieTree;
@@ -44,7 +57,7 @@ TrieTree* initTrieTree();
 
 Vector* innerSearchForString(TrieTree* my_trie_tree, Vector* name /* strings*/);
 
-void insertString(TrieTree* my_trie_tree, string element, int state_id);
+void insertString(TrieTree* my_trie_tree, char element, int state_id);
 void insertWord(TrieTree* my_trie_tree, string* new_number_ptr, TrieNode2* node_found2, int state_id);
 Vector* insertWords(TrieTree* my_trie_tree, Vector* name /* strings*/);
 int updateId(TrieTree* my_trie_tree, int old_id);
@@ -58,6 +71,10 @@ void cutLinkToFirstNodeInPath(	TrieTree* my_trie_tree,
 int deleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/);
 
 void printTrie(TrieTree* my_trie_tree);
+void printWordTrie(TrieTree* my_trie_tree);
+
+void printTrieWords(TrieTree* my_trie_tree);
+
 void printTrieRecursive(TrieTree* my_trie_tree, int root, string indents);
 
 #endif

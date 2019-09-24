@@ -81,7 +81,7 @@ void append(Vector* container, void* element)
 {
 	if(container != NULL)
 	{
-		//printf("pop %i, size %i\n", container->population, container->size);
+		//printf("push %i, size %i\n", container->population, container->size);
 
 		if(container->size == 0)
 		{
@@ -119,6 +119,41 @@ void append(Vector* container, void* element)
 		//Print(container);
 	}
 
+}
+bool popItem(Vector* container)
+{
+	if(container != NULL)
+	{
+		//printf("here %i\n", container->population - 1);
+		//		Print(container);
+
+		int index = container->population - 1;
+		free(container->values[index]);
+		container->values[index] = NULL;
+
+		container->population -= 1;
+		//Print(container);
+		return true;
+	}
+	return false;
+}
+void incrementTopInt(Vector* container)
+{
+	if(container != NULL)
+	{
+		//printf("here %i\n", container->population);
+		//		Print(container);
+		if(container->population > 0)
+		{
+			int index = container->population - 1;
+			//free(container->values[index]);
+			//container->values[index] = NULL;
+			*((int*) container->values[index]) += 1;
+			//container->population -= 1;
+			//Print(container);
+
+		}
+	}
 }
 bool deleteItem(Vector* container, int index)
 {
@@ -195,13 +230,12 @@ void shiftLeft(Vector* container, int start, int end)
 		container->values[i] = container->values[i - 1];
 
 	}
-	container->values[start] = NULL;
+	//container->values[start] = NULL;
 }
-// inserts as if vector is sorted
-/*
-bool insertItem(Vector* container, void* element, int type)
+
+bool insertItem(Vector* container, void* element, int insert_location, int type)
 {
-	// assume container is storted
+	// assume element to insert was not already in container
 	// does container->values[index] exist?
 	if(container != NULL)
 	{
@@ -216,17 +250,17 @@ bool insertItem(Vector* container, void* element, int type)
 			return true;
 		}
 		// only do this if item isn't already in the container
-		Match* match_status = searchItem(container, element, type);
-		if(match_status != NULL)
-		{
-			if(match_status->exists)
-			{
-				return true;		
-			}
-			else
-			{
+		//Match* match_status = searchItem(container, element, type);
+		//if(match_status != NULL)
+		//{
+			//if(match_status->exists)
+			//{
+			//	return true;		
+			//}
+			//else
+			//{
 
-				int j = match_status->index;
+				int j = insert_location;
 				//if(searchItem(container, element, type))
 				if(container->population == container->size)
 				{
@@ -243,12 +277,12 @@ bool insertItem(Vector* container, void* element, int type)
 				container->values[j] = element;
 				container->population++;
 				return true;
-			}
-		}
+			//}
+		//}
 		
 	}
-	return true;
-}*/
+	return false;
+}
 
 /*
 typedef struct Match
@@ -620,7 +654,7 @@ int searchItemTrieDict2(Vector* trie_tree_dict, Vector* edges, void* element, in
 		//printf("%i, %i\n", integer, _string);
 		while((low <= high) && (mid < edges->population))
 		{
-			printf("%i, %i, %i\n", low, high, mid);
+			// printf("%i, %i, %i\n", low, high, mid);
 			bool is_less_than = false;
 			// type of edge
 			switch(type)
@@ -632,15 +666,15 @@ int searchItemTrieDict2(Vector* trie_tree_dict, Vector* edges, void* element, in
 					{
 						case trie_node_2:
 						{
-							printf("got here\n");
+							// printf("got here\n");
 							int word_id = *((int*) edges->values[mid]);
 							void* value_from_trie_node_2 = getValue((TrieNode2*) trie_tree_dict->values[    word_id  ]);
 							string string_from_trie_node_2 = *(string*) value_from_trie_node_2;
-							printf("%s, %s\n", ((string*) element)->c_str(), string_from_trie_node_2.c_str()  );
+							// printf("%s, %s\n", ((string*) element)->c_str(), string_from_trie_node_2.c_str()  );
 
 							if(isEqualString(element, value_from_trie_node_2))
 							{
-								printf("found it\n");
+								// printf("found it\n");
 								return *((int*) edges->values[mid]);
 							}
 							is_less_than = isLessThanInt(element, value_from_trie_node_2);
@@ -691,7 +725,7 @@ int searchItemTrieDict2(Vector* trie_tree_dict, Vector* edges, void* element, in
 		}
 		// the entries are sorted, but not the items they point to
 		// the entries should be in the order that the items they point to are in sorted order
-		printf("item not found %i\n", low);
+		// printf("item not found %i\n", low);
 		// item didn't get found
 		
 		/*
