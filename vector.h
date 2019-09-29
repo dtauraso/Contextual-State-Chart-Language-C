@@ -31,6 +31,8 @@ int getPopulation(Vector* container);
 
 void append(Vector* container, void* element);
 bool popItem(Vector* container);
+bool popFirst(Vector* container);
+
 void incrementTopInt(Vector* container);
 
 bool deleteItem(Vector* container, int index);

@@ -617,6 +617,29 @@ int main(int argc, char** argv)
 
 	printTrieWords(my_dynamic_machine->trie_tree_dict);
 
+	// because 'start' is the same ansestor to start and start2  the link to it is not deleted
+	
+
+	// haven't tested alternating inserts and deletes
+	// haven't tested inserts and deletes on a complex graph
+	// haven't done search
+	deleteWords(my_dynamic_machine->trie_tree_dict, addStringToVector2("start2", "2"));
+	printTrie(my_dynamic_machine->trie_tree_dict);
+	printWordTrie(my_dynamic_machine->trie_tree_dict);
+	printTrieWords(my_dynamic_machine->trie_tree_dict);
+
+
+	deleteWords(my_dynamic_machine->trie_tree_dict, addStringToVector3("start", "start 1", "start 2"));
+	printTrie(my_dynamic_machine->trie_tree_dict);
+	printWordTrie(my_dynamic_machine->trie_tree_dict);
+	printTrieWords(my_dynamic_machine->trie_tree_dict);
+
+	
+	
+	
+
+	//printTrieWords(my_dynamic_machine->trie_tree_dict);
+
 	exit(1);
 	/*
 	start

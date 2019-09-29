@@ -67,7 +67,10 @@ void cutLinkToFirstNodeInPath(	TrieTree* my_trie_tree,
 								int* lower_bound_ptr,
 								int start_node,
 								int ith_string_in_input);
-
+void eraseEdgeToTopCharNode(Vector* char_nodes_matching,
+							int j,
+							TrieTree* my_trie_tree,
+							char top_node_value);
 int deleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/);
 
 void printTrie(TrieTree* my_trie_tree);

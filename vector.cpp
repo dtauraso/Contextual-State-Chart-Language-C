@@ -62,6 +62,7 @@ void* getItem(Vector* container, int i)
 }
 void setItemToNull(Vector* container, int i)
 {
+	//printf("set to null\n");
 	if(i < container->population && i >= 0)
 	{
 		//printf("item |%x|\n", container->values[i]);
@@ -125,7 +126,7 @@ bool popItem(Vector* container)
 	if(container != NULL)
 	{
 		//printf("here %i\n", container->population - 1);
-		//		Print(container);
+		//Print(container);
 
 		int index = container->population - 1;
 		free(container->values[index]);
@@ -136,6 +137,10 @@ bool popItem(Vector* container)
 		return true;
 	}
 	return false;
+}
+bool popFirst(Vector* container)
+{
+	return deleteItem(container, 0);
 }
 void incrementTopInt(Vector* container)
 {
@@ -774,29 +779,37 @@ int searchItemTrieDict2(Vector* trie_tree_dict, Vector* edges, void* element, in
 }
 void Print(Vector* container)
 {
-	//printf("printing container pop %i, size %i\n", container->population, container->size);
-	for(int i = 0; i < container->population; i++)
+	if(container != NULL)
 	{
-		//printf("i %i\n", i);
-		if(container->values[i] == NULL)
+		//printf("printing container pop %i, size %i\n", container->population, container->size);
+		for(int i = 0; i < container->population; i++)
 		{
-			printf("|NULL|\n");
+			//printf("i %i\n", i);
+			if(container->values[i] == NULL)
+			{
+				printf("|NULL|\n");
+			}
+			else
+			{
+				//printf("|%x|", container->values[i]);
+				void* a = container->values[i];
+				int* b = (int*) a;
+				printf("|%i|", *b);
+				
+				//printf("|item|");
+			}
 		}
-		else
+		if(container->population == 0)
 		{
-			//printf("|%x|", container->values[i]);
-			void* a = container->values[i];
-			int* b = (int*) a;
-			printf("|%i|", *b);
-			
-			//printf("|item|");
+			printf("none");
 		}
+		printf("\n\n");
 	}
-	if(container->population == 0)
+	else
 	{
-		printf("none");
+		printf("empty container\n");
 	}
-	printf("\n\n");
+	
 
 }
 void printStrings(Vector* container)

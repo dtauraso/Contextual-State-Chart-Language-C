@@ -22,6 +22,7 @@ typedef struct TrieNode2
 
 }TrieNode2;
 */
+
 TrieNode2* initTrieNode2()
 {
 	// assume the dafault type to be stored is an integer
@@ -42,15 +43,44 @@ TrieNode2* initTrieNode2()
 }
 bool deleteTrieNode2(TrieNode2* node)
 {
-	free(node->value);
-	if(deleteAllItems(node->links))
+	if(node != NULL)
 	{
-		//printf("erased links\n");
+		free(node->value);
+		if(node->links != NULL)
+		{
+				deleteAllItems(node->links);
+				node->links = NULL;
+
+		}
+		if(node->chars_from_edges != NULL)
+		{
+				deleteAllItems(node->chars_from_edges);
+				node->chars_from_edges = NULL;
+
+		}
+		//printf("word letters %x\n", node->word_letters);
+		if(node->word_letters != NULL)
+		{
+			//printf("about to erase\n");
+			deleteAllItems(node->word_letters);
+			node->word_letters = NULL;
+			//printf("erased\n");
+		}
 		free(node);
-		//node = NULL;
 		return true;
+		/*
+		if(deleteAllItems(node->links))
+		{
+			//printf("erased links\n");
+			free(node);
+			//node = NULL;
+			return true;
+		}
+
+		return false;
+		*/
 	}
-	return false;
+	
 
 }
 void* getValue(TrieNode2* node)
@@ -122,6 +152,22 @@ TrieTree* initTrieTree()
 
 	
 */
+void push(Vector* container, int new_item)
+{
+	int* new_item_ptr = (int*) malloc(sizeof(int));
+	*new_item_ptr = new_item;
+	append(container, new_item_ptr);
+}
+int getNextNode(TrieTree* my_trie_tree, Vector* node_id_stack, Vector* ith_edge_stack)
+{
+	int top_node_id = *((int*) getItem(node_id_stack, getPopulation(node_id_stack) - 1));
+	TrieNode2* top_node = (TrieNode2*) getItem(my_trie_tree->word_tree, top_node_id);
+
+	int top_ith_edge = *((int*) getItem(ith_edge_stack, getPopulation(ith_edge_stack) - 1));
+	return *((int*) getItem(top_node->links, top_ith_edge) );
+
+}
+
 // int search
 /*
 push items to a stack
@@ -246,6 +292,8 @@ Vector* insertWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	// how they are connected:
 	// each proxy node has links to the next proxy node and to the char nodes making up the sequence it represents
 	// the last char node made from each input string links to its counterpart proxy node
+
+	// 3 different sets of numbers used: char node id's, word id's, state id's
 	printf("inserting\n");
 	printStrings(name);
 	printf("\n");
@@ -524,10 +572,13 @@ int updateId(TrieTree* my_trie_tree, int old_id)
 	}
 	return old_id;
 }
+/*
 void deleteWord(TrieTree* my_trie_tree, int word_id)
 {
 	// delete the word object at word_id
 }
+*/
+/*
 void cutLinkToFirstNodeInPath(	TrieTree* my_trie_tree,
 								Vector* name,
 								int* lower_bound_ptr,
@@ -551,6 +602,7 @@ void cutLinkToFirstNodeInPath(	TrieTree* my_trie_tree,
 
 	deleteItem(root_node->links, link_location);
 }
+*/
 void appendNode(Vector* collected_nodes_to_delete, int tracker)
 {
 	int* tracker_ptr = (int*) malloc(sizeof(int));
@@ -610,10 +662,275 @@ int deleteNodes(Vector* nodes_to_delete, TrieTree* my_trie_tree)
 	return state_id_to_delete;
 }
 
+void eraseEdgeToTopCharNode(Vector* char_nodes_matching,
+							int j,
+							TrieTree* my_trie_tree,
+							char top_node_value)
+{
+	if(getPopulation(char_nodes_matching) > 0)
+	{
+		// assumes all pointers exist
+		int prev_node_id_2 = *((int*) getItem(char_nodes_matching, j));
+		//printf("prev node id %i\n", prev_node_id_2);
+		TrieNode2* prev_node_2 = (TrieNode2*) getItem(my_trie_tree->trie_tree, prev_node_id_2);
+		//printf("before find loop\n");
+
+
+		// find the index of the correct letter edge using the char value of the top char node
+		char prev_edge_letter = top_node_value;
+		int id_of_edge_to_delete = 0;
+		// 
+		for(int i = 0; i < getPopulation(prev_node_2->chars_from_edges); i++)
+		{
+			//printf("%i, ", *((int* )  getItem(prev_node_2->chars_from_edges, i) ));
+			char letter_edge = ((char) *((int* )  getItem(prev_node_2->chars_from_edges, i) ) );
+			if(letter_edge == prev_edge_letter)
+			{
+				//printf("found match %i\n", i);
+				id_of_edge_to_delete = i;
+			}
+
+		}
+		deleteItem(prev_node_2->chars_from_edges, id_of_edge_to_delete);
+		prev_node_2->char_links[prev_edge_letter] = -1;
+	}
+	
+
+}
+
 int deleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 {
 
+	/*
+	find the char and word paths
 
+	erase the char and word nodes and accompinying stacks
+
+	erase the final char and word links(requires saving data from stacks before poping)
+
+	erase auxiliary stacks
+
+	the root is deleted if there is only 1 char path in trie
+
+	haven't tested this on paths where the root doesn't have the final edge to be deleted
+	*/
+	printf("delete\n");
+	Vector* char_nodes_matching = initVector();
+	Vector* word_nodes_matching = initVector();
+	int prev_node_id = 0;
+	if(name == NULL)
+	{
+		return -1;
+	}
+	// assume name is not a sequence of null strings
+	TrieNode2* prev_node = (TrieNode2*) getItem(my_trie_tree->trie_tree, 0);
+	push(char_nodes_matching, 0);
+	push(word_nodes_matching, 0);
+
+	// getting the stack of char node ids matching the input
+	for(int i = 0; i < name->population; i++)
+	{
+		//TrieNode2* proxy_node = initTrieNode2();
+
+		//proxy_node->word_letters = initVector();
+		//proxy_node->links = initVector();
+
+
+		// search through string and make path
+		//int number_of_new_letters = 0;
+		int size = ((string*) name->values[i])->size();
+		for(int j = 0; j < size; j++)
+		{
+			char letter = (*((string*) name->values[i]))[j];
+
+			int edge = prev_node->char_links[letter];
+
+			//printf("%c\n", letter);
+
+			if(edge > -1)
+			{
+				push(char_nodes_matching, edge);
+
+			}
+			else
+			{
+				// exit cause there is no match
+				printf("can't delete because it doesn't exist\n");
+				return -1;
+			}
+			prev_node = (TrieNode2*) getItem(my_trie_tree->trie_tree, edge);
+
+		}
+		
+		if(prev_node->word_counterpart > -1)
+		{
+			push(word_nodes_matching, prev_node->word_counterpart);
+		}
+	}
+	// there will be at least 1 word represented by char_nodes_matching
+	Print(char_nodes_matching);
+	//exit(1);
+
+	// erase the char path, final edge, and char stack
+	// assuming there will always be a node whose edge has to be deleted
+	//printf("here\n");
+	//Vector* words_stack = initVector();
+	int j = getPopulation(char_nodes_matching) - 1;
+	int top_edge = *((int*) getItem(char_nodes_matching, j));
+	TrieNode2* top_node = (TrieNode2*) getItem(my_trie_tree->trie_tree, top_edge);
+
+	
+	// for deleting the hanging edge
+	char poped_node_value;
+	poped_node_value = top_node->my_value;
+	// delete the node
+	deleteTrieNode2(top_node);
+	setItemToNull(my_trie_tree->trie_tree, top_edge);
+	top_node = NULL;
+
+
+	popItem(char_nodes_matching);
+
+	j = getPopulation(char_nodes_matching) - 1;
+	top_edge = *((int*) getItem(char_nodes_matching, j));
+	top_node = (TrieNode2*) getItem(my_trie_tree->trie_tree, top_edge);
+
+	// deleting char nodes and poping from char stack
+	while(getPopulation(top_node->chars_from_edges) <= 1 && top_node->state_id == -1 )
+	{
+
+			
+
+		// this will always the the last char deleted from char trie tree
+		poped_node_value = top_node->my_value;
+
+		deleteTrieNode2(top_node);
+		setItemToNull(my_trie_tree->trie_tree, top_edge);
+		top_node = NULL;
+
+		popItem(char_nodes_matching);
+
+		if(getPopulation(char_nodes_matching) == 0)
+		{
+			break;
+		}
+
+		j = getPopulation(char_nodes_matching) - 1;
+		top_edge = *((int*) getItem(char_nodes_matching, j));
+		top_node = (TrieNode2*) getItem(my_trie_tree->trie_tree, top_edge);
+	}
+	// delete the hanging edge
+	if(getPopulation(char_nodes_matching) > 0)
+	{
+		eraseEdgeToTopCharNode(char_nodes_matching,
+							   j,
+							   my_trie_tree,
+							   poped_node_value);
+	}
+	printf("after lots of deleting\n");
+	Print(char_nodes_matching);
+		Print(word_nodes_matching);
+	printWordTrie(my_trie_tree);
+
+	printf("delete word nodes\n");
+	// there will always be at least 1 word matching the input
+	int top_word_id = getPopulation(word_nodes_matching) - 1;
+
+	int deleted_word_edge = *((int*) getItem(word_nodes_matching, top_word_id));
+	TrieNode2* top_word = (TrieNode2*) getItem(my_trie_tree->word_tree, deleted_word_edge);
+	// loop is still wrong
+	while(getPopulation(word_nodes_matching) > 1)
+	{
+
+		Print(word_nodes_matching);
+	//printWordTrie(my_trie_tree);
+
+		deleteTrieNode2(top_word);
+					printf("here\n");
+		printf("deleted_word_edge %i\n", deleted_word_edge);
+		// node 5 is erased and node 2's links are erased
+		setItemToNull(my_trie_tree->word_tree, deleted_word_edge);
+		top_word = NULL;
+		printWordTrie(my_trie_tree);
+		popItem(word_nodes_matching);
+		if(getPopulation(word_nodes_matching) == 1)
+		{
+			break;
+		}
+		top_word_id = getPopulation(word_nodes_matching) - 1;
+		deleted_word_edge = *((int*) getItem(word_nodes_matching, top_word_id));
+		top_word = (TrieNode2*) getItem(my_trie_tree->word_tree, deleted_word_edge);
+
+	}
+	printWordTrie(my_trie_tree);
+
+	printf("after word stack deleting %i\n", deleted_word_edge);
+		Print(word_nodes_matching);
+
+	// delete word nodes and word stack
+	// delete final word edge
+	//printf("%i\n", poped_word_id);
+	int edge = *((int*) getItem(word_nodes_matching, 0));
+	TrieNode2* word_node = (TrieNode2*) getItem(my_trie_tree->word_tree, edge);
+	int location_of_word_edge = 0;
+	for(int i = 0; i < getPopulation(word_node->links); i++)
+	{
+		int word_node_edge = *((int*) getItem(word_node->links, i));
+		if(word_node_edge == deleted_word_edge)
+		{
+			location_of_word_edge = i;
+			break;
+		}
+	}
+	printf("location fo word edge %i\n", location_of_word_edge);
+	deleteItem(word_node->links, location_of_word_edge);
+	// cleanup words containing same chars as previous deleted char paths
+	// wasn't deleted earlier because the char node linking to it is a fork char
+	// if the last word's edges have now been deleted, delete the node and the link to it
+	//if(getPopulation(word_node->links) == 0)
+	//{
+	//	printf("word node %i can be deleted\n", edge);
+	//}
+	/*
+	// first ancestor word may link to a sibling word instead(if the 2 words overlap)
+	int ancestor_word = findAncestorWord(char_nodes_matching, my_trie_tree);
+	printf("ansestor word %i\n", ancestor_word);
+	push(words_stack, 0);
+
+	deleteAllItems(char_nodes_matching);
+	printf("my word stack\n");
+	//Print(words_stack);
+
+	// erase the edge from the prev node before deleting the current node
+	// don't erase the edge from the final node on the stack
+	for(int i = 0; i < getPopulation(words_stack); i++)
+	{
+		Print(words_stack);
+
+		int edge = *((int*) getItem(words_stack, i));
+		if(edge > 0)
+		{
+			TrieNode2* word_node = (TrieNode2*) getItem(my_trie_tree->word_tree, edge);
+			deleteTrieNode2(word_node);
+			setItemToNull(my_trie_tree->word_tree, edge);
+
+		}
+		else
+		{
+
+		}
+
+	}
+	deleteAllItems(words_stack);
+	*/
+	deleteAllItems(char_nodes_matching);
+	deleteAllItems(word_nodes_matching);
+	// deleteAllItems should have already set these to NULL
+	char_nodes_matching = NULL;
+	word_nodes_matching = NULL;
+	printf("done %x, %x\n", char_nodes_matching, word_nodes_matching);
+	//Print(char_nodes_matching);
+	//Print(word_nodes_matching);
 
 	/*
 
@@ -673,6 +990,7 @@ int deleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	// possibly modified input vector comes out with all the strings stored as a trie
 	// all leaf nodes will have a link to the sate object
 	// returns the id of the last node found
+	/*
 	int prev_node_id = 0;
 	TrieNode2* prev_node = (TrieNode2*) getItem(my_trie_tree->trie_tree, 0);
 
@@ -752,10 +1070,10 @@ int deleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	// printf("%i\n", last_partial_match);
 	// printf("%s\n", ( (string*)  ((TrieNode2*) getItem(my_trie_tree->trie_tree, last_partial_match))->value)->c_str() );
 	// printf("%i\n",   ((TrieNode2*) getItem(my_trie_tree->trie_tree, last_partial_match))->state_id );
-	/*
+	
 	the pre lower bound is the fork
 	another pre lower bound is the second to last node with data
-	*/
+	
 	// path has 0 forks but ends at an internal node that is a fork
 	if( ((TrieNode2*) getItem(my_trie_tree->trie_tree, last_partial_match))->state_id > -1 )
 	{
@@ -791,7 +1109,7 @@ int deleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 				cutLinkToFirstNodeInPath(	my_trie_tree, name,
 											lower_bound_ptr,
 											node_before_match_having_data,
-											name_before_match_having_data/* wrong */);
+											name_before_match_having_data wrong );
 
 				Vector* nodes_to_delete = initVector();
 				int tracker = lower_bound;
@@ -925,7 +1243,7 @@ int deleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	}
 	
 		// how to change prev and current to integers
-		/*
+		
 		erase link to current from prev
 		prev = current
 		update current
@@ -936,10 +1254,10 @@ int deleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 
 		prev = current
 		update current
-		*/
+		
 
 
-
+	*/
 	return -1;
 
 }
@@ -986,32 +1304,56 @@ void printWordTrie(TrieTree* my_trie_tree)
 	{
 
 		TrieNode2* node = (TrieNode2*) getItem(my_trie_tree->word_tree, i);
+		//("node %x\n", node);
 		if(node != NULL)
 		{
 			//printf("printing array\n");
 
 			//printf("%i |%c| %i %i\n", i, node->my_value, node->start_of_word, node->state_id);
 			printf("%i |", i);
-			//printf("%i\n", node->word_letters);
-			for(int j = 0; j < getPopulation(node->word_letters); j++)
+			//printf("%x %i\n", node->word_letters, getPopulation(node->word_letters));
+			//printf("here\n");
+			//Print(node->word_letters);
+			//printf("done\n");
+			if(node->word_letters != NULL)
 			{
-				int k = *((int*) getItem(node->word_letters, j));
-				TrieNode2* char_node = (TrieNode2*) getItem(my_trie_tree->trie_tree, k);
+				for(int j = 0; j < getPopulation(node->word_letters); j++)
+				{
+					int k = *((int*) getItem(node->word_letters, j));
+					//printf("k %i\n", k);
+					TrieNode2* char_node = (TrieNode2*) getItem(my_trie_tree->trie_tree, k);
+					//printf("char_node %x\n", char_node);
 
-				//printf("|%i|", k);
-				printf("%c", char_node->my_value);
+					//printf("|%i|", k);
+					if(char_node != NULL)
+					{
+						printf("%c", char_node->my_value);
+
+					}
+				}
 			}
+			
 			printf("|\nlinks\n");
-			//printf("%i\n", node->links);
-			for(int l = 0; l < getPopulation(node->links); l++)
+			if(node->links != NULL)
 			{
-				int k = *((int*) getItem(node->links, l));
-				printf("|%i|", k);
+				// does insert recreate root's links?
+				printf("%i\n", getPopulation(node->links));
+				for(int l = 0; l < getPopulation(node->links); l++)
+				{
+					int k = *((int*) getItem(node->links, l));
+					printf("|%i|", k);
 
+				}
+				printf("\n\n");
+
+
+			}
+			else
+			{
+				printf("empty\n\n");
 			}
 
 			
-			printf("\n\n");
 
 		}
 		else
@@ -1080,10 +1422,9 @@ string collectWord(TrieTree* my_trie_tree, Vector* node_id_stack)
 	}
 	return word;
 }
-
 void printTrieWords(TrieTree* my_trie_tree)
 {
-	/*
+	// printing the trie tree using the word tree
 	// node_id_stack
 	Vector* node_id_stack = initVector();
 	// ith_edge_stack
@@ -1103,293 +1444,155 @@ void printTrieWords(TrieTree* my_trie_tree)
 	*start_node_id_ptr = start_node_id;
 	append(node_id_stack, start_node_id_ptr);
 
-
-	int top_node_id = *((int*) getItem(node_id_stack, getPopulation(node_id_stack) - 1));
+	// get next node after root
+	int top_node_id = *((int*) getItem(node_id_stack, 0));
 	TrieNode2* top_node = (TrieNode2*) getItem(my_trie_tree->word_tree, top_node_id);
-
-	// failes here
-	int top_ith_edge = *((int*) getItem(ith_edge_stack, getPopulation(ith_edge_stack) - 1));
+	if(getPopulation(top_node->links) == 0)
+	{
+		printf("empty graph\n");
+		return;
+	}
+	int top_ith_edge = *((int*) getItem(ith_edge_stack, 0));
 	//int next_letter = *((int*) getItem(top_node->chars_from_edges, top_ith_edge) );
-
+	//Print(top_node->links);
 	int next_edge = *((int*) getItem(top_node->links, top_ith_edge) );//top_node->char_links[next_letter];
-	
+
+	//printf("next edge %i\n", next_edge);
 	int loop_count = 0;
-	TrieNode2* next_word_node = (TrieNode2*) getItem(my_trie_tree->trie_tree, next_edge);
+	TrieNode2* next_letter_node;// = (TrieNode2*) getItem(my_trie_tree->trie_tree, next_edge);
 
 	int* first_node_id_ptr = (int*) malloc(sizeof(int));
 	*first_node_id_ptr = next_edge;
-	append(node_id_stack, start_node_id_ptr);
+	append(node_id_stack, first_node_id_ptr);
 
 
 	int* first_ith_edge_ptr = (int*) malloc(sizeof(int));
 	*first_ith_edge_ptr = 0;
-	append(ith_edge_stack, start_ith_edge_ptr);
+	append(ith_edge_stack, first_ith_edge_ptr);
 	indent_level += 3;
 	//indent_level += 3;
 	// push first node to stack
 	// update indent_leve
 	//Print(ith_edge_stack);
 	//Print(node_id_stack);
+	// status of stacks
+	// 0, next_edge(first node)
+	// 0, 0
+	//printf("here\n");
 	// first letter is the first letter of the first sequence
-	while(/*loop_count < 20 &&  getPopulation(node_id_stack) > 0)
+	while(/*loop_count < 6 &&  */getPopulation(node_id_stack) > 0)
 	{
-		next_letter_node = (TrieNode2*) getItem(my_trie_tree->trie_tree, next_edge);
+		//printf("node id %i\n", next_edge);
+
+		// use the node id for tracking, not the node pointer
+
+		// first round this is the first child from root
+		next_letter_node = (TrieNode2*) getItem(my_trie_tree->word_tree, next_edge);
 		// process 1 node per round
 		//printf("loop %i\n", loop_count);
 		//printf("here\n");
  		//printf("node id %i\n", top_node_id);
 		//printf("here 2\n");
-		//printf("node %i\n\n", next_letter_node->start_of_word);
-		/*
-		dfs with stack
-		get word
-		print with indent
-		get next word if can
-		else
-			loop
-				pop words off untill stack is empty or find one with more edges
-				decrement indent level for each pop
+		//printf("node %i\n\n", next_letter_node);
+		
+		//Print(ith_edge_stack);
+		//Print(node_id_stack);
 
-			push new node onto stack
-			increment indent level
-
-
-			
-		if(next_letter_node->start_of_word)
+		// print word
+		printf("%s|", makeSpaces(indent_level).c_str());
+		for(int j = 0; j < getPopulation(next_letter_node->word_letters); j++)
 		{
-			//printf("start collecting\n");
-			// traverse nodes from stack in reverse order to collect the string
-			// stop collecting when hit the root or a previous start of word
-			string word = collectWord(my_trie_tree, node_id_stack);
-			if(word.size() > 0)
+			int k = *((int*) getItem(next_letter_node->word_letters, j));
+			//printf("|%i|", k);
+
+			TrieNode2* char_node = (TrieNode2*) getItem(my_trie_tree->trie_tree, k);
+
+			printf("%c", char_node->my_value);
+			if(j == getPopulation(next_letter_node->word_letters) - 1)
 			{
-
-
-				printf("%s|%s|", makeSpaces(indent_level).c_str(), word.c_str());
-				if(top_node->state_id > -1)
+				if(char_node->state_id > -1)
 				{
-					printf(" -> %i\n", top_node->state_id);
+					printf("| -> %i", char_node->state_id);
 				}
 				else
 				{
-					printf("\n");
+					printf("|");
 				}
-				//indent_level += 3;
 
 			}
-			// print out the string with indents
-
-
-			
-
 
 		}
-		//printf("%c %i\n", next_letter_node->my_value, next_letter_node->start_of_word);
 
-		if(next_letter_node->start_of_word)
+		printf("\n");
+		//printf("got here\n");
+		// have to check before getting the next edge cause the last possible node in the current path is on the stack(because it was just printed)
+		//printf("next node id %i\n", next_edge);
+		if(getPopulation(next_letter_node->links) > 0)
 		{
-			//if()
-			printf("increment indent\n");
+			// find the next edge and add it here
+			push(node_id_stack, getNextNode(my_trie_tree, node_id_stack, ith_edge_stack));
+			push(ith_edge_stack, 0);
+			//printf("after push\n");
+			//Print(ith_edge_stack);
+			//Print(node_id_stack);
 			indent_level += 3;
+			next_edge = *((int*) getItem(node_id_stack, getPopulation(node_id_stack) - 1));
 
-		}
-		// push(node_id_stack, next_edge)
-		// push(ith_edge_stack, 0)
-		// how to know when to stop? doesn't need to stop here
-		int start_node_id = next_edge;
-		int* start_node_id_ptr = (int*) malloc(sizeof(int));
-		*start_node_id_ptr = start_node_id;
-		append(node_id_stack, start_node_id_ptr);
-		
-		int start_ith_edge = 0;
-		int* start_ith_edge_ptr = (int*) malloc(sizeof(int));
-		*start_ith_edge_ptr = start_ith_edge;
-		append(ith_edge_stack, start_ith_edge_ptr);
-		// update some more things so next_edge is ready for start of loop
-		top_node_id = *((int*) getItem(node_id_stack, getPopulation(node_id_stack) - 1));
-		top_node = (TrieNode2*) getItem(my_trie_tree->trie_tree, top_node_id);
-
-
-		top_ith_edge = *((int*) getItem(ith_edge_stack, getPopulation(ith_edge_stack) - 1));
-
-		// 
-		//printf("# of edges %i\n", getPopulation(top_node->chars_from_edges));
-		// only get the next item if there is an edge
-		// if there are no edges
-			// don't know
-		if(getPopulation(top_node->chars_from_edges) > 0)
-		{
-			
-			next_letter = *((int*) getItem(top_node->chars_from_edges, top_ith_edge) );
-			// at some point we try to get to a node that doesn't exist
-			//printf("next letter %i\n", next_letter);
-			next_edge = top_node->char_links[next_letter];
-			//printf("next edge %i\n", next_edge);
-
-			next_letter_node = (TrieNode2*) getItem(my_trie_tree->trie_tree, next_edge);
 		}
 		else
 		{
+			int top_node_id_2 = *((int*) getItem(node_id_stack,
+													 getPopulation(node_id_stack) - 1));
+			TrieNode2* top_node_2 = (TrieNode2*) getItem(my_trie_tree->word_tree, top_node_id_2);
 
-			// pop and push next one
-			string word = collectWord(my_trie_tree, node_id_stack);
-			printf("%s|%s|", makeSpaces(indent_level).c_str(), word.c_str());
-			if(top_node->state_id > -1)
-			{
-				printf(" -> %i\n", top_node->state_id);
-			}
-			else
-			{
-				printf("\n");
-			}
-			//indent_level += 3;
-
-			//printf("%s|%s| -> %i\n", makeSpaces(indent_level).c_str(), word.c_str(),
-			//	top_node->state_id);
-
-			//printf("pop and push next one\n");
-
-			//Print(ith_edge_stack);
-			//Print(node_id_stack);
-
-			/*
-			if top node is the start of a word
-				indents--
-			loop while stack is not empty
-				pop
-				check if top node is the start of a word
-					yes, then indents--
-				if we can increment the children of top node
-					increment the children of top node
-					push new node to the top
-					indents++
-					break
-
-			currently, the ability to decrement the indents is completely dependent on wether or not the top node has >= 2 children
-			because the part I'm looking at has 2 children this happens to word
-
-			have a word tree
-				each node has a vector of node ids holding the sequence of the letters
-			
-			popItem(ith_edge_stack);
-			popItem(node_id_stack);
-			//printf("decrement indents\n");
-
-					//indent_level -= 3;
-			//Print(ith_edge_stack);
-			//Print(node_id_stack);
-			/*
-			top_node_id = *((int*) getItem(node_id_stack, getPopulation(node_id_stack) - 1));
-			top_node = (TrieNode2*) getItem(my_trie_tree->trie_tree, top_node_id);
-			
-			//int top_ith_edge = *((int*) getItem(ith_edge_stack, getPopulation(ith_edge_stack) - 1));
-			//printf("incrementing\n");
-
-			// update top edge id
-			incrementTopInt(ith_edge_stack);
-			//Print(ith_edge_stack);
-			int top_ith_edge_x = *((int*) getItem(ith_edge_stack, getPopulation(ith_edge_stack) - 1));
-
-			int top_node_id_x = *((int*) getItem(node_id_stack, getPopulation(node_id_stack) - 1));
-			TrieNode2* top_node_x = (TrieNode2*) getItem(my_trie_tree->trie_tree, top_node_id_x);
-
-			//printf("top ith edge %i, %i\n", top_ith_edge_x, getPopulation(top_node_x->chars_from_edges));
-
-			// while top edge id >= top node's edge count
-			while(top_ith_edge_x >= getPopulation(top_node_x->chars_from_edges))
+			// exit when stack is empty or there is a new node to visit
+			while(getPopulation(node_id_stack) > 0 /* may simply be here to keep something true */)
 			{
 				// pop from both stacks
-				// get top node
-				// update top edge id
-
+				//printf("before pop\n");
 				popItem(ith_edge_stack);
 				popItem(node_id_stack);
-				//printf("stacks\n");
+				//printf("after pop\n");
 				//Print(ith_edge_stack);
 				//Print(node_id_stack);
-				if(getPopulation(ith_edge_stack) > 0)
+				indent_level -= 3;
+				if(getPopulation(node_id_stack) == 0)
 				{
-					incrementTopInt(ith_edge_stack);
-					//printf("after incrementing\n");
-					top_ith_edge_x = *((int*) getItem(ith_edge_stack, getPopulation(ith_edge_stack) - 1));
-					top_node_id_x = *((int*) getItem(node_id_stack, getPopulation(node_id_stack) - 1));
-
-
-					top_node_x = (TrieNode2*) getItem(my_trie_tree->trie_tree, top_node_id_x);
-
-					if(top_node_x != NULL)
-					{
-						// don't decrement if we are at the last round
-						if(top_node_id_x != 0)
-						{
-							// root may be visited
-							if(top_node_x->start_of_word)
-							{
-
-								printf("decrement indents %i\n", top_node_id_x);
-								//printf("indent_level %i\n", indent_level);
-
-								indent_level -= 3;
-								//printf("indent_level %i\n", indent_level);
-
-
-							}
-						}
-						
-
-				
-					}
-					//printf("%x\n", top_node_x);
-					//printf("indent level %i\n", indent_level);
-
-				}
-				else
-				{
-					//printf("indent level %i\n", indent_level);
-					
-					// quit loop when stacks are empty
-					//printf("stack is empty\n");
 					break;
 				}
+				// decriment indent_level
+				top_node_id_2 = *((int*) getItem(node_id_stack,
+													 getPopulation(node_id_stack) - 1));
 
-			}
-			if(getPopulation(ith_edge_stack) > 0)
-			{
-				printf("after iteration\n");
-				Print(ith_edge_stack);
-				Print(node_id_stack);
-				// get the trackers ready for the next loop iteration
-				top_ith_edge = *((int*) getItem(ith_edge_stack, getPopulation(ith_edge_stack) - 1));
-
-				top_node_id = *((int*) getItem(node_id_stack, getPopulation(node_id_stack) - 1));
-				top_node = (TrieNode2*) getItem(my_trie_tree->trie_tree, top_node_id);
+				top_node_2 = (TrieNode2*) getItem(my_trie_tree->word_tree, top_node_id_2);
 
 				top_ith_edge = *((int*) getItem(ith_edge_stack, getPopulation(ith_edge_stack) - 1));
-				next_letter = *((int*) getItem(top_node->chars_from_edges, top_ith_edge) );
 
-				next_edge = top_node->char_links[next_letter];
+				//printf("top node id %i, population %i, top edge %i\n", top_node_id_2, getPopulation(top_node_2->links), top_ith_edge);
+				// have to use the edge for the below comparison too
+				// if edge at top of stack can be incremented(edge + 1 < node's links length)
+				if(top_ith_edge + 1 < getPopulation(top_node_2->links))
+				{
+					// wrong
+					//printf("need to push\n");
+					incrementTopInt(ith_edge_stack);
 
-				int start_ith_edge = 0;
-				int* start_ith_edge_ptr = (int*) malloc(sizeof(int));
-				*start_ith_edge_ptr = start_ith_edge;
-				append(ith_edge_stack, start_ith_edge_ptr);
+					// push new node(will be next_letter_node) and 0 to stacks
+					// increment indent_level
 
+					next_edge = getNextNode(my_trie_tree, node_id_stack, ith_edge_stack);
 
-				int start_node_id = next_edge;
-				int* start_node_id_ptr = (int*) malloc(sizeof(int));
-				*start_node_id_ptr = start_node_id;
-				append(node_id_stack, start_node_id_ptr);
-				Print(ith_edge_stack);
-				Print(node_id_stack);
-				printf("next edge %i\n", next_edge);
-				indent_level += 3;
+					push(node_id_stack, next_edge);
+					push(ith_edge_stack, 0);
+					indent_level += 3;
 
+					break;
+
+				}
 			}
-			// where does this go?
-			//indent_level += 3;
-
-
+			//printf("done with poping\n");
 		}
+		
 		//Print(ith_edge_stack);
 		//Print(node_id_stack);
 		
@@ -1397,7 +1600,7 @@ void printTrieWords(TrieTree* my_trie_tree)
 
 
 	}
-	*/
+	
 }
 
 void printTrieRecursive(TrieTree* my_trie_tree, int root, string indents)
