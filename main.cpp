@@ -595,6 +595,10 @@ int main(int argc, char** argv)
 
 	printTrieWords(my_dynamic_machine->trie_tree_dict);
 
+	deleteWords(my_dynamic_machine->trie_tree_dict, addStringToVector3("start", "start 1", "start 2"));
+	printTrie(my_dynamic_machine->trie_tree_dict);
+	printWordTrie(my_dynamic_machine->trie_tree_dict);
+	printTrieWords(my_dynamic_machine->trie_tree_dict);
 
 	//printTrieRecursive(my_dynamic_machine->trie_tree_dict, 0, " ");
 
@@ -608,6 +612,7 @@ int main(int argc, char** argv)
 	// passes
 	//printTrie(my_dynamic_machine->trie_tree_dict);
 	//exit(1);
+	// 
 	Vector* name2 = addStringToVector2("start2", "2");
 	name2 = insertWords(my_dynamic_machine->trie_tree_dict, name2);
 	printStrings(name2);
@@ -620,19 +625,16 @@ int main(int argc, char** argv)
 	// because 'start' is the same ansestor to start and start2  the link to it is not deleted
 	
 
-	// haven't tested alternating inserts and deletes
+	// haven't tested alternating inserts and deletes(appears to work)
 	// haven't tested inserts and deletes on a complex graph
 	// haven't done search
+	// haven't done insert where a new dimention is added to the state
 	deleteWords(my_dynamic_machine->trie_tree_dict, addStringToVector2("start2", "2"));
 	printTrie(my_dynamic_machine->trie_tree_dict);
 	printWordTrie(my_dynamic_machine->trie_tree_dict);
 	printTrieWords(my_dynamic_machine->trie_tree_dict);
 
 
-	deleteWords(my_dynamic_machine->trie_tree_dict, addStringToVector3("start", "start 1", "start 2"));
-	printTrie(my_dynamic_machine->trie_tree_dict);
-	printWordTrie(my_dynamic_machine->trie_tree_dict);
-	printTrieWords(my_dynamic_machine->trie_tree_dict);
 
 	
 	

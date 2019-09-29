@@ -37,7 +37,9 @@ TrieNode2* initTrieNode2()
 	my_node->state_id = -1;
 	my_node->start_of_word = 0;
 	my_node->word_counterpart = -1;
-
+	// set the word_letters to null
+	// that way only the word nodes have a non-null copy
+	my_node->word_letters = NULL;
 	return my_node;
 
 }
@@ -58,10 +60,11 @@ bool deleteTrieNode2(TrieNode2* node)
 				node->chars_from_edges = NULL;
 
 		}
-		//printf("word letters %x\n", node->word_letters);
+		printf("word letters %x\n", node->word_letters);
 		if(node->word_letters != NULL)
 		{
-			//printf("about to erase\n");
+			printf("about to erase\n");
+			// needs to be initialized for all TrieNode Objects(fix insert)
 			deleteAllItems(node->word_letters);
 			node->word_letters = NULL;
 			//printf("erased\n");
@@ -800,18 +803,23 @@ int deleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	{
 
 			
+		Print(char_nodes_matching);
 
 		// this will always the the last char deleted from char trie tree
 		poped_node_value = top_node->my_value;
-
+		printf("here %x\n", top_node);
 		deleteTrieNode2(top_node);
+				printf("last edge %i, j %i\n", top_edge, j);
+
 		setItemToNull(my_trie_tree->trie_tree, top_edge);
 		top_node = NULL;
 
 		popItem(char_nodes_matching);
-
-		if(getPopulation(char_nodes_matching) == 0)
+		// can't delete the root node
+		// wrong
+		if(getPopulation(char_nodes_matching) == 1)
 		{
+			printf("last j %i\n", j);
 			break;
 		}
 
@@ -819,9 +827,14 @@ int deleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 		top_edge = *((int*) getItem(char_nodes_matching, j));
 		top_node = (TrieNode2*) getItem(my_trie_tree->trie_tree, top_edge);
 	}
+		Print(char_nodes_matching);
+
 	// delete the hanging edge
 	if(getPopulation(char_nodes_matching) > 0)
 	{
+							j = getPopulation(char_nodes_matching) - 1;
+
+		printf("problem is in here %i\n", j);
 		eraseEdgeToTopCharNode(char_nodes_matching,
 							   j,
 							   my_trie_tree,
@@ -829,7 +842,7 @@ int deleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	}
 	printf("after lots of deleting\n");
 	Print(char_nodes_matching);
-		Print(word_nodes_matching);
+	Print(word_nodes_matching);
 	printWordTrie(my_trie_tree);
 
 	printf("delete word nodes\n");
