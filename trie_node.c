@@ -139,7 +139,7 @@ void printStateName(TrieNode* root)
 
 // binary search
 // find the midpoint after the search fails
-// append to the right
+// VectorAppend to the right
 /*
 int searchInsert(vector<int>& nums, int target) {
         
@@ -946,7 +946,7 @@ bool sizeGreaterThan1AndCopyRightSizeGreaterThan0(int size, int copy_right_size)
 	return size > 1 && copy_right_size > 0;
 }
 
-TrieNode** insertItem(int pos, TrieNode* node, TrieNode* value)
+TrieNode** VectorInsertItem(int pos, TrieNode* node, TrieNode* value)
 {
 	//printf("insert item nod's size %i\n", node->size);
 	int size = node->size;
@@ -1088,7 +1088,7 @@ bool insert1Item(TrieNode* node, TrieNode* target_chain, int location)
 		//printf("inserting items\n");
 		//printf("1 insert item nod's size %i\n", node->size);
 
-		TrieNode** new_neighbors = insertItem(location, node, target_chain);
+		TrieNode** new_neighbors = VectorInsertItem(location, node, target_chain);
 		//printf("word saved %s\n", new_neighbors[location]->word);
 		//printf("word saved %s\n", new_neighbors[1]->word);
 

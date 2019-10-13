@@ -9,9 +9,9 @@ string makeSpaces(int indent_level);
 
 const char* getInput(Tokens* my_tokens);
 int getI(Tokens* my_tokens);
-TrieTree* initTrieTree();
-void insertString(TrieTree* my_trie_tree, string element);
-//int getPopulation(Vector* container);
+TrieTree* TrieTreeInitTrieTree();
+void TrieTreeInsertString(TrieTree* my_trie_tree, string element);
+//int VectorGetPopulation(Vector* container);
 
 enum data_types{is_list, is_string, is_empty_case};
 enum token_types {_primitive, _object, _array, _string};
@@ -258,14 +258,14 @@ typedef struct ExtendedState
 ExtendedState* initExtendedState()
 {
 	ExtendedState* new_extended_state = (ExtendedState*) malloc(sizeof(ExtendedState));
-	new_extended_state->data = initVector();
+	new_extended_state->data = VectorInitVector();
 	new_extended_state->next_contexts = new map<string, int>();
 	new_extended_state->id = 0;
 	new_extended_state->type = 0;
 	return new_extended_state;
 }
 /*
-ExtendedState* insertString(ExtendedState* node, string value)
+ExtendedState* TrieTreeInsertString(ExtendedState* node, string value)
 {
 	// insert
 	string* new_string = (string*) malloc(sizeof(string));
@@ -295,13 +295,13 @@ typedef struct OrderedDict
 OrderedDict* initOrderedDict()
 {
 	OrderedDict* new_dict = (OrderedDict*) malloc(sizeof(OrderedDict));
-	new_dict->items = initVector();
+	new_dict->items = VectorInitVector();
 	new_dict->dict = new multimap<string, ExtendedState*>();
 	multimap<string, ExtendedState*>::iterator it = new_dict->dict->begin();
 	new_dict->root = initExtendedState();
 	// insert the string
 	/*
-	new_dict->root = insertString(new_dict->root, "root");
+	new_dict->root = TrieTreeInsertString(new_dict->root, "root");
 
 	new_dict->dict->insert(it, pair<string, ExtendedState*>("root", new_dict->root));
 	new_dict->max_id = 0;
@@ -375,13 +375,13 @@ DynamicMachine* initDynamicMachine(StateMachine* my_machine)
 						pair<string, MapNode*>("root", initMapNode()));
 
 	// buffers for adding, deleting, modifying
-	my_dynamic_machine->name = initVector(); // strings
-	my_dynamic_machine->start_children = initVector();  // array of strings
-	my_dynamic_machine->children = initVector(); // array of strings
-	my_dynamic_machine->next_states = initVector(); // array of strings
+	my_dynamic_machine->name = VectorInitVector(); // strings
+	my_dynamic_machine->start_children = VectorInitVector();  // array of strings
+	my_dynamic_machine->children = VectorInitVector(); // array of strings
+	my_dynamic_machine->next_states = VectorInitVector(); // array of strings
 	my_dynamic_machine->value = makeDataInt(0);
 
-	my_dynamic_machine->trie_tree_dict = initTrieTree();
+	my_dynamic_machine->trie_tree_dict = TrieTreeInitTrieTree();
 	//
 	my_dynamic_machine->my_search = NULL;
 	my_dynamic_machine->my_insert = NULL;
@@ -548,7 +548,7 @@ void printStateTrie(DynamicMachine* my_dynamic_machine, string root, int indent_
 {
 	/*
 		get the state if exists
-			print state
+			VectorPrint state
 		go through the neighbors in the nested map
 		printStateTrie(neighbor string in nested map)
 	*/
@@ -1116,7 +1116,7 @@ void printTrieNodeTreeFlat(TrieNode* root)
 	TrieNode* root_tracker = root;
 	if(root_tracker != NULL)
 	{
-		//printf("\nabout to print word root_tracker->word %x, root_tracker->neighbors %x\n", root_tracker->word, root_tracker->neighbors);
+		//printf("\nabout to VectorPrint word root_tracker->word %x, root_tracker->neighbors %x\n", root_tracker->word, root_tracker->neighbors);
 
 		if(root_tracker->word != NULL)
 		{

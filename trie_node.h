@@ -108,7 +108,7 @@ bool sizeIs1AndCopyRightSizeGreaterThan0(int size, int copy_right_size);
 bool sizeGreaterThan1AndCopyLeftSizeGreaterThan0(int size, int copy_left_size);
 bool sizeGreaterThan1AndCopyRightSizeGreaterThan0(int size, int copy_right_size);
 
-TrieNode** insertItem(int pos, TrieNode* node, TrieNode* value);
+TrieNode** VectorInsertItem(int pos, TrieNode* node, TrieNode* value);
 
 
 int distance(int pos, int size);

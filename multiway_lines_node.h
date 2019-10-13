@@ -12,15 +12,15 @@ typedef struct Vector
 
 }Vector;
 
-Vector* initVector();
-Vector* initVectorSize(int size);
+Vector* VectorInitVector();
+Vector* VectorInitVectorSize(int size);
 
-bool deleteVector(Vector* container);
-int getLastIndex(Vector* container);
-void* getItem(Vector* container, int i);
+bool VectorDeleteVector(Vector* container);
+int VectorGetLastIndex(Vector* container);
+void* VectorGetItem(Vector* container, int i);
 
-void append(Vector* container, void* element);
-bool deleteItem(Vector* container, int index);
+void VectorAppend(Vector* container, void* element);
+bool VectorDeleteItem(Vector* container, int index);
 
 void test();
 */

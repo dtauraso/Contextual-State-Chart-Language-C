@@ -423,7 +423,7 @@ bool oneLineOneOne(Scanner* my_scanner)
 
 	if(my_scanner != NULL)
 	{
-		my_scanner->_lines_graph = initVector();
+		my_scanner->_lines_graph = VectorInitVector();
 		my_scanner->root = 0;
 		int* x = (int*) malloc(sizeof(int));
 		*x = my_scanner->root;
@@ -431,15 +431,15 @@ bool oneLineOneOne(Scanner* my_scanner)
 		MultiwayLinesNode* dummy_dummy_root_node = initMultiwayLinesNode();
 		dummy_dummy_root_node = setName(dummy_dummy_root_node, "dummy_dummy_root");
 
-		append(my_scanner->_lines_graph, dummy_dummy_root_node);
+		VectorAppend(my_scanner->_lines_graph, dummy_dummy_root_node);
 
 		MultiwayLinesNode* dummy_root_node = initMultiwayLinesNode();
 		dummy_root_node = setName(dummy_root_node, "dummy_root");
 
-		append(my_scanner->_lines_graph, dummy_root_node);
+		VectorAppend(my_scanner->_lines_graph, dummy_root_node);
 		// doubly link root_node and dummy_root_node
 		/*
-		append(1) to root_node's child vector
+		VectorAppend(1) to root_node's child vector
 		set dummy_root_node's parent value to 0
 		*/
 
@@ -452,7 +452,7 @@ bool oneLineOneOne(Scanner* my_scanner)
 
 
 
-		append(my_scanner->_lines_graph, root_node);
+		VectorAppend(my_scanner->_lines_graph, root_node);
 		doubleLink2(my_scanner->_lines_graph, 1, 2);
 
 		my_scanner->two_lines = initTwoLines();
@@ -550,8 +550,8 @@ bool setupFirstTwoNodes(Scanner* my_scanner)
 			MultiwayLinesNode* child_node = initMultiwayLinesNode();
 			child_node = setName(child_node, my_scanner->two_lines->second_line->word);
 
-			append(my_scanner->_lines_graph, parent_node);
-			append(my_scanner->_lines_graph, child_node);
+			VectorAppend(my_scanner->_lines_graph, parent_node);
+			VectorAppend(my_scanner->_lines_graph, child_node);
 			
 			doubleLink2(my_scanner->_lines_graph,
 						my_scanner->two_lines->_parent,
@@ -591,7 +591,7 @@ bool makeNodeForWordTwo(Scanner* my_scanner)
 		temp_child_node = setName(temp_child_node, my_scanner->two_lines->second_line->word);
 
 
-		append(my_scanner->_lines_graph, temp_child_node);
+		VectorAppend(my_scanner->_lines_graph, temp_child_node);
 		my_scanner->two_lines->_temp_child = my_scanner->_lines_graph->population - 1;
 
 
@@ -618,18 +618,18 @@ bool downLink(Scanner* my_scanner)
 			my_scanner->_lines_graph->population - 1);
 
 
-		MultiwayLinesNode* x =  getMultiwayLinesNode(getItem(my_scanner->_lines_graph,
+		MultiwayLinesNode* x =  getMultiwayLinesNode(VectorGetItem(my_scanner->_lines_graph,
 				my_scanner->two_lines->_parent));
 		int x_parent_size = x->children_ids->population;
-		int* next_parent = getInt(getItem(x->children_ids, x_parent_size - 1));
+		int* next_parent = getInt(VectorGetItem(x->children_ids, x_parent_size - 1));
 		//printf("next parent %i\n", *next_parent);
 		my_scanner->two_lines->_parent = *next_parent;
 
-		MultiwayLinesNode* y = getMultiwayLinesNode(getItem(my_scanner->_lines_graph, my_scanner->two_lines->_child));
+		MultiwayLinesNode* y = getMultiwayLinesNode(VectorGetItem(my_scanner->_lines_graph, my_scanner->two_lines->_child));
 
 		int y_child_size = y->children_ids->population;
 
-		int* next_child = getInt(getItem(y->children_ids, y_child_size - 1));
+		int* next_child = getInt(VectorGetItem(y->children_ids, y_child_size - 1));
 
 		my_scanner->two_lines->_child = *next_child;
 		
@@ -662,14 +662,14 @@ bool upLink(Scanner* my_scanner)
 			// have parent go up 1 parent
 			// have child go up 1 parent
 
-			MultiwayLinesNode* x =  getMultiwayLinesNode(getItem(my_scanner->_lines_graph,
+			MultiwayLinesNode* x =  getMultiwayLinesNode(VectorGetItem(my_scanner->_lines_graph,
 			my_scanner->two_lines->_parent));
 
 			int next_parent = x->parent_id;
 
 			my_scanner->two_lines->_parent = next_parent;
 
-			MultiwayLinesNode* y = getMultiwayLinesNode(getItem(my_scanner->_lines_graph, my_scanner->two_lines->_child));
+			MultiwayLinesNode* y = getMultiwayLinesNode(VectorGetItem(my_scanner->_lines_graph, my_scanner->two_lines->_child));
 
 
 

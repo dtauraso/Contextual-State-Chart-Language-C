@@ -11,7 +11,7 @@ typedef struct Vector
 }Vector;
 
 
-Vector* initVector()
+Vector* VectorInitVector()
 {
 	Vector* new_container = (Vector*) malloc(sizeof(Vector));
 	new_container->values = NULL;
@@ -19,7 +19,7 @@ Vector* initVector()
 	new_container->population = 0;
 	return new_container;
 }
-Vector* initVectorSize(int size)
+Vector* VectorInitVectorSize(int size)
 {
 	Vector* new_container = (Vector*) malloc(sizeof(Vector) * size);
 	new_container->values = (void**) malloc(sizeof(void*) * size);
@@ -27,7 +27,7 @@ Vector* initVectorSize(int size)
 	new_container->population = 0;
 	return new_container;
 }
-bool deleteVector(Vector* container)
+bool VectorDeleteVector(Vector* container)
 {
 	for(int i = 0; i < container->population; i++)
 	{
@@ -39,11 +39,11 @@ bool deleteVector(Vector* container)
 	return true;
 }
 
-int getLastIndex(Vector* container)
+int VectorGetLastIndex(Vector* container)
 {
 	return container->population - 1;
 }
-void* getItem(Vector* container, int i)
+void* VectorGetItem(Vector* container, int i)
 {
 	//printf("getting item %i, %i\n", i, container->population);
 	if(i < container->population && i >= 0)
@@ -57,7 +57,7 @@ void* getItem(Vector* container, int i)
 		return NULL;
 	}
 }
-void Print(Vector* container)
+void VectorPrint(Vector* container)
 {
 	printf("printing container pop %i, size %i\n", container->population, container->size);
 	for(int i = 0; i < container->population; i++)
@@ -80,7 +80,7 @@ void Print(Vector* container)
 	printf("\n");
 
 }
-void append(Vector* container, void* element)
+void VectorAppend(Vector* container, void* element)
 {
 	if(container != NULL)
 	{
@@ -119,11 +119,11 @@ void append(Vector* container, void* element)
 
 		}
 		//printf("result\n");
-		//Print(container);
+		//VectorPrint(container);
 	}
 
 }
-bool deleteItem(Vector* container, int index)
+bool VectorDeleteItem(Vector* container, int index)
 {
 	//printf("delete at %i\n", index);
 	// set container[index] to null
@@ -151,47 +151,47 @@ bool deleteItem(Vector* container, int index)
 void test()
 {
 	// make a vector
-	Vector* my_vector = initVector();
+	Vector* my_vector = VectorInitVector();
 
 	// add a list of numbers
 
 	int* a = (int*) malloc(sizeof(int));
 	*a = 0;
-	append(my_vector, a);
-	Print(my_vector);
+	VectorAppend(my_vector, a);
+	VectorPrint(my_vector);
 	int* b = (int*) malloc(sizeof(int));
 	*b = 1;
-	append(my_vector, b);
-	Print(my_vector);
+	VectorAppend(my_vector, b);
+	VectorPrint(my_vector);
 
 	int* c = (int*) malloc(sizeof(int));
 	*c = 2;
-	append(my_vector, c);
-	Print(my_vector);
+	VectorAppend(my_vector, c);
+	VectorPrint(my_vector);
 
 	int* d = (int*) malloc(sizeof(int));
 	*d = 2;
-	append(my_vector, d);
-	Print(my_vector);
+	VectorAppend(my_vector, d);
+	VectorPrint(my_vector);
 
 
-	deleteItem(my_vector, 1);
-	Print(my_vector);
-	deleteItem(my_vector, 2);
-	Print(my_vector);
+	VectorDeleteItem(my_vector, 1);
+	VectorPrint(my_vector);
+	VectorDeleteItem(my_vector, 2);
+	VectorPrint(my_vector);
 
-	deleteItem(my_vector, 0);
-	Print(my_vector);
+	VectorDeleteItem(my_vector, 0);
+	VectorPrint(my_vector);
 
-	deleteItem(my_vector, 0);
-	Print(my_vector);	
+	VectorDeleteItem(my_vector, 0);
+	VectorPrint(my_vector);	
 	
 	for(int i = 0; i < 5; i++)
 	{
 		printf("inserting %i\n", i);
 		int* j = &i;
-		append(my_vector, j, 0);
-		Print(my_vector);
+		VectorAppend(my_vector, j, 0);
+		VectorPrint(my_vector);
 		//printf("element added %i\n", (int) my_vector->values[i]);
 	}
 	printf("here\n");
@@ -242,7 +242,7 @@ void printMultiwayLinesNodesInContainer(Vector* container)
 			printf("i %i\n", i);
 			//printf("|%x|", container->values[i]);
 			//void* a = container->values[i];
-			MultiwayLinesNode* node = getMultiwayLinesNode(getItem(container, i));
+			MultiwayLinesNode* node = getMultiwayLinesNode(VectorGetItem(container, i));
 			printf("%s\n", node->line.c_str());
 
 			printf("parent %i\n", node->parent_id);
@@ -250,7 +250,7 @@ void printMultiwayLinesNodesInContainer(Vector* container)
 			printf("children\n");
 			for(int j = 0; j < node->children_ids->population; j++)
 			{
-				printf("%i\n", *getInt(getItem(node->children_ids, j)));
+				printf("%i\n", *getInt(VectorGetItem(node->children_ids, j)));
 			}
 			printf("\n\n");
 			//int* b = (int*) a;
@@ -271,7 +271,7 @@ MultiwayLinesNode* initMultiwayLinesNode()
 	new_parse_node->parent_id = 0;
 	new_parse_node->children = NULL;
 	new_parse_node->children_size = 0;
-	new_parse_node->children_ids = initVector();
+	new_parse_node->children_ids = VectorInitVector();
 	return new_parse_node;
 }
 // destroy
@@ -335,7 +335,7 @@ MultiwayLinesNode* setName(MultiwayLinesNode* node, string line)
 MultiwayLinesNode* appendParent(MultiwayLinesNode* node, MultiwayLinesNode* parent)
 {
 
-	//printf("append parent\n");
+	//printf("VectorAppend parent\n");
 
 	if(node->parents_size == 0)
 	{
@@ -395,7 +395,7 @@ MultiwayLinesNode* appendParent(MultiwayLinesNode* node, MultiwayLinesNode* pare
 
 MultiwayLinesNode* appendChild(MultiwayLinesNode* node, MultiwayLinesNode* child)
 {
-	//printf("append child\n");
+	//printf("VectorAppend child\n");
 
 	if(node->children_size == 0)
 	{
@@ -598,7 +598,7 @@ void printTree2(Vector* container, int root, int indent_level)
 	}
 	else
 	{
-		MultiwayLinesNode* root_node = getMultiwayLinesNode(getItem(container, root));
+		MultiwayLinesNode* root_node = getMultiwayLinesNode(VectorGetItem(container, root));
 		if(root_node != NULL)
 		{
 			//printf("node is not null %s, %i\n", root_node->line.c_str(), indent_level);
@@ -648,7 +648,7 @@ void printParentPath(Vector* container, int start)
 	{
 		for(int i = start; i >= 0;)
 		{
-			MultiwayLinesNode* node = getMultiwayLinesNode(getItem(container, i));
+			MultiwayLinesNode* node = getMultiwayLinesNode(VectorGetItem(container, i));
 			if(node->line.size())
 			{
 				printf("|%s|\n", node->line.c_str());
@@ -697,7 +697,7 @@ void doubleLink2(Vector* container, int parent, int child)
 	int* x = (int*) malloc(sizeof(int));
 	*x = child;
 	//printf("inserting ")
-	append(_parent->children_ids, x);
-	//Print(_parent->children_ids);
+	VectorAppend(_parent->children_ids, x);
+	//VectorPrint(_parent->children_ids);
 	_child->parent_id = parent;
 }

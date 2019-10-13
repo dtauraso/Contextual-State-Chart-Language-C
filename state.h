@@ -153,7 +153,7 @@ DynamicState* initDynamicState(	Vector* name, // strings
 								Vector* next_states, // array of strings
 								Data* value);
 // final 2 structs for trie ordered dict
-void insertString(TrieTree* my_trie_tree, string element);
+void TrieTreeInsertString(TrieTree* my_trie_tree, string element);
 
 typedef struct MapNode
 {

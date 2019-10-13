@@ -42,7 +42,7 @@ char* getNextWord(char* input, int i)
 
 struct ContextState* makeTree(char* input, int i)
 {
-	struct ContextState* test = newState();
+	struct ContextState* VectorTest = newState();
 
 	/*
 	get the word

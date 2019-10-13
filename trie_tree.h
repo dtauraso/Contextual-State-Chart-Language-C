@@ -20,13 +20,13 @@ typedef struct TrieNode2
 	void* value; // has been a string*
 	char my_value;
 	// will be unsorted
-	Vector* links;  // ints
+	Vector* links;  // ints, word node links to each other
 	int char_links[256];
 	Vector* chars_from_edges;
 	// will be sorted
 	//Vector* sorted_link_indecies; // ints
 
-	Vector* word_letters; // for word tree
+	Vector* word_letters; // ints for word nodes to char nodes
 	int value_type;
 	// 0 -> int
 	// 1 -> string
@@ -36,10 +36,10 @@ typedef struct TrieNode2
 	bool start_of_word;
 
 }TrieNode2;
-TrieNode2* initTrieNode2();
-bool deleteTrieNode2(TrieNode2* node);
+TrieNode2* TrieNode2initTrieNode2();
+bool TrieNode2DeleteTrieNode2(TrieNode2* node);
 
-void* getValue(TrieNode2* node);
+void* TrieNode2GetValue(TrieNode2* node);
 
 typedef struct TrieTree
 {
@@ -53,31 +53,34 @@ typedef struct TrieTree
 	int max_state_id;
 
 }TrieTree;
-TrieTree* initTrieTree();
+TrieTree* TrieTreeInitTrieTree();
+void TrieTreePush(Vector* container, int new_item);
+int TrieTreeGetNextNode(TrieTree* my_trie_tree, Vector* node_id_stack, Vector* ith_edge_stack);
+int TrieTreeSearch(TrieTree* my_trie_tree, Vector* name /* strings*/);
 
-Vector* innerSearchForString(TrieTree* my_trie_tree, Vector* name /* strings*/);
 
-void insertString(TrieTree* my_trie_tree, char element, int state_id);
-void insertWord(TrieTree* my_trie_tree, string* new_number_ptr, TrieNode2* node_found2, int state_id);
-Vector* insertWords(TrieTree* my_trie_tree, Vector* name /* strings*/);
-int updateId(TrieTree* my_trie_tree, int old_id);
+// prepend trieTree to all functions
+void TrieTreeInsertString(TrieTree* my_trie_tree, char element, int state_id);
+void TrieTreeInsertWord(TrieTree* my_trie_tree, string* new_number_ptr, TrieNode2* node_found2, int state_id);
+Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name /* strings*/);
+int TrieTreeUpdateId(TrieTree* my_trie_tree, int old_id);
 
-void cutLinkToFirstNodeInPath(	TrieTree* my_trie_tree,
+void TrieTreeCutLinkToFirstNodeInPath(	TrieTree* my_trie_tree,
 								Vector* name,
 								int* lower_bound_ptr,
 								int start_node,
 								int ith_string_in_input);
-void eraseEdgeToTopCharNode(Vector* char_nodes_matching,
+void TrieTreeEraseEdgeToTopCharNode(Vector* char_nodes_matching,
 							int j,
 							TrieTree* my_trie_tree,
 							char top_node_value);
-int deleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/);
+int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/);
 
-void printTrie(TrieTree* my_trie_tree);
-void printWordTrie(TrieTree* my_trie_tree);
+void TrieTreePrintTrie(TrieTree* my_trie_tree);
+void TrieTreePrintWordTrie(TrieTree* my_trie_tree);
 
-void printTrieWords(TrieTree* my_trie_tree);
+void TrieTreePrintTrieWords(TrieTree* my_trie_tree);
 
-void printTrieRecursive(TrieTree* my_trie_tree, int root, string indents);
+void TrieTreePrintTrieRecursive(TrieTree* my_trie_tree, int root, string indents);
 
 #endif
