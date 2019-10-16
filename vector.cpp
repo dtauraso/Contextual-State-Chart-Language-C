@@ -15,6 +15,7 @@ void* TrieNode2GetValue(TrieNode2* node);
 
 Vector* VectorInitVector()
 {
+	// printf("here\n");
 	Vector* new_container = (Vector*) malloc(sizeof(Vector));
 	new_container->values = NULL;
 	new_container->size = 0;
@@ -48,17 +49,26 @@ int VectorGetLastIndex(Vector* container)
 // for unsorted only
 void* VectorGetItem(Vector* container, int i)
 {
-	//printf("getting item %i, %i\n", i, container->population);
-	if(i < container->population && i >= 0)
+	if(container != NULL)
 	{
-		//printf("item |%x|\n", container->values[i]);
-		return container->values[i];
+		// printf("getting item %i, %i\n", i, container->population);
+		if(container->population == 0)
+		{
+			printf("container is empty\n");
+			return NULL;
+		}
+		else if(i < container->population && i >= 0)
+		{
+			//printf("item |%x|\n", container->values[i]);
+			return container->values[i];
+		}
+		else
+		{
+			//printf("out of bounds\n");
+			return NULL;
+		}
 	}
-	else
-	{
-		//printf("out of bounds\n");
-		return NULL;
-	}
+
 }
 void VectorSetItemToNull(Vector* container, int i)
 {
@@ -1109,11 +1119,19 @@ void printMultiwayLinesNodesInContainer(Vector* container)
 
 Vector* VectorAddStringToVector1(string string_1)
 {
+	// printf("got here 1\n");
 	Vector* list_of_strings_1 = VectorInitVector();
 
+	// printf("got here 2\n");
+
 	string* string_1_ptr = (string*) malloc(sizeof(string));
+	// printf("got here 3\n");
+
 	*string_1_ptr = string_1;
+
 	VectorAppend(list_of_strings_1, string_1_ptr);
+	// printf("got here 4\n");
+
 	return list_of_strings_1;
 }
 

@@ -3,6 +3,8 @@
 #include "standard_headers.h"
 #include "vector.h"
 
+// int char_limit = 93 possible visible characters as edges
+
 struct Vector;
 // only for ensuring insert follows a linear control flow from searching to inserting
 typedef struct TrieMatch
@@ -21,7 +23,8 @@ typedef struct TrieNode2
 	char my_value;
 	// will be unsorted
 	Vector* links;  // ints, word node links to each other
-	int char_links[256];
+	int char_links[243]; // any number > 242 doesn't cause a catastrophic error for the program
+
 	Vector* chars_from_edges;
 	// will be sorted
 	//Vector* sorted_link_indecies; // ints
@@ -34,6 +37,7 @@ typedef struct TrieNode2
 
 	int word_counterpart; // set in the last character of the word to the word node
 	bool start_of_word;
+
 
 }TrieNode2;
 TrieNode2* TrieNode2initTrieNode2();
@@ -61,6 +65,14 @@ int TrieTreeSearch(TrieTree* my_trie_tree, Vector* name /* strings*/);
 
 // prepend trieTree to all functions
 void TrieTreeInsertString(TrieTree* my_trie_tree, char element, int state_id);
+int TrieNode2GetLastNode(TrieTree* my_trie_tree, int prev_node_id);
+int TrieNode2GetLastEdge(TrieTree* my_trie_tree, int prev_node_id);
+int TrieNode2GetWordCounterpart(TrieTree* my_trie_tree, int prev_node_id);
+TrieNode2* TrieNode2GetWord(TrieTree* my_trie_tree, int prev_node_id);
+string* TrieNode2MakeStringFromWord(TrieTree* my_trie_tree, int prev_node_id);
+void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_proxy_id, Vector* name /* strings*/);
+
+
 void TrieTreeInsertWord(TrieTree* my_trie_tree, string* new_number_ptr, TrieNode2* node_found2, int state_id);
 Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name /* strings*/);
 int TrieTreeUpdateId(TrieTree* my_trie_tree, int old_id);
