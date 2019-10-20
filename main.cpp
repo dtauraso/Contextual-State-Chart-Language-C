@@ -658,28 +658,37 @@ int main(int argc, char** argv)
 	Vector* i1 = TrieTreeInsertWords(my_dynamic_machine->trie_tree_dict, VectorAddStringToVector1("i"));
 	// TrieTreePrintTrie(my_dynamic_machine->trie_tree_dict);
 	VectorPrintStrings(i1);
+	printf("\n");
+
 	TrieTreePrintTrieWords(my_dynamic_machine->trie_tree_dict);
 	Vector* i2 = TrieTreeInsertWords(my_dynamic_machine->trie_tree_dict, VectorAddStringToVector1("i"));
 	// TrieTreePrintTrie(my_dynamic_machine->trie_tree_dict);
 	VectorPrintStrings(i2);
+	printf("\n");
 
 	Vector* i3 = TrieTreeInsertWords(my_dynamic_machine->trie_tree_dict, VectorAddStringToVector1("i"));
 	// TrieTreePrintTrie(my_dynamic_machine->trie_tree_dict);
 	VectorPrintStrings(i3);
+	printf("\n");
 	TrieTreePrintTrieWords(my_dynamic_machine->trie_tree_dict);
 
 	// according to the logs, it probably went out of bounds
 	// fix bounds problem
 	// the max number of visible chars is 96
-	for(int i = 0; i < 97; i++)
-	{
-				TrieTreePrintWordTrie(my_dynamic_machine->trie_tree_dict);
+	Vector* i4 = TrieTreeInsertWords(my_dynamic_machine->trie_tree_dict, VectorAddStringToVector1("j"));
+	i4 = TrieTreeInsertWords(my_dynamic_machine->trie_tree_dict, VectorAddStringToVector2("j", "![[)"));
 
-		Vector* i4 = TrieTreeInsertWords(my_dynamic_machine->trie_tree_dict, VectorAddStringToVector1("j"));
+	for(int i = 0; i < 3; i++)
+	{
+	// 			// TrieTreePrintWordTrie(my_dynamic_machine->trie_tree_dict);
+	// TrieTreePrintTrie(my_dynamic_machine->trie_tree_dict);
+
+		i4 = TrieTreeInsertWords(my_dynamic_machine->trie_tree_dict, VectorAddStringToVector1("j"));
 		// TrieTreePrintTrieWords(my_dynamic_machine->trie_tree_dict);
 
 	}
-	// TrieTreePrintTrieWords(my_dynamic_machine->trie_tree_dict);
+	TrieTreePrintTrieWords(my_dynamic_machine->trie_tree_dict);
+	// TrieTreePrintTrie(my_dynamic_machine->trie_tree_dict);
 
 	printf("testing user interfeering with the generator\n");
 	/*

@@ -68,6 +68,7 @@ void* VectorGetItem(Vector* container, int i)
 			return NULL;
 		}
 	}
+	return NULL;
 
 }
 void VectorSetItemToNull(Vector* container, int i)
@@ -87,6 +88,12 @@ void VectorSetItemToNull(Vector* container, int i)
 int VectorGetPopulation(Vector* container)
 {
 	return container->population;
+}
+void VectorAppendInt(Vector* container, int element)
+{
+	int* element_ptr = (int*) malloc(sizeof(int));
+	*element_ptr = element;
+	VectorAppend(container, element_ptr);
 }
 void VectorAppend(Vector* container, void* element)
 {

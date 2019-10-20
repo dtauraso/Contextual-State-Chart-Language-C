@@ -28,6 +28,7 @@ void* VectorGetItem(Vector* container, int i);
 void VectorSetItemToNull(Vector* container, int i);
 
 int VectorGetPopulation(Vector* container);
+void VectorAppendInt(Vector* container, int element);
 
 void VectorAppend(Vector* container, void* element);
 bool VectorPopItem(Vector* container);
