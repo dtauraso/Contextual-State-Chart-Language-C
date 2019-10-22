@@ -1066,6 +1066,7 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 
 	haven't tested this on paths where the root doesn't have the final edge to be deleted
 	*/
+	// VectorPrintStrings(name);
 	// printf("delete\n");
 	Vector* char_nodes_matching = VectorInitVector();
 	Vector* word_nodes_matching = VectorInitVector();
@@ -1091,13 +1092,15 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 		// search through string and make path
 		//int number_of_new_letters = 0;
 		int size = ((string*) name->values[i])->size();
+		
 		for(int j = 0; j < size; j++)
 		{
 			char letter = (*((string*) name->values[i]))[j];
 
 			int edge = prev_node->char_links[letter];
+			// printf("%c ", letter);
 
-			//printf("%c\n", letter);
+			// printf("%i\n", edge);
 
 			if(edge > -1)
 			{
@@ -1120,8 +1123,8 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 		}
 	}
 	// there will be at least 1 word represented by char_nodes_matching
-	//VectorPrint(char_nodes_matching);
-	//VectorPrint(word_nodes_matching);
+	// VectorPrint(char_nodes_matching);
+	// VectorPrint(word_nodes_matching);
 
 	//exit(1);
 
@@ -1139,7 +1142,7 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 		top_node->state_id = -1;
 		return -1;
 	}
-	
+
 	// for deleting the hanging edge
 	char poped_node_value;
 	poped_node_value = top_node->my_value;
@@ -1148,12 +1151,12 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	VectorSetItemToNull(my_trie_tree->trie_tree, top_edge);
 	top_node = NULL;
 
-
 	VectorPopItem(char_nodes_matching);
 
 	j = VectorGetPopulation(char_nodes_matching) - 1;
 	top_edge = *((int*) VectorGetItem(char_nodes_matching, j));
 	top_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, top_edge);
+
 
 	// if no items from the stack can be deleted
 	// the item shares a path with other items
@@ -1188,7 +1191,6 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 		top_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, top_edge);
 	}
 		//VectorPrint(char_nodes_matching);
-
 	// delete the hanging edge
 	if(VectorGetPopulation(char_nodes_matching) > 0)
 	{
@@ -1200,6 +1202,7 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 							   my_trie_tree,
 							   poped_node_value);
 	}
+
 	//printf("after lots of deleting\n");
 	//VectorPrint(char_nodes_matching);
 	//VectorPrint(word_nodes_matching);
@@ -1218,6 +1221,7 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 
 	//printf("delete word nodes\n");
 	// there will always be at least 1 word matching the input
+
 	int top_word_id = VectorGetPopulation(word_nodes_matching) - 1;
 
 	int deleted_word_edge = *((int*) VectorGetItem(word_nodes_matching, top_word_id));
@@ -1250,6 +1254,8 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 		top_word = (TrieNode2*) VectorGetItem(my_trie_tree->word_tree, deleted_word_edge);
 
 	}
+		
+
 	/*
 		moved to the next item
 		target value was reset
@@ -1264,11 +1270,15 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	// delete word nodes and word stack
 	// delete final word edge
 	//printf("%i\n", top_word_id);
+	// printf("got here\n");
+
 	int edge = *((int*) VectorGetItem(word_nodes_matching, VectorGetPopulation(word_nodes_matching) - 1));
 	TrieNode2* word_node = (TrieNode2*) VectorGetItem(my_trie_tree->word_tree, edge);
 	int location_of_word_edge = 0;
+	printf("%i\n", VectorGetPopulation(word_node->links));
 	for(int i = 0; i < VectorGetPopulation(word_node->links); i++)
 	{
+		// printf("%i\n", i);
 		int word_node_edge = *((int*) VectorGetItem(word_node->links, i));
 		if(word_node_edge == prev_deleted_word_edge)
 		{
@@ -1276,10 +1286,15 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 			break;
 		}
 	}
+	// printf("got here 2\n");
 	//printf("location of word edge %i\n", location_of_word_edge);
 	//VectorPrint(word_node->links);
 	VectorDeleteItem(word_node->links, location_of_word_edge);
-	VectorSetItemToNull(word_node->links, deleted_word_edge);
+	// VectorPrint(word_node->links);
+	// printf("population %i\n", VectorGetPopulation(word_node->links));
+
+	// printf("%i\n", deleted_word_edge);
+	// VectorSetItemToNull(word_node->links, deleted_word_edge);
 	//top_word = NULL;
 
 	//printf("when delete is over\n");
@@ -1373,9 +1388,10 @@ void TrieTreePrintWordTrie(TrieTree* my_trie_tree)
 			if(node->links != NULL)
 			{
 				// does insert recreate root's links?
-				//printf("%i\n", VectorGetPopulation(node->links));
+				printf("number of links %i\n", VectorGetPopulation(node->links));
 				for(int l = 0; l < VectorGetPopulation(node->links); l++)
 				{
+					// printf("%i\n", i);
 					int k = *((int*) VectorGetItem(node->links, l));
 					printf("|%i|", k);
 

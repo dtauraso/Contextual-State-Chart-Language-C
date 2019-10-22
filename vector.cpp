@@ -180,7 +180,7 @@ void VectorIncrementTopInt(Vector* container)
 bool VectorDeleteItem(Vector* container, int index)
 {
 	// needs a special delete function for the object type
-	//printf("delete at %i\n", index);
+	// printf("delete at %i\n", index);
 	// set container[index] to null
 	// shift all values from [index + 1, end] to the left by 1
 	if(container != NULL)
@@ -193,6 +193,7 @@ bool VectorDeleteItem(Vector* container, int index)
 		container->values[index] = NULL;
 		if(index < container->population)
 		{
+			// printf("%i %i\n", index + 1, container->population);
 			for(int i = index + 1; i < container->population; i++)
 			{
 				container->values[i - 1] = container->values[i];
@@ -200,7 +201,10 @@ bool VectorDeleteItem(Vector* container, int index)
 				container->values[i] = NULL;
 
 			}
+			// VectorPrint(container);
+
 			container->population--;
+			// printf("%i\n", container->population);
 		}
 		return true;
 	}

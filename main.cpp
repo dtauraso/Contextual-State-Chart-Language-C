@@ -686,18 +686,83 @@ int main(int argc, char** argv)
 	// so the last official edge from i is # not !
 	// sort of wierd from the word perspective(It's displayed as a separate path), but prevents the letter incrementer from accidentally
 	// going to an edge already used
-	for(int i = 0; i < 300; i++)
+	// works up to 10
+	Vector* collections_of_words = VectorInitVector();
+	for(int i = 0; i < 100; i++)
 	{
-	// 			// TrieTreePrintWordTrie(my_dynamic_machine->trie_tree_dict);
-	// TrieTreePrintTrie(my_dynamic_machine->trie_tree_dict);
 
 		i4 = TrieTreeInsertWords(my_dynamic_machine->trie_tree_dict, VectorAddStringToVector1("i"));
+		VectorAppend(collections_of_words, i4);
+		// TrieTreePrintTrie(my_dynamic_machine->trie_tree_dict);
+		// TrieTreePrintWordTrie(my_dynamic_machine->trie_tree_dict);
+		// TrieTreePrintTrieWords(my_dynamic_machine->trie_tree_dict);
+		// printf("\n");
+
+		// VectorPrintStrings(i4);
+
+		
 		// VectorPrintStrings(i4);
 		int a1 = TrieTreeSearch(my_dynamic_machine->trie_tree_dict, i4);
 		printf("found %i\n", a1);
-
+// |a| -> 1
+//       |tgrfede|
+//          |f| -> 2
+//    |i| -> 5
+//       |!| -> 6
+//       |"| -> 7
+//       |#| -> 8
+//       |![[)| -> 10
+//       |$| -> 12
+//       |%| -> 14
+//       |&| -> 16
+//       |'| -> 18
+//       |(| -> 20
+//    |j| -> 9
+		// |a| -> 1
+		// 	|tgrfede|
+		// 		|f| -> 2
+		// |i| -> 5
+		// 	|!| -> 6
+		// 	|"| -> 7
+		// 	|#| -> 8
+		// 	|![[)| -> 10
+		// 	|$| -> 11
+		// 	|%| -> 12
+		// 	|&| -> 13
+		// 	|'| -> 14
+		// 	|(| -> 15
+		// 	|)| -> 16
+		// 	|*| -> 17
+		// 	|+| -> 18
+		// 	|,| -> 19
+		// 	|-| -> 20
+		// 	|.| -> 21
+		// |j| -> 9
 		// TrieTreePrintTrieWords(my_dynamic_machine->trie_tree_dict);
 
+	}
+	TrieTreePrintTrieWords(my_dynamic_machine->trie_tree_dict);
+
+	printf("erase every other\n");
+	for(int i = 0; i < 100; i++)
+	{
+		if(i % 2 == 0)
+		{
+			printf("erase\n");
+			Vector* my_word = (Vector*) VectorGetItem(collections_of_words, i);
+					// VectorAppend(collections_of_words, i4);
+
+			VectorPrintStrings(my_word);
+
+
+			TrieTreeDeleteWords(my_dynamic_machine->trie_tree_dict, my_word);
+			printf("after delete\n");
+			// TrieTreePrintWordTrie(my_dynamic_machine->trie_tree_dict);
+			int a1 = TrieTreeSearch(my_dynamic_machine->trie_tree_dict, my_word);
+			printf("found %i\n", a1);
+
+
+		}
 	}
 	
 	// i4 = TrieTreeInsertWords(my_dynamic_machine->trie_tree_dict, VectorAddStringToVector2("j", "![[)55"));
