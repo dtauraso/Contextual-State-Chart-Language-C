@@ -544,7 +544,7 @@ void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_p
 	// determine if we are making a sibling or child node
 	// find the last possible word node for sibling and child
 	// find the last possible char node for sibling and chld
-
+// |i||~||~||~||4||5|
 	// get last char untill there is no edge
 	while(last_child_letter > -1)
 	{
@@ -552,8 +552,18 @@ void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_p
 		prev_node_id = TrieNode2GetLastNode(my_trie_tree, prev_node_id);
 		VectorAppendInt(path, prev_node_id);
 
+		
 		// get the next edge
 		last_child_letter = TrieNode2GetLastEdge(my_trie_tree, prev_node_id);
+		// make sure the last item in existing path is not added to the adjusted name
+		if(last_child_letter > -1)
+		{
+			string* x = TrieNode2MakeStringFromWord(my_trie_tree, prev_node_id);
+
+			VectorAppend(name, x);
+
+		}
+
 
 	}
 	// need the last string of the name to be the first node in the path
@@ -566,8 +576,8 @@ void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_p
 	int last_prev_node_2 = TrieTreeFindLastPrevNode(my_trie_tree, path);
 	// find prev_word_node
 	int last_word_node_2 = TrieTreeFindLastWordNode(my_trie_tree, path);
+
 	// printf("char hook %i, word hook %i\n", last_prev_node_2, last_word_node_2);
-	VectorDeleteAllItems(path);
 	// TrieTreePrintTrie(my_trie_tree);
 	// TrieTreePrintWordTrie(my_trie_tree);
 	// TrieTreePrintTrieWords(my_trie_tree);
@@ -636,6 +646,7 @@ void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_p
 	// dummy_value is the char linking last_prev_char_node to new char node
 	// char_id is the location of new char node in tree
 	int char_id = VectorGetPopulation(my_trie_tree->trie_tree) - 1;
+
 	int* dummy_value_ptr = (int*) malloc(sizeof(int));
 	*dummy_value_ptr = dummy_value;
 
@@ -655,7 +666,7 @@ void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_p
 	*char_id_ptr = char_id;
 	VectorAppend(word->word_letters, char_id_ptr);
 	// printf("char id %i\n", char_id);
-	VectorPrint(word->word_letters);
+	// VectorPrint(word->word_letters);
 	// printf("got here 6\n");
 	// insert word node into word tree
 	VectorAppend(my_trie_tree->word_tree, word);
@@ -687,6 +698,11 @@ void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_p
 	// printf("got here 9.5\n");
 
 	string* new_context_word = TrieNode2MakeStringFromWord(my_trie_tree, char_id);
+
+	// append from path the node values in the range to the name
+	// i: [1, end]
+	VectorDeleteAllItems(path);
+
 	// printf("got here 10\n");
 	VectorAppend(name, new_context_word);
 

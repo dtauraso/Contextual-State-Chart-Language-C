@@ -686,13 +686,15 @@ int main(int argc, char** argv)
 	// so the last official edge from i is # not !
 	// sort of wierd from the word perspective(It's displayed as a separate path), but prevents the letter incrementer from accidentally
 	// going to an edge already used
-	for(int i = 0; i < 50; i++)
+	for(int i = 0; i < 300; i++)
 	{
 	// 			// TrieTreePrintWordTrie(my_dynamic_machine->trie_tree_dict);
-	TrieTreePrintTrie(my_dynamic_machine->trie_tree_dict);
+	// TrieTreePrintTrie(my_dynamic_machine->trie_tree_dict);
 
 		i4 = TrieTreeInsertWords(my_dynamic_machine->trie_tree_dict, VectorAddStringToVector1("i"));
-		VectorPrintStrings(i4);
+		// VectorPrintStrings(i4);
+		int a1 = TrieTreeSearch(my_dynamic_machine->trie_tree_dict, i4);
+		printf("found %i\n", a1);
 
 		// TrieTreePrintTrieWords(my_dynamic_machine->trie_tree_dict);
 
