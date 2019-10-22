@@ -73,7 +73,10 @@ string* TrieNode2MakeStringFromWord(TrieTree* my_trie_tree, int prev_node_id);
 
 bool TrieTreeEdgeIndicatesToMakeChild(int letter_edge);
 
-bool TrieTreeIsChild(TrieTree* my_trie_tree, Vector* path);
+
+int TrieTreeFindLastPrevNode(TrieTree* my_trie_tree, Vector* path);
+
+int TrieTreeFindLastWordNode(TrieTree* my_trie_tree, Vector* path);
 
 void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_proxy_id, Vector* name /* strings*/);
 

@@ -339,7 +339,7 @@ string* TrieNode2MakeStringFromWord(TrieTree* my_trie_tree, int prev_node_id)
 				//printf("|%i|", k);
 				if(char_node != NULL)
 				{
-					printf("%c\n", char_node->my_value);
+					// printf("%c\n", char_node->my_value);
 					word += char_node->my_value;
 
 				}
@@ -358,7 +358,7 @@ bool TrieTreeEdgeIndicatesToMakeChild(int letter_edge)
 
 	if(letter_edge == -1)   // only true when VectorGetPopulation(path) == 1 is true
 	{
-		printf("make child\n");
+		// printf("make child\n");
 		return true;
 
 	}
@@ -366,7 +366,7 @@ bool TrieTreeEdgeIndicatesToMakeChild(int letter_edge)
 	else if(letter_edge < 126 && letter_edge >= 0) 	// only true when VectorGetPopulation(path) > 1 is trie
 	{
 		// correct
-		printf("make sibling\n");
+		// printf("make sibling\n");
 		return false;
 	}
 	// ~ case
@@ -375,47 +375,13 @@ bool TrieTreeEdgeIndicatesToMakeChild(int letter_edge)
 	else  // if at last possible visible number
 	{
 		// untested(very likely to be correct too)
-		printf("make child\n");
+		// printf("make child\n");
 		return true;
 
 	}
 
 }
-bool TrieTreeIsChild(TrieTree* my_trie_tree, Vector* path)
-{
-	// assumes 	my_trie_tree exists and path has at least 1 item in it
-	// if path has 1 item assume a parent found is root(first time inserting)
-	// find out if it's last edge allows for more space
-
-	// VectorPrint(path);
-
-	int parent_location = 0;
-
-	// this is the second insert(first double insert)
-	if(VectorGetPopulation(path) == 1)
-	{
-		// case 1 where our item has been added a sceond time
-		// the only path item is the parent
-		int parent_index = VectorGetPopulation(path) - 1;
-		parent_location = *((int*) VectorGetItem(path, parent_index));
-	}
-	else if(VectorGetPopulation(path) > 1)
-	{
-		// printf("in here\n");
-		int parent_index = VectorGetPopulation(path) - 2;
-		parent_location = *((int*) VectorGetItem(path, parent_index));
-		// second to last item is the parent
-		
-		// last item is the child
-	}
-	// printf("parent location %i\n", parent_location);
-	int letter = (int) TrieNode2GetLastEdge(my_trie_tree, parent_location);
-	// printf("letter %i\n", letter);
-	return TrieTreeEdgeIndicatesToMakeChild(letter);
-	// if path has < 1 items assume the parent will not be the root
-	// checks the last 2 items in path
-}
-int findLastPrevNode(TrieTree* my_trie_tree, Vector* path)
+int TrieTreeFindLastPrevNode(TrieTree* my_trie_tree, Vector* path)
 {
 	int parent_location;
 	// first time inserting
@@ -428,7 +394,7 @@ int findLastPrevNode(TrieTree* my_trie_tree, Vector* path)
 	}
 	else if(VectorGetPopulation(path) > 1)
 	{
-		printf("have a longer path char\n");
+		// printf("have a longer path char\n");
 		/* 
 			get penultimate node and find out if it's edge exceeds '~' 
 		 */
@@ -436,20 +402,43 @@ int findLastPrevNode(TrieTree* my_trie_tree, Vector* path)
 		int penultimate_node_index = VectorGetPopulation(path) - 2;
 		int penultimate_node_id =  *((int*) VectorGetItem(path, penultimate_node_index));
 		int letter = TrieNode2GetLastEdge(my_trie_tree, penultimate_node_id);
-		printf("%c\n", letter);
+		// printf("%c\n", letter);
 		if(letter >= 0 && letter < 126)  // there is room to add a sibling
 		{
 
+			// return penultimate_node_id;
+			TrieNode2* char_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, penultimate_node_id);
+			// starting at the penultimate node
+			// working so far
+			while(char_node->word_counterpart == -1)
+			{
+				penultimate_node_index--;
+				penultimate_node_id =  *((int*) VectorGetItem(path, penultimate_node_index));
+				char_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, penultimate_node_id);
+			}
+			// printf("node stopped at %i\n", penultimate_node_id);
 			return penultimate_node_id;
 		}
+		else if(letter == 126)
+		{
+			// printf("have to reset\n");
+			int final_node_location = VectorGetPopulation(path) - 1;
+			int final_node_id  = *(int*) VectorGetItem(path, final_node_location);
+			return final_node_id;
+		}
+		
+		
 		// TrieNode2* penultimate_char_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, penultimate_node_id);
 		// printf("%c\n", penultimate_char_node->my_value);
 
 	}
 	
+	return 0;
+	
+	
 }
 
-int findLastWordNode(TrieTree* my_trie_tree, Vector* path)
+int TrieTreeFindLastWordNode(TrieTree* my_trie_tree, Vector* path)
 {
 	int parent_location;
 
@@ -459,11 +448,11 @@ int findLastWordNode(TrieTree* my_trie_tree, Vector* path)
 		parent_location = *((int*) VectorGetItem(path, parent_index));
 		TrieNode2* node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, parent_location);
 		int word_node_id = node->word_counterpart;
-		
+		return word_node_id;
 	}
 	else if(VectorGetPopulation(path) > 1)
 	{
-		printf("have a longer path word\n");
+		// printf("have a longer path word\n");
 		int penultimate_node_index = VectorGetPopulation(path) - 2;
 		int penultimate_node_id =  *((int*) VectorGetItem(path, penultimate_node_index));
 		int letter = TrieNode2GetLastEdge(my_trie_tree, penultimate_node_id);
@@ -474,8 +463,8 @@ int findLastWordNode(TrieTree* my_trie_tree, Vector* path)
 
 		if(letter >= 0 && letter < 126)  // there is room to add a sibling
 		{
-			printf("find the penultimate char node for the word node\n");
-			printf("the edge found is %c\n", letter);
+			// printf("find the penultimate char node for the word node\n");
+			// printf("the edge found is %c\n", letter);
 			// loop backwards to 
 			TrieNode2* char_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, penultimate_node_id);
 			// starting at the penultimate node
@@ -486,9 +475,18 @@ int findLastWordNode(TrieTree* my_trie_tree, Vector* path)
 				penultimate_node_id =  *((int*) VectorGetItem(path, penultimate_node_index));
 				char_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, penultimate_node_id);
 			}
-			printf("node stopped at %i\n", penultimate_node_id);
-			return penultimate_node_id;
+			// printf("node stopped at %i\n", penultimate_node_id);
+			// worked earlier cause the counterpart id == the char node id
+			return char_node->word_counterpart;//penultimate_node_id;
 		}
+		else if(letter == 126)
+		{
+			penultimate_node_index = VectorGetPopulation(path) - 1;
+			penultimate_node_id =  *((int*) VectorGetItem(path, penultimate_node_index));
+			TrieNode2* char_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, penultimate_node_id);
+			return char_node->word_counterpart;
+		}
+		
 
 		// case 2 (child)
 			// the penultimate char node has '~' as an edge
@@ -503,6 +501,10 @@ int findLastWordNode(TrieTree* my_trie_tree, Vector* path)
 
 		// }
 	}
+
+
+	return 0;
+
 }
 // TrieNode2* TrieNodeGetTrieNode()
 void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_proxy_id, Vector* name /* strings*/)
@@ -522,12 +524,12 @@ void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_p
 	// int edge_location = *((int*) VectorGetItem(prev_node->chars_from_edges, edge_index));
 	// int edge_value = *((int*) VectorGetItem(prev_node->char_links, edge_location));
 	// what if there is no edge? prev_node_id is the last node
-	printf("got here\n");
+	// printf("got here\n");
 
 	TrieNode2* prev_proxy = (TrieNode2*) VectorGetItem(my_trie_tree->word_tree, prev_proxy_id);
 	// how is this -1 after puting into a tree
 	int last_child_letter = TrieNode2GetLastEdge(my_trie_tree, prev_node_id);
-	printf("last child %i\n", last_child_letter);
+	// printf("last child %i\n", last_child_letter);
 	int prev_prev_node_id = prev_node_id;
 	// TrieNode2* last_prev_word_node;
 	int last_word_counterpart = prev_node_id;
@@ -555,199 +557,29 @@ void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_p
 
 	}
 	// need the last string of the name to be the first node in the path
-	printf("our path\n");
-	VectorPrint(path);
+	// printf("our path\n");
+	// VectorPrint(path);
 	
 	
 	// printf("%i\n", TrieTreeIsChild(my_trie_tree, path));
 	// find prev_node
-	int last_prev_node_2 = findLastPrevNode(my_trie_tree, path);
+	int last_prev_node_2 = TrieTreeFindLastPrevNode(my_trie_tree, path);
 	// find prev_word_node
-	int last_word_node_2 = findLastWordNode(my_trie_tree, path);
-	printf("char hook %i, word hook %i\n", last_prev_node_2, last_word_node_2);
+	int last_word_node_2 = TrieTreeFindLastWordNode(my_trie_tree, path);
+	// printf("char hook %i, word hook %i\n", last_prev_node_2, last_word_node_2);
+	VectorDeleteAllItems(path);
+	// TrieTreePrintTrie(my_trie_tree);
+	// TrieTreePrintWordTrie(my_trie_tree);
+	// TrieTreePrintTrieWords(my_trie_tree);
 
-	TrieTreePrintTrie(my_trie_tree);
-	TrieTreePrintWordTrie(my_trie_tree);
-	// exit(1);
-	//if(last_child_letter > -1)
-	// {
-		// wrong
-		// getting the nth dimention added in previous rounds
-
-		// prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, prev_node_id);
-
-
-
-		// int last_child = VectorGetPopulation(prev_node->links);
-		// there can not be -n children
-		// while there is no room to add another child
-		// the words and charas grow at different rates
-		// make sure we get all dimentions already stored in the tree
-		// ["256", "255, 256" ]
-		// 256, 255: 256  char sequence[256, 255, 256]
-		// w1, w2
-		//     w1
-		// w1,       w2
-		// (256, state1, word1)(when do we want this word?), (255, -1, -1), (256, state3, word3) -> NULL
-		// (256, state1, word1), (256, state3, word3) -> NULL
-
-		// (256, state1, word1), (256, -1, -1), (255, state3, word3) 
-
-		// (256, state1, word1), (256, -1, -1), (256, state3, word3) 
-		// 256, 256, 256
-		// printf("got here\n");
-		// save the path then look at the last neighbor of the last 2 or 1 items in the path
-		// traversing down the tree is working
-		// while(last_child_letter <= 126 && last_child_letter >= 33) // largest value in ascii table with a visible character value
-		// {
-			// printf("node id %i\n", prev_node_id)
-			// maybe the operations were meant for a different senario so now they don't work
-			// need to add each edge to name
-			// not possbile to know when to chose sibling or parent
-			// can't locate the last parent
-			// if(TrieNode2GetWordCounterpart(my_trie_tree, prev_node_id) > -1)
-			// {
-				// prev_node was at j the first round then j, ~ next round
-				// string* new_context_word = TrieNode2MakeStringFromWord(my_trie_tree, prev_node_id);
-				// printf("exited TrieNode2MakeStringFromWord\n");
-				// VectorAppend(name, new_context_word);
-
-
-			// }
-			// last_child_letter = TrieNode2GetLastEdge(my_trie_tree, prev_node_id);
-			// printf("last child letter %i\n", last_child_letter);
-			// we are at the 
-			// these conditions appear to be off(they are connected to the original idea of sibling and parent)
-			// if(last_child_letter == -1)  // find out if the last node links to a word
-			// {
-				// if(TrieNode2GetWordCounterpart(my_trie_tree, prev_node_id) > -1)
-				// {
-					// printf("at last counterpart\n");
-					// last_word_counterpart = TrieNode2GetWordCounterpart(my_trie_tree, prev_node_id);
-					// printf("last word counterpart %i\n", last_word_counterpart);
-					// last_prev_word_node = (TrieNode2*) VectorGetItem(my_trie_tree->word_tree,
-																	// TrieNode2GetWordCounterpart(my_trie_tree, prev_node_id));
-
-				// }
-			// }
-			// else  // will be false the last time
-			// {
-				// find out if any node before the last node links to a word
-
-				// there will be at least 1 more node to see
-				// have a parent word trailing the char node path
-				// didn't I already solve this? no
-				// if(TrieNode2GetWordCounterpart(my_trie_tree, prev_prev_node_id) > -1)
-				// {
-					// printf("at last counterpart 2\n");
-					// last_word_counterpart = TrieNode2GetWordCounterpart(my_trie_tree, prev_prev_node_id);
-					// printf("last word counterpart %i\n", last_word_counterpart);
-					// last_prev_word_node = (TrieNode2*) VectorGetItem(my_trie_tree->word_tree,
-																	// TrieNode2GetWordCounterpart(my_trie_tree, prev_prev_node_id));
-
-				// }
-			// }
-			
-			// we want the final word
-				// we are not on any nodes between the second to last char node and last char node with word counterparts
-			
-			
-			// printf("exited TrieNode2GetLastEdge\n");
-			// printf("%i, %i\n", prev_node_id, prev_prev_node_id);
-			// if()
-			// only insert it if we move foreward
-			// advance to last node
-			// printf("before TrieNode2GetLastNode\n");
-			// there are no edges to get
-			// not true on the last round
-			// if(last_child_letter > -1) // because there is no support in TrieNode2GetLastNode
-			// {
-			// 	prev_prev_node_id = prev_node_id;
-
-			// 	// if the last node != 126 then it quits
-			// 	// what happens if the next letter < 126 && >= 33?
-			// 	prev_node_id = TrieNode2GetLastNode(my_trie_tree, prev_node_id);
-			// 	VectorAppendInt(path, prev_node_id);
-
-			// 	// printf("after TrieNode2GetLastNode\n");
-
-			// }
-
-			
-
-
-			/*
-			root
-				i
-					null
-			
-			i
-				~
-					!
-			*/
-
-
-		// }
-		// if()
-		// what happens when last_child == -1?
-		// last_prev_word_node = (TrieNode2*) VectorGetItem(my_trie_tree->word_tree, last_child_letter);
-	// }
-	// printf("our path\n");
-	// VectorPrintStrings(name);
-	// VectorPrint(path);
-	// appears to be correct
-	// if(TrieTreeIsChild(my_trie_tree, path))
-	// {
-	// 	printf("make a child to %i\n", prev_node_id);
-	// 	// still have to get the last_word_counterpart
-	// 	printf("word id %i\n", last_word_counterpart);
-
-	// }
-	// else
-	// {
-	// 	printf("add sibling to %i\n", prev_node_id);
-	// 	printf("parent is %i\n", prev_prev_node_id);
-	// 	prev_node_id = prev_prev_node_id;
-
-	// }
-	
-
-	// if(VectorGetPopulation(path) > 0)
-	// {
-
-	// }
-	// look at the path collected to find out if we make a child or sibling
-	// look at the path collected to find the second to last word usied if we are making a sibling
-	// don't look at path if the size == 0
-	// delete path after linking is done
-	// there were no children so this will be the first child
-	// if(last_child_letter == -1)
-	// {
-	// 	printf("make a child to %i\n", prev_node_id);
-	// 	printf("word id %i\n", last_word_counterpart);
-	// 	// exit(1);
-	// }
-	// // also acts on the no loop case also
-	// else  // 0 <= last_child < 256 never going to happen
-	// {
-	// 	printf("add sibling to %i\n", prev_node_id);
-	// 	printf("parent is %i\n", prev_prev_node_id);
-	// 	// add a sibling instead of a child
-	// 	// save the second to last prev_node_id so it can be used here
-	// 	prev_node_id = prev_prev_node_id;
-
-	// 	// where is the problem?
-
-	// 	// first sibling worded
-	// 	// second sibling failed
-	// }
-	// printf("prev node id %i\n", prev_node_id);
 	// assumes we alway make a new context to the tree
 	// what if we are only adding a sibline nod to the tree?
 	
 	// printf("got past loop\n");
 	// assume this will always exist from previous rounds of insert - generator and generator
 	// link routine below works
+	// assuming we are always making a child
+	// the difference as shown above is who the parent is
 	TrieNode2* last_prev_word_node = (TrieNode2*) VectorGetItem(my_trie_tree->word_tree, last_word_node_2/*TrieNode2GetWordCounterpart(my_trie_tree, prev_node_id)*/);//TrieNode2GetWord(my_trie_tree, prev_node_id);
 	TrieNode2* last_prev_char_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, last_prev_node_2);
 	// printf("got here\n");
@@ -774,9 +606,14 @@ void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_p
 
 		int last_index = VectorGetPopulation(last_prev_char_node->chars_from_edges) - 1;
 		int last_letter = *((int*) VectorGetItem(last_prev_char_node->chars_from_edges, last_index));
-		// printf("last letter %i\n", last_letter);
-		// new dimention name
-		dummy_value = (char) (last_letter + 1);  // 0 <= last_index <= 256
+		// printf("last letter %c\n", last_letter);
+		if(last_letter < 126 && last_letter >= 0)
+		{
+
+			// new dimention name
+			dummy_value = (char) (last_letter + 1);  // 0 <= last_index < 256
+		}
+		
 
 	}
 	// printf("got here 3\n");
@@ -912,9 +749,9 @@ Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	// the last char node made from each input string links to its counterpart proxy node
 
 	// 3 different sets of numbers used: char node id's, word id's, state id's
-	printf("inserting\n");
-	VectorPrintStrings(name);
-	printf("\n");
+	// printf("inserting\n");
+	// VectorPrintStrings(name);
+	// printf("\n");
 	// 1 take a sequence of items and add them to an ordered trie dict
 	// 2 make some examples of states as input
 	
@@ -1151,7 +988,7 @@ Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	else
 	{
 		/* code */
-		printf("item has already been added so generate a new case for it\n");
+		// printf("item has already been added so generate a new case for it\n");
 		TrieTreeAddSoubtleCase(my_trie_tree, prev_node_id, prev_proxy_id, name);
 	}
 	
@@ -1213,7 +1050,7 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 
 	haven't tested this on paths where the root doesn't have the final edge to be deleted
 	*/
-	printf("delete\n");
+	// printf("delete\n");
 	Vector* char_nodes_matching = VectorInitVector();
 	Vector* word_nodes_matching = VectorInitVector();
 	int prev_node_id = 0;
@@ -1282,7 +1119,7 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	
 	if(top_node->state_id > -1 && VectorGetPopulation(top_node->chars_from_edges) >= 1)
 	{
-		printf("at internal node\n");
+		// printf("at internal node\n");
 		top_node->state_id = -1;
 		return -1;
 	}
@@ -1326,7 +1163,7 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 		// wrong
 		if(VectorGetPopulation(char_nodes_matching) == 1)
 		{
-			printf("last j %i\n", j);
+			// printf("last j %i\n", j);
 			break;
 		}
 
@@ -1351,12 +1188,12 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	//VectorPrint(char_nodes_matching);
 	//VectorPrint(word_nodes_matching);
 	//TrieTreePrintWordTrie(my_trie_tree);
-	printf("words\n");
-	VectorPrint(word_nodes_matching);
-	VectorPrint(char_nodes_matching);
+	// printf("words\n");
+	// VectorPrint(word_nodes_matching);
+	// VectorPrint(char_nodes_matching);
 
 	int word_counterpart = top_node->word_counterpart;
-	printf("word counterpart %i\n", word_counterpart);
+	// printf("word counterpart %i\n", word_counterpart);
 	// check each word as it is erase and find out if it's = the id on the stack
 	// the char node on the top of the char stack always links to a word node
 	// yes, because 1 single word will always be deleted if the state in question ends in a leaf node
@@ -1370,13 +1207,13 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	int deleted_word_edge = *((int*) VectorGetItem(word_nodes_matching, top_word_id));
 	TrieNode2* top_word = (TrieNode2*) VectorGetItem(my_trie_tree->word_tree, deleted_word_edge);
 	// loop is still wrong
-	printf("start\n");
+	// printf("start\n");
 	int prev_deleted_word_edge = 0;
 	while(VectorGetPopulation(word_nodes_matching) > 1 && deleted_word_edge != word_counterpart)
 	{
 		// seems to go 1 iteration too far and the target value is rest with the lin before it
-		VectorPrint(word_nodes_matching);
-		printf("deleted word edge %i\n", deleted_word_edge);
+		// VectorPrint(word_nodes_matching);
+		// printf("deleted word edge %i\n", deleted_word_edge);
 	//TrieTreePrintWordTrie(my_trie_tree);
 	
 		TrieNode2DeleteTrieNode2(top_word);
@@ -1404,9 +1241,9 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	*/
 	//TrieTreePrintWordTrie(my_trie_tree);
 
-	printf("after word stack deleting %i\n", prev_deleted_word_edge);
-	VectorPrint(word_nodes_matching);
-	VectorPrint(char_nodes_matching);
+	// printf("after word stack deleting %i\n", prev_deleted_word_edge);
+	// VectorPrint(word_nodes_matching);
+	// VectorPrint(char_nodes_matching);
 
 	// delete word nodes and word stack
 	// delete final word edge
