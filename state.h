@@ -49,7 +49,8 @@ typedef struct Data
 	*/
 	int _int;
 
-	char* _string;  // convert to string
+	string _string;
+	
 	int string_size;
 
 	float _float;
@@ -101,25 +102,25 @@ user should only have to use part of the name to search for it, all relevant var
 
 // size = O(n)
 
-typedef struct ExtendedState
-{
-	void* data;
-	map<string, int>* next_contexts;
-	int id;
-	int type;
-	// DynamicState(for state machine part) or string(for neighbors part)
-}ExtendedState;
-ExtendedState* initExtendedState();
+/*
+Vector strings for array
+Vector trienodes for dict
+bool type of container
 
-typedef struct OrderedDict
+*/
+
+
+
+typedef struct DynamicMachine
 {
-	// ordered dictioanry where the dict part is implemented using a trie
-	Vector* items;
-	struct ExtendedState* root;
-	multimap<string, ExtendedState*>* dict;
-	int max_id;
-}OrderedDict;
-OrderedDict* initOrderedDict();
+
+	Vector* states;
+	TrieTree* state_names;
+	// root is position 0
+
+
+
+}DynamicMachine;
 
 typedef struct DynamicState
 {
@@ -127,80 +128,52 @@ typedef struct DynamicState
 
 	Vector* start_children;
 
-	OrderedDict* _start_children;
+	// OrderedDict* _start_children;
 
 	Vector* children;
-	OrderedDict* _children;
+	// OrderedDict* _children;
 
 	Vector* next_states;
 
-	OrderedDict* _next_states;
+	// OrderedDict* _next_states;
 
 	Data* value;
-	int level_number;
-	bool (*function) (void*);
-	bool parent_status;
-	int max_id_for_siblings; // so the max id of machine doesn't grow too fast
-	int id;
+	bool container_type;
+	// int level_number;
+	bool (*function) (DynamicMachine* my_machine, DynamicState* current_state);
+	// bool parent_status;
+	// int max_id_for_siblings; // so the max id of machine doesn't grow too fast
+	// int id;
 	// this part is not the trie tree part
 	// ith value in |name|th level, so all states are enumerated with respect to the deepest context dimention they are in(not numbered, but when they are numbered and how many siblings they have)
 	//remaining items for the asyncronous nfa evaluator state machine
 
 }DynamicState;
+
+
+// dynamic state funcitons
 DynamicState* initDynamicState(	Vector* name, // strings
 								Vector* start_children,  // array of strings
 								Vector* children, // array of strings
 								Vector* next_states, // array of strings
+								bool (*function) (DynamicMachine* my_machine, DynamicState* current_state),
 								Data* value);
+
+// dynamic machine functions
 // final 2 structs for trie ordered dict
 void TrieTreeInsertString(TrieTree* my_trie_tree, string element);
 
-typedef struct MapNode
-{
-	// string_0, string_1[i] -> states[i]
-	// string_0, null -> states[0]
-	string current_name_part; // first one is first state
-	map<string, struct DynamicState*>* next_name_part_states_s;
-
-	//set<string>* string_1;
-	// string_1 is the key
-	//map<string, struct DynamicState* >* states;
-
-}MapNode;
-MapNode* initMapNode();
-
-
-typedef struct DynamicMachine
-{
-	/*
-string_0 -> (string_1, DynamicState)
-
-*/
-	//map<string, MapNode*>* trie_tree_dict;
-
-	map<string, MapNode*>* trie_names;  // assume first node is the first state name
-	// "root" is the initial string for all states
-	StateMachine* static_machine;
-	TrieTree* trie_tree_dict;
-	// auxiliary data hierarchy for filling up the vectors
-
-	// buffers for adding, deleting, modifying
-	Vector* name; // strings
-	Vector* start_children;  // array of strings
-	Vector* children; // array of strings
-	Vector* next_states; // array of strings
-	Data* value;
-
-	//
-	struct Search* my_search;
-	struct Insert* my_insert;
-	struct Delete* my_delete;
-	int max_id;
 
 
 
-}DynamicMachine;
-DynamicMachine* initDynamicMachine(StateMachine* my_machine);
+DynamicMachine* DynamicMachineInitDynamicMachine();
+void DynamicMachineAppendState(DynamicMachine* my_machine, DynamicState* state);
+bool returnATrueValue(DynamicMachine* my_machine, DynamicState* current_state);
+
+int DynamicMachineRunStates(DynamicMachine* my_machine, Vector* state_names);
+
+void DynamicMachineTest();
+
 void printArraysOfStrings(Vector* arrays_of_strings, int indent_level);
 void printArrayOfStrings(Vector* array_of_strings, int indent_level);
 void printState(DynamicState* my_state, int indent_level);

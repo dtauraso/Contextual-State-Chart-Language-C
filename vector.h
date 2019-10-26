@@ -42,30 +42,10 @@ void VectorShiftItems(Vector* container, int index);
 
 
 void VectorShiftLeft(Vector* container, int start, int end);
-//bool VectorInsertItem(Vector* container, void* element, int type);
-bool VectorInsertItem(Vector* container, void* element, int insert_location, int type);
-
-bool VectorIsEqualInt(void* a, void* b);
-bool VectorIsEqualString(void* a, void* b);
-bool VectorIsGreaterThanOrEqualInt(void* a, void* b);
-bool VectorIsGreaterThanOrEqualString(void* a, void* b);
-bool VectorIsGreaterThanInt(void* a, void* b);
-bool VectorIsGreaterThanString(void* a, void* b);
-
-
-bool VectorIsLessThanInt(void* a, void* b);
-bool VectorIsLessThanString(void* a, void* b);
-int VectorSearchItem(Vector* container, void* element, int type);
 
 
 
 void VectorTest();
-void VectorTestSorted();
-
-void* VectorFindItem(Vector* container, void* element, int type);
-Match* VectorSearchItemTrieDict(Vector* trie_tree_dict, Vector* edges, void* element, int type, int dict_type);
-
-int VectorSearchItemTrieDict2(Vector* trie_tree_dict, Vector* edges, void* element, int type, int dict_type);
 
 
 void VectorPrint(Vector* container);

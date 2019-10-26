@@ -1104,6 +1104,7 @@ bool makeTreeStateMachine(Scanner* my_scanner)
 		//machine->current_state = current_state
 		deleteMachineForMakeTree(machine);
 
+		printf("end state machine\n");
 		//printf("machine is done\n");
 		//printTree(my_scanner->lines_graph, 0);
 

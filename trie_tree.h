@@ -102,5 +102,6 @@ void TrieTreePrintWordTrie(TrieTree* my_trie_tree);
 void TrieTreePrintTrieWords(TrieTree* my_trie_tree);
 
 void TrieTreePrintTrieRecursive(TrieTree* my_trie_tree, int root, string indents);
+void TrieTreeTest();
 
 #endif

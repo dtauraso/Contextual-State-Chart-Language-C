@@ -9,8 +9,8 @@ string makeSpaces(int indent_level);
 
 const char* getInput(Tokens* my_tokens);
 int getI(Tokens* my_tokens);
-TrieTree* TrieTreeInitTrieTree();
-void TrieTreeInsertString(TrieTree* my_trie_tree, string element);
+// TrieTree* TrieTreeInitTrieTree();
+// void TrieTreeInsertString(TrieTree* my_trie_tree, string element);
 //int VectorGetPopulation(Vector* container);
 
 enum data_types{is_list, is_string, is_empty_case};
@@ -255,15 +255,15 @@ typedef struct ExtendedState
 	int id;
 }ExtendedState;
 */
-ExtendedState* initExtendedState()
-{
-	ExtendedState* new_extended_state = (ExtendedState*) malloc(sizeof(ExtendedState));
-	new_extended_state->data = VectorInitVector();
-	new_extended_state->next_contexts = new map<string, int>();
-	new_extended_state->id = 0;
-	new_extended_state->type = 0;
-	return new_extended_state;
-}
+// ExtendedState* initExtendedState()
+// {
+// 	ExtendedState* new_extended_state = (ExtendedState*) malloc(sizeof(ExtendedState));
+// 	new_extended_state->data = VectorInitVector();
+// 	new_extended_state->next_contexts = new map<string, int>();
+// 	new_extended_state->id = 0;
+// 	new_extended_state->type = 0;
+// 	return new_extended_state;
+// }
 /*
 ExtendedState* TrieTreeInsertString(ExtendedState* node, string value)
 {
@@ -275,15 +275,15 @@ ExtendedState* TrieTreeInsertString(ExtendedState* node, string value)
 	return node;
 	// set the type of the void*
 }*/
-ExtendedState* insertDynamicState(ExtendedState* node, DynamicState* value)
-{
-	// insert
-	node->data = value;
-	node->type = 1;
-	return node;
-	// set the type of the void*
+// ExtendedState* insertDynamicState(ExtendedState* node, DynamicState* value)
+// {
+// 	// insert
+// 	node->data = value;
+// 	node->type = 1;
+// 	return node;
+// 	// set the type of the void*
 
-}
+// }
 /*
 typedef struct OrderedDict
 {
@@ -292,34 +292,35 @@ typedef struct OrderedDict
 	multimap<string, ExtendedState*>* dict;
 }OrderedDict;
 */
-OrderedDict* initOrderedDict()
-{
-	OrderedDict* new_dict = (OrderedDict*) malloc(sizeof(OrderedDict));
-	new_dict->items = VectorInitVector();
-	new_dict->dict = new multimap<string, ExtendedState*>();
-	multimap<string, ExtendedState*>::iterator it = new_dict->dict->begin();
-	new_dict->root = initExtendedState();
-	// insert the string
-	/*
-	new_dict->root = TrieTreeInsertString(new_dict->root, "root");
+// OrderedDict* initOrderedDict()
+// {
+// 	OrderedDict* new_dict = (OrderedDict*) malloc(sizeof(OrderedDict));
+// 	new_dict->items = VectorInitVector();
+// 	new_dict->dict = new multimap<string, ExtendedState*>();
+// 	multimap<string, ExtendedState*>::iterator it = new_dict->dict->begin();
+// 	new_dict->root = initExtendedState();
+// 	// insert the string
+// 	/*
+// 	new_dict->root = TrieTreeInsertString(new_dict->root, "root");
 
-	new_dict->dict->insert(it, pair<string, ExtendedState*>("root", new_dict->root));
-	new_dict->max_id = 0;
-	*/
-	return new_dict;
-}
-OrderedDict* insertState(OrderedDict* my_ordered_dict, Vector* strings)
-{
-	// insert the strings into the dict
-	// don't need to generate extra strings cause these are only for the neighbor states
+// 	new_dict->dict->insert(it, pair<string, ExtendedState*>("root", new_dict->root));
+// 	new_dict->max_id = 0;
+// 	*/
+// 	return new_dict;
+// }
+// OrderedDict* insertState(OrderedDict* my_ordered_dict, Vector* strings)
+// {
+// 	// insert the strings into the dict
+// 	// don't need to generate extra strings cause these are only for the neighbor states
 
-	return NULL;
-}
+// 	return NULL;
+// }
 
 DynamicState* initDynamicState(	Vector* name, // strings
 								Vector* start_children,  // array of strings
 								Vector* children, // array of strings
 								Vector* next_states, // array of strings
+								bool (*function) (DynamicMachine* my_machine, DynamicState* current_state),
 								Data* value)
 {
 	DynamicState* my_dynamic_state = (DynamicState*) malloc(sizeof(DynamicState));
@@ -328,26 +329,26 @@ DynamicState* initDynamicState(	Vector* name, // strings
 	my_dynamic_state->children = children;
 	my_dynamic_state->next_states = next_states;
 	my_dynamic_state->value = value;
-	my_dynamic_state->level_number = 0;
-	my_dynamic_state->function = NULL;
-	my_dynamic_state->parent_status = false;
+	// my_dynamic_state->level_number = 0;
+	my_dynamic_state->function = function;
+	// my_dynamic_state->parent_status = false;
 	return my_dynamic_state;
 }
 
-MapNode* initMapNode()
-{
-	MapNode* my_map_node = (MapNode*) malloc(sizeof(MapNode));
-	//my_map_node->string_1 = new set<string>();
-	//my_map_node->states = new map<string, struct DynamicState*>();
-	//my_map_node->state = NULL;
-	//my_map_node->state_map_is_empty = false;
-	my_map_node->current_name_part = "";
-	my_map_node->next_name_part_states_s = new map<string, DynamicState*>();
+// MapNode* initMapNode()
+// {
+// 	MapNode* my_map_node = (MapNode*) malloc(sizeof(MapNode));
+// 	//my_map_node->string_1 = new set<string>();
+// 	//my_map_node->states = new map<string, struct DynamicState*>();
+// 	//my_map_node->state = NULL;
+// 	//my_map_node->state_map_is_empty = false;
+// 	my_map_node->current_name_part = "";
+// 	my_map_node->next_name_part_states_s = new map<string, DynamicState*>();
 
-	return my_map_node;
-}
+// 	return my_map_node;
+// }
 
-DynamicMachine* initDynamicMachine(StateMachine* my_machine)
+DynamicMachine* DynamicMachineInitDynamicMachine()
 {
 	/*
 
@@ -364,33 +365,175 @@ DynamicMachine* initDynamicMachine(StateMachine* my_machine)
 	*/
 	DynamicMachine* my_dynamic_machine = (DynamicMachine*) malloc(sizeof(DynamicMachine));
 
-	my_dynamic_machine->static_machine = my_machine;
+	my_dynamic_machine->state_names = TrieTreeInitTrieTree();
+	my_dynamic_machine->states = VectorInitVector();
+	// store the name
+	// TrieTree* state_names;
+
+	// Vector* states;
+	
+
+	// my_dynamic_machine->static_machine = my_machine;
 
 	// auxiliary data hierarchy for filling up the vectors
-	my_dynamic_machine->trie_names = new map<string, MapNode*>();
+	// my_dynamic_machine->trie_names = new map<string, MapNode*>();
 
 	// insert root -> mapnode
-	map<string, MapNode*>::iterator it = my_dynamic_machine->trie_names->begin();
-	my_dynamic_machine->trie_names->insert(it,
-						pair<string, MapNode*>("root", initMapNode()));
+	// map<string, MapNode*>::iterator it = my_dynamic_machine->trie_names->begin();
+	// my_dynamic_machine->trie_names->insert(it,
+	// 					pair<string, MapNode*>("root", initMapNode()));
 
 	// buffers for adding, deleting, modifying
-	my_dynamic_machine->name = VectorInitVector(); // strings
-	my_dynamic_machine->start_children = VectorInitVector();  // array of strings
-	my_dynamic_machine->children = VectorInitVector(); // array of strings
-	my_dynamic_machine->next_states = VectorInitVector(); // array of strings
-	my_dynamic_machine->value = makeDataInt(0);
+	// my_dynamic_machine->name = VectorInitVector(); // strings
+	// my_dynamic_machine->start_children = VectorInitVector();  // array of strings
+	// my_dynamic_machine->children = VectorInitVector(); // array of strings
+	// my_dynamic_machine->next_states = VectorInitVector(); // array of strings
+	// my_dynamic_machine->value = makeDataInt(0);
 
-	my_dynamic_machine->trie_tree_dict = TrieTreeInitTrieTree();
+	// my_dynamic_machine->trie_tree_dict = TrieTreeInitTrieTree();
 	//
-	my_dynamic_machine->my_search = NULL;
-	my_dynamic_machine->my_insert = NULL;
-	my_dynamic_machine->my_delete = NULL;
+	// my_dynamic_machine->my_search = NULL;
+	// my_dynamic_machine->my_insert = NULL;
+	// my_dynamic_machine->my_delete = NULL;
 
 	return my_dynamic_machine;
 }
 
+void DynamicMachineAppendState(DynamicMachine* my_machine, DynamicState* state)
+{
+	// append state
+	VectorAppend(my_machine->states, state);
+	// insert word into trie
+	TrieTreeInsertWords(my_machine->state_names, state->name);
+}
+bool returnATrueValue(DynamicMachine* my_machine, DynamicState* current_state)
+{
+	printf("returning true\n");
+	return false;
+}
 
+int DynamicMachineRunStates(DynamicMachine* my_machine, DynamicState* current_state, Vector* state_names)
+{
+	// Vector* state_names is a vector of vectors holding strings
+	// run through a vector of state names and record the index values of the passing states
+	if(state_names != NULL)
+	{
+		int winning_state = 0;
+		bool state_changed = false;
+		for(int i = 0; i < VectorGetPopulation(state_names); i++)
+		{
+			Vector* state_name = (Vector*) VectorGetItem(state_names, i);
+			if(state_name != NULL)
+			{
+				// get the state id
+				int state_id = TrieTreeSearch(my_machine->state_names, state_name);
+				// printf("state id %i\n", state_id);
+				// get the state
+				DynamicState* state = (DynamicState*) VectorGetItem(my_machine->states, state_id);
+				// run the state
+				if(state->function(my_machine, current_state))
+				{
+					winning_state = i;
+					state_changed = true;
+					break;
+				}
+				
+			}
+
+		}
+		if(!state_changed)
+		{
+			return -1;
+		}
+		return winning_state;
+	}
+}
+void DynamicMachineTest()
+{
+	DynamicMachine* my_machine = DynamicMachineInitDynamicMachine();
+	// Vector* name, // strings
+	// 							Vector* start_children,  // array of strings
+	// 							Vector* children, // array of strings
+	// 							Vector* next_states, // array of strings
+	// 							Data* value
+	// make a sequence to parse
+	// a^nb^nc^n
+
+	/*
+	control flow graph
+		children
+			variables
+				children
+					a_count
+						Data
+							0
+					b_count
+						Data
+							0
+					c_count
+						Data
+							0
+					input_string
+						Data
+							"abc"
+					i
+						Data
+							0
+			a
+				f
+					recordA
+				next
+					a | (b | c)
+			b
+				f
+					recordBAndCheckWithA
+				next
+					b | c
+			c
+				f
+					recordCAndCheckWithA
+				next
+					c | end
+			end
+				f
+					returnTrue
+				next
+					none
+	*/
+	DynamicMachineAppendState(	my_machine,
+								initDynamicState(VectorAddStringToVector3(
+													"state 1", "rhtgdsfdfrhtdfgsda", "rfi4ewor4w8edirfedfed\""),
+												NULL,
+												NULL,
+												NULL,
+												returnATrueValue,
+												makeDataInt(2)
+												)
+								);
+	// state name in trie test
+	TrieTreePrintTrieWords(my_machine->state_names);
+	DynamicState* x = (DynamicState*) VectorGetItem(my_machine->states, 0);
+	// out of bounds with VectorGetItem
+	string* y = (string*) VectorGetItem(x->name, 2);
+	// state object name test
+	printf("%s\n", y->c_str());
+	// data mutation test
+	x->value->_int++;
+	Data* z = x->value;
+	printf("%i\n", z->_int);
+
+	// x->function = returnATrueValue;
+	x->function(NULL, NULL);
+	Vector* state_names = VectorInitVector();
+	VectorAppend(state_names, VectorAddStringToVector3(
+							"state 1",
+							"rhtgdsfdfrhtdfgsda",
+							"rfi4ewor4w8edirfedfed\""));
+
+	int winning_state = DynamicMachineRunStates(my_machine, x, state_names);
+	printf("winning state %i\n", winning_state);
+
+}
 void printArraysOfStrings(Vector* arrays_of_strings, int indent_level)
 {
 	if(arrays_of_strings != NULL)
@@ -544,57 +687,57 @@ typedef struct DynamicState
 }DynamicState;
 */
 
-void printStateTrie(DynamicMachine* my_dynamic_machine, string root, int indent_level)
-{
-	/*
-		get the state if exists
-			VectorPrint state
-		go through the neighbors in the nested map
-		printStateTrie(neighbor string in nested map)
-	*/
-	//printf("printStateTrie\n");
-	if(my_dynamic_machine != NULL)
-	{
-		if(root.size() > 0)
-		{
-			//printf("not null\n");
-			// map<string, MapNode*>* trie_tree_dict
-			map<string, MapNode*>::iterator it = my_dynamic_machine->trie_names->find(root);
-			if(	it != my_dynamic_machine->trie_names->end() )
-			{
-				//printf("item exists\n");
-				MapNode* node = it->second;
-				if(node->current_name_part.size() > 0)
-				{
-					map<string, DynamicState*>::iterator it2 = node->next_name_part_states_s->find(node->current_name_part);
-					DynamicState* state = it2->second;
+// void printStateTrie(DynamicMachine* my_dynamic_machine, string root, int indent_level)
+// {
+// 	/*
+// 		get the state if exists
+// 			VectorPrint state
+// 		go through the neighbors in the nested map
+// 		printStateTrie(neighbor string in nested map)
+// 	*/
+// 	//printf("printStateTrie\n");
+// 	if(my_dynamic_machine != NULL)
+// 	{
+// 		if(root.size() > 0)
+// 		{
+// 			//printf("not null\n");
+// 			// map<string, MapNode*>* trie_tree_dict
+// 			map<string, MapNode*>::iterator it = my_dynamic_machine->trie_names->find(root);
+// 			if(	it != my_dynamic_machine->trie_names->end() )
+// 			{
+// 				//printf("item exists\n");
+// 				MapNode* node = it->second;
+// 				if(node->current_name_part.size() > 0)
+// 				{
+// 					map<string, DynamicState*>::iterator it2 = node->next_name_part_states_s->find(node->current_name_part);
+// 					DynamicState* state = it2->second;
 
-					//printf("%s\n", node->current_name_part.c_str());
-					printf("%s%s\n", makeSpaces(indent_level).c_str(), node->current_name_part.c_str());
-					printState(state, indent_level);
+// 					//printf("%s\n", node->current_name_part.c_str());
+// 					printf("%s%s\n", makeSpaces(indent_level).c_str(), node->current_name_part.c_str());
+// 					printState(state, indent_level);
 
-				}
-				else
-				{
-					//printf("none\n");
-				}
-				for(map<string, DynamicState*>::iterator it = node->next_name_part_states_s->begin();
-					it != node->next_name_part_states_s->end();
-					it++
-					)
-				{
-					//printf("%s\n", it->first.c_str());
-					printStateTrie(my_dynamic_machine,
-						it->first,
-						indent_level + 2);
-				}
+// 				}
+// 				else
+// 				{
+// 					//printf("none\n");
+// 				}
+// 				for(map<string, DynamicState*>::iterator it = node->next_name_part_states_s->begin();
+// 					it != node->next_name_part_states_s->end();
+// 					it++
+// 					)
+// 				{
+// 					//printf("%s\n", it->first.c_str());
+// 					printStateTrie(my_dynamic_machine,
+// 						it->first,
+// 						indent_level + 2);
+// 				}
 
 				
-			}
-		}
+// 			}
+// 		}
 		
-	}
-}
+// 	}
+// }
 
 
 // api's, not state functions
@@ -792,38 +935,38 @@ int runState(StateMachine* machine, int start_of_next_states, void* object/*Scan
 	return -10;
 
 }
-bool makeStateMachine(DynamicMachine* my_machine)
-{
+// bool makeStateMachine(DynamicMachine* my_machine)
+// {
 
-	if(my_machine != NULL)
-	{
+// 	if(my_machine != NULL)
+// 	{
 
-		StateMachine* machine = my_machine->static_machine;
-		// the first state doesn't get run
-		// machine is finished the moment the current state == done
-		//int counter = 0;
-		printf("start state machine\n");
-		//int current_state = machine->current_state;
-		// loop through and try the children
-		int level = 0;
-		int counter = 0;
-		int* counter_ptr = &counter;
-		int debug_states_run = -1;
-		int* debug_states_run_ptr = &debug_states_run;
-		runMachine(machine, my_machine, level, counter_ptr, debug_states_run_ptr);
-		//printMultiwayLinesNodesInContainer(my_scanner->_lines_graph);
+// 		StateMachine* machine = my_machine->static_machine;
+// 		// the first state doesn't get run
+// 		// machine is finished the moment the current state == done
+// 		//int counter = 0;
+// 		printf("start state machine\n");
+// 		//int current_state = machine->current_state;
+// 		// loop through and try the children
+// 		int level = 0;
+// 		int counter = 0;
+// 		int* counter_ptr = &counter;
+// 		int debug_states_run = -1;
+// 		int* debug_states_run_ptr = &debug_states_run;
+// 		runMachine(machine, my_machine, level, counter_ptr, debug_states_run_ptr);
+// 		//printMultiwayLinesNodesInContainer(my_scanner->_lines_graph);
 
-		//machine->current_state = current_state
-		//deleteMachineForMakeTree(machine);
+// 		//machine->current_state = current_state
+// 		//deleteMachineForMakeTree(machine);
 
-		//printf("machine is done\n");
-		//printTree(my_scanner->lines_graph, 0);
+// 		//printf("machine is done\n");
+// 		//printTree(my_scanner->lines_graph, 0);
 
-		return true;
-	}
+// 		return true;
+// 	}
 
-	return false;
-}
+// 	return false;
+// }
 
 
 /*
@@ -930,7 +1073,7 @@ void printData(Data* var_data, int indent_level)
 			}
 			case 1:
 			{
-				printf("%s%s\n", makeSpaces(indent_level).c_str(), var_data->_string);
+				printf("%s%s\n", makeSpaces(indent_level).c_str(), var_data->_string.c_str());
 
 				break;
 			}
@@ -1220,10 +1363,11 @@ Data* makeDataString(char* a)
 }*/
 void deleteData(Data* variable)
 {
-	if(variable->_string)
+	if(variable->_string.size() > 0)
 	{
-		free(variable->_string);
-		variable->_string = NULL;
+		// wierd
+		free(&variable->_string);
+		// variable->_string = NULL;
 	}
 	free(variable);
 	variable = NULL;

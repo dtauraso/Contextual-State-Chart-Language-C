@@ -20,7 +20,7 @@ start state
 			Function
 				returnTrue
 			Next
-				------------------------------g
+				-------------------------------
 				state 5 true
 				state 6 true
 				------------------------------g

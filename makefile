@@ -25,13 +25,13 @@ test:
 
 	#-./state_machine.x parsing_tree.json calculator_example.txt
 	#-./state_machine.x parsing_tree.json parallel_programming_example.txt
-	-./state_machine.x parsing_tree.json parallel_programming_example2.txt
+	# -./state_machine.x parsing_tree.json parallel_programming_example2.txt
 
 	#-./state_machine.x parsing_tree.json start.txt
 
 	#-./state_machine.x parallel_programming_example_json.json calculator_example.txt
 
-	#-./state_machine.x parallel_programming_example.json parallel_programming_example.txt
+	-./state_machine.x parallel_programming_example.json parallel_programming_example.txt
 
 	#-./state_machine.x parsing_tree.json little_sequence_hierarchy.txt
 	#-./testing.x parsing_tree.json calculator_example.txt

@@ -1648,3 +1648,172 @@ void TrieTreePrintTrieRecursive(TrieTree* my_trie_tree, int root, string indents
 }
 
 
+void TrieTreeTest()
+{
+	TrieTree* my_trie_tree = TrieTreeInitTrieTree();
+	Vector* name2 = TrieTreeInsertWords(my_trie_tree, VectorAddStringToVector2("abvf", "tgrfede"));
+	
+	int a = TrieTreeSearch(my_trie_tree, VectorAddStringToVector2("abvf", "tgrfede"));
+	printf("found %i\n", a);
+	Vector* name1 = TrieTreeInsertWords(my_trie_tree, VectorAddStringToVector1("abvf"));
+
+
+	
+	TrieTreeDeleteWords(my_trie_tree, VectorAddStringToVector2("abvf", "tgrfede"));
+	Vector* name3 = TrieTreeInsertWords(my_trie_tree, VectorAddStringToVector3("abvf", "tgrfede", "f"));
+
+
+
+	Vector* name4 = TrieTreeInsertWords(my_trie_tree, VectorAddStringToVector3("abvf", "tgrfede", "hijk"));
+	
+	Vector* name5 = TrieTreeInsertWords(my_trie_tree, VectorAddStringToVector4("abvf", "tgrfede", "hijk", "i"));
+	TrieTreeDeleteWords(my_trie_tree, VectorAddStringToVector3("abvf", "tgrfede", "hijk"));
+
+	TrieTreeDeleteWords(my_trie_tree, VectorAddStringToVector4("abvf", "tgrfede", "hijk", "i"));
+
+	// TrieTreePrintTrie(my_dynamic_machine->trie_tree_dict);
+	// TrieTreePrintWordTrie(my_dynamic_machine->trie_tree_dict);
+	TrieTreePrintTrieWords(my_trie_tree);
+
+	// //TrieTreeSearch
+	
+	// Vector* name6 = TrieTreeInsertWords(my_dynamic_machine->trie_tree_dict, VectorAddStringToVector3("a", "e", "g"));
+	
+	// Vector* name7 = TrieTreeInsertWords(my_dynamic_machine->trie_tree_dict, VectorAddStringToVector1("b"));
+	
+	// Vector* name8 = TrieTreeInsertWords(my_dynamic_machine->trie_tree_dict, VectorAddStringToVector1("c"));
+	
+	// Vector* name9 = TrieTreeInsertWords(my_dynamic_machine->trie_tree_dict, VectorAddStringToVector2("c", "d"));
+	// TrieTreeDeleteWords(my_dynamic_machine->trie_tree_dict, VectorAddStringToVector1("c"));
+
+
+
+	// TrieTreePrintTrie(my_dynamic_machine->trie_tree_dict);
+	// TrieTreePrintTrieWords(my_dynamic_machine->trie_tree_dict);
+	
+	printf("testing the generator case and the user interfeering with the generator case\n");
+	Vector* x = VectorAddStringToVector1("i");
+	// printf("got here\n");
+	Vector* i = TrieTreeInsertWords(my_trie_tree, VectorAddStringToVector1("iii"));
+	// TrieTreePrintTrie(my_dynamic_machine->trie_tree_dict);
+	// exit(1);
+	TrieTreePrintWordTrie(my_trie_tree);
+	// TrieTreePrintTrieWords(my_dynamic_machine->trie_tree_dict);
+
+	Vector* i1 = TrieTreeInsertWords(my_trie_tree, VectorAddStringToVector1("iii"));
+	// TrieTreePrintTrie(my_dynamic_machine->trie_tree_dict);
+	VectorPrintStrings(i1);
+	// exit(1);
+	// printf("\n");
+
+	// TrieTreePrintTrieWords(my_dynamic_machine->trie_tree_dict);
+	Vector* i2 = TrieTreeInsertWords(my_trie_tree, VectorAddStringToVector1("iii"));
+	// // TrieTreePrintTrie(my_dynamic_machine->trie_tree_dict);
+	VectorPrintStrings(i2);
+	// printf("\n");
+
+	Vector* i3 = TrieTreeInsertWords(my_trie_tree, VectorAddStringToVector1("iii"));
+	// // TrieTreePrintTrie(my_dynamic_machine->trie_tree_dict);
+	VectorPrintStrings(i3);
+	// printf("\n");
+	// TrieTreePrintTrieWords(my_dynamic_machine->trie_tree_dict);
+
+	// according to the logs, it probably went out of bounds
+	// fix bounds problem
+	// the max number of visible chars is 96
+	Vector* i4 = TrieTreeInsertWords(my_trie_tree, VectorAddStringToVector1("j"));
+	VectorPrintStrings(i4);
+	// wondering why this would work as it could throw off the letter counter
+	i4 = TrieTreeInsertWords(my_trie_tree, VectorAddStringToVector2("iii", "![[)"));
+	VectorPrintStrings(i4);
+	i4 = TrieTreeInsertWords(my_trie_tree, VectorAddStringToVector2("iii", "![[)8[)"));
+	VectorPrintStrings(i4);
+
+	// the ! char node is also connected to the other word starting with !
+	// so the last official edge from i is # not !
+	// sort of wierd from the word perspective(It's displayed as a separate path), but prevents the letter incrementer from accidentally
+	// going to an edge already used
+	// works up to 10
+	Vector* collections_of_words = VectorInitVector();
+	for(int i = 0; i < 100; i++)
+	{
+
+		i4 = TrieTreeInsertWords(my_trie_tree, VectorAddStringToVector1("iii"));
+		VectorAppend(collections_of_words, i4);
+		// TrieTreePrintTrie(my_dynamic_machine->trie_tree_dict);
+		// TrieTreePrintWordTrie(my_dynamic_machine->trie_tree_dict);
+		// TrieTreePrintTrieWords(my_dynamic_machine->trie_tree_dict);
+		// printf("\n");
+
+		// VectorPrintStrings(i4);
+
+		
+		// VectorPrintStrings(i4);
+		int a1 = TrieTreeSearch(my_trie_tree, i4);
+		printf("found %i\n", a1);
+// |a| -> 1
+//       |tgrfede|
+//          |f| -> 2
+//    |i| -> 5
+//       |!| -> 6
+//       |"| -> 7
+//       |#| -> 8
+//       |![[)| -> 10
+//       |$| -> 12
+//       |%| -> 14
+//       |&| -> 16
+//       |'| -> 18
+//       |(| -> 20
+//    |j| -> 9
+		// |a| -> 1
+		// 	|tgrfede|
+		// 		|f| -> 2
+		// |i| -> 5
+		// 	|!| -> 6
+		// 	|"| -> 7
+		// 	|#| -> 8
+		// 	|![[)| -> 10
+		// 	|$| -> 11
+		// 	|%| -> 12
+		// 	|&| -> 13
+		// 	|'| -> 14
+		// 	|(| -> 15
+		// 	|)| -> 16
+		// 	|*| -> 17
+		// 	|+| -> 18
+		// 	|,| -> 19
+		// 	|-| -> 20
+		// 	|.| -> 21
+		// |j| -> 9
+		// TrieTreePrintTrieWords(my_dynamic_machine->trie_tree_dict);
+
+	}
+	TrieTreePrintTrieWords(my_trie_tree);
+
+	printf("erase every other\n");
+	for(int i = 0; i < 100; i++)
+	{
+		 if(i % 3 == 0)
+		 {
+			printf("erase\n");
+			Vector* my_word = (Vector*) VectorGetItem(collections_of_words, i);
+					// VectorAppend(collections_of_words, i4);
+
+			VectorPrintStrings(my_word);
+
+
+			TrieTreeDeleteWords(my_trie_tree, my_word);
+			printf("after delete\n");
+			// TrieTreePrintWordTrie(my_dynamic_machine->trie_tree_dict);
+			int a1 = TrieTreeSearch(my_trie_tree, my_word);
+			printf("found %i\n", a1);
+
+
+		 }
+	}
+	TrieTreePrintTrieWords(my_trie_tree);
+
+	printf("testing user interfeering with the generator\n");
+
+	
+}
