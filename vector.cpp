@@ -465,13 +465,70 @@ Vector* VectorAddStringToVector4(string string_1, string string_2, string string
 	return list_of_strings_1;
 }
 
-Vector* VectorCombineVectors(Vector* source_1, Vector* source_2)
+Vector* VectorCombineVectors1(Vector* source_1)
+{
+	Vector* list_of_lists_of_strings = VectorInitVector();
+
+	VectorAppend(list_of_lists_of_strings, source_1);
+
+
+	return list_of_lists_of_strings;
+
+}
+Vector* VectorCombineVectors2(Vector* source_1, Vector* source_2)
 {
 	Vector* list_of_lists_of_strings = VectorInitVector();
 
 	VectorAppend(list_of_lists_of_strings, source_1);
 
 	VectorAppend(list_of_lists_of_strings, source_2);
+
+	return list_of_lists_of_strings;
+
+}
+Vector* VectorCombineVectors3(Vector* source_1, Vector* source_2, Vector* source_3)
+{
+	Vector* list_of_lists_of_strings = VectorInitVector();
+
+	VectorAppend(list_of_lists_of_strings, source_1);
+
+	VectorAppend(list_of_lists_of_strings, source_2);
+
+	VectorAppend(list_of_lists_of_strings, source_3);
+
+	return list_of_lists_of_strings;
+
+}
+
+Vector* VectorCombineVectors4(Vector* source_1, Vector* source_2, Vector* source_3, Vector* source_4)
+{
+	Vector* list_of_lists_of_strings = VectorInitVector();
+
+	VectorAppend(list_of_lists_of_strings, source_1);
+
+	VectorAppend(list_of_lists_of_strings, source_2);
+
+	VectorAppend(list_of_lists_of_strings, source_3);
+
+	VectorAppend(list_of_lists_of_strings, source_4);
+
+	return list_of_lists_of_strings;
+
+}
+
+Vector* VectorCombineVectors5(Vector* source_1, Vector* source_2, Vector* source_3, Vector* source_4, Vector* source_5)
+{
+	Vector* list_of_lists_of_strings = VectorInitVector();
+
+	VectorAppend(list_of_lists_of_strings, source_1);
+
+	VectorAppend(list_of_lists_of_strings, source_2);
+
+	VectorAppend(list_of_lists_of_strings, source_3);
+
+	VectorAppend(list_of_lists_of_strings, source_4);
+
+	VectorAppend(list_of_lists_of_strings, source_5);
 
 	return list_of_lists_of_strings;
 

@@ -177,6 +177,79 @@ TrieTreePush items to a stack
 when done, return a pointer to the stack
 */
 
+int TrieTreeGetVariable(TrieTree* my_trie_tree, string name)
+{
+	/*
+	if the 1 word matches traverse the rest of the trie to get the integer
+	assume there is only 1 unique path
+	return -1 if there is no unique path to the item that exists(multiple paths and a path that has a dead end are both fails)
+	*/
+	int prev_node_id = 0;
+	TrieNode2* prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, 0);
+	//Vector* stack = VectorInitVector();
+	int* prev_node_id_ptr = (int*) malloc(sizeof(int));
+	*prev_node_id_ptr = 0;
+	//VectorAppend(stack, prev_node_id_ptr);
+	// search untill no match is possible, or input is empty
+	// insert untill input runs out
+	for(int i = 0; i < name.size(); i++)
+	{
+
+
+		char letter = name[i];
+		// make sure this is valid
+		// are there chars_from_edges?
+	
+		int edge = prev_node->char_links[letter];
+
+
+		if(edge == -1)
+		{
+			return -1;
+		}
+		
+		else
+		{
+			prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, edge);
+
+		}
+		
+	}
+	// the name is matched
+	// while the current node has no state data
+	/*
+			if # of edges > 1
+				return -1
+			else if # of edges == 1 and there is state data
+				return -1
+			else if # of edges == 1 and no state data
+				get the next node
+		
+		should run untill we hit the last node that also has state data
+	*/
+	while(prev_node->state_id == -1)
+	{
+		int edge_count = VectorGetPopulation(prev_node->chars_from_edges);
+		if(edge_count > 1)
+		{
+			return -1
+		}
+		else if(edge_count == 1 && prev_node->state_id > -1)
+		{
+			return -1
+		}
+		else if(edge_count == 1 && prev_node->state_id == -1)
+		{
+			int letter = *((int*) VectorGetItem(prev_node->chars_from_edges, 0));
+			int edge = prev_node->char_links[letter];
+			prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, edge);
+
+		}
+	}
+
+	return prev_node->state_id;
+
+}
 
 int TrieTreeSearch(TrieTree* my_trie_tree, Vector* name /* strings*/)
 {

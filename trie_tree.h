@@ -60,6 +60,8 @@ typedef struct TrieTree
 TrieTree* TrieTreeInitTrieTree();
 void TrieTreePush(Vector* container, int new_item);
 int TrieTreeGetNextNode(TrieTree* my_trie_tree, Vector* node_id_stack, Vector* ith_edge_stack);
+int TrieTreeGetVariable(TrieTree* my_trie_tree, string name);
+
 int TrieTreeSearch(TrieTree* my_trie_tree, Vector* name /* strings*/);
 
 

@@ -168,9 +168,14 @@ void TrieTreeInsertString(TrieTree* my_trie_tree, string element);
 
 DynamicMachine* DynamicMachineInitDynamicMachine();
 void DynamicMachineAppendState(DynamicMachine* my_machine, DynamicState* state);
+
+bool recordA(DynamicMachine* my_machine, DynamicState* current_state);
+bool returnTrue(DynamicMachine* my_machine, DynamicState* current_state);
 bool returnATrueValue(DynamicMachine* my_machine, DynamicState* current_state);
 
 int DynamicMachineRunStates(DynamicMachine* my_machine, Vector* state_names);
+
+DynamicState* DynamicStateMakeVariable(string variable_name, Data* value);
 
 void DynamicMachineTest();
 
@@ -300,7 +305,7 @@ Data* makeDataInt(int a);
 
 Data* makeDataFloat(float a);
 
-Data* makeDataString(char* a);
+Data* makeDataString(string a);
 void deleteData(Data* variable);
 
 
