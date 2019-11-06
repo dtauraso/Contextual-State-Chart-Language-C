@@ -862,6 +862,7 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name /* strings*/, 
 	// only char nodes
 	int current_node_id = 0;
 	TrieNode2* current_node;
+	VectorPrintStrings(name);
 
 	// TrieNode2* prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, 0);
 
@@ -929,6 +930,8 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name /* strings*/, 
 
 		}
 	}
+	printf("the chars should be added in\n");
+	TrieTreePrintTrie(my_trie_tree);
 	// run through the trie made and make the word trie 
 	int current_node_id_2 = 0;
 	TrieNode2* current_node_2;
@@ -953,7 +956,7 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name /* strings*/, 
 			if(edge == -1)
 			{
 				// we have no where else to go and the input should be already done
-				printf("should not be happening %c", letter);
+				printf("should not be happening |%c| %i\n", letter, edge);
 			}
 			else if(edge > 0)
 			{
@@ -987,7 +990,7 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name /* strings*/, 
 						next_node->word_counterpart = VectorGetPopulation(my_trie_tree->word_tree) - 1;
 
 						// append the added word to the end of the current word node's edges
-						VectorAppend(current_word_node->links, next_node->word_counterpart);
+						VectorAppendInt(current_word_node->links, next_node->word_counterpart);
 
 						// set the current word node to the added word node
 						// current_word_node_id = next_node->word_counterpart;
