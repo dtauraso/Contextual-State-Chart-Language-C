@@ -438,7 +438,7 @@ Vector* DynamicMachineAppendState(DynamicMachine* my_machine, DynamicState* stat
 	VectorAppend(my_machine->states, state);
 	// insert word into trie
 
-	Vector* new_state_name = TrieTreeInsertWords(my_machine->state_names, state->name, -1);
+	Vector* new_state_name = TrieTreeInsertWords2(my_machine->state_names, state->name, -1);
 
 	// update the state's name
 	// copy the extra parts over
@@ -454,24 +454,6 @@ Vector* DynamicMachineAppendState(DynamicMachine* my_machine, DynamicState* stat
 		}
 	}
 	return new_state_name;
-}
-bool recordA(DynamicMachine* my_machine, DynamicState* current_state)
-{
-	// get vars using current state
-	// if the current char at input is 'a'
-		// increment a count
-		// return true
-	// return false
-	return true;
-}
-bool returnTrue(DynamicMachine* my_machine, DynamicState* current_state)
-{
-	return true;
-}
-bool returnATrueValue(DynamicMachine* my_machine, DynamicState* current_state)
-{
-	printf("returning false\n");
-	return false;
 }
 
 int DynamicMachineRunStates(DynamicMachine* my_machine, DynamicState* current_state, Vector* state_names)
@@ -523,7 +505,8 @@ DynamicState* DynamicStateGetVariable(DynamicMachine* my_machine, TrieTree* vari
 		return NULL;
 
 	}
-	TrieTreePrintTrieWords(variables_trie_tree);
+	// TrieTreePrintTrie(variables_trie_tree);
+	// TrieTreePrintTrieWords(variables_trie_tree);
 
 	DynamicState* state_retrieved = (DynamicState*) VectorGetItem(my_machine->states, state_id);
 	return state_retrieved;
@@ -538,15 +521,15 @@ Data* getVariable(DynamicMachine* my_machine, DynamicState* current_state, strin
 	{
 		
 		Vector* child = (Vector*) VectorGetItem(current_state->children, i);
-		VectorPrintStrings(child);
+		// VectorPrintStrings(child);
 		if(VectorGetPopulation(child) >= 1)
 		{
-			printf("got here\n");
+			// printf("got here\n");
 			string first_name = *((string*) VectorGetItem(child, 0));
 			// will have many of "variables" in the general machine
 			if(first_name == "variables")
 			{
-				printf("in variables\n");
+				// printf("in variables\n");
 				int state_id = TrieTreeSearch(my_machine->state_names, child);
 				if(state_id == -1)
 				{
@@ -554,7 +537,7 @@ Data* getVariable(DynamicMachine* my_machine, DynamicState* current_state, strin
 					return NULL;
 				}
 				DynamicState* variables_state = (DynamicState*) VectorGetItem(my_machine->states, state_id);
-				VectorPrintStrings(variables_state->name);
+				// VectorPrintStrings(variables_state->name);
 				DynamicState* variable_state = DynamicStateGetVariable(my_machine, variables_state->_children, current_state, variable);
 				if(variable_state == NULL)
 				{
@@ -586,6 +569,53 @@ float getFloat(Data* variable)
 {
 	return variable->_float;
 }
+string setString(Data* variable, string new_string)
+{
+	variable->_string = new_string;
+}
+int setInt(Data* variable, int new_int)
+{
+	variable->_int = new_int;
+}
+float setFloat(Data* variable, float new_float)
+{
+	variable->_float = new_float;
+}
+bool recordA(DynamicMachine* my_machine, DynamicState* /*current*/parent_state)
+{
+	printf("first state function\n");
+	string my_variable = getString(getVariable(my_machine, parent_state, "input_string"));
+
+	printf("input_string = %s\n", my_variable.c_str());
+
+	int my_a_count = getInt(getVariable(my_machine, parent_state, "i"));
+
+	printf("i = %i\n", my_a_count);
+
+
+	printf("first character %c\n", my_variable[my_a_count]);
+	// ++my_a_count returns the value after incrementing it, my_a_count++ returns the value before incrememnting it
+	setInt(getVariable(my_machine, parent_state, "i"), ++my_a_count);
+	int x = getInt(getVariable(my_machine, parent_state, "i"));
+	printf("i = %i\n", x);
+
+	// get vars using current state
+	// if the current char at input is 'a'
+		// increment a count
+		// return true
+	// return false
+	return true;
+}
+bool returnTrue(DynamicMachine* my_machine, DynamicState* current_state)
+{
+	return true;
+}
+bool returnATrueValue(DynamicMachine* my_machine, DynamicState* current_state)
+{
+	printf("returning false\n");
+	return false;
+}
+
 				// getVariable(my_machine, current_state, "i")  
 				// 	start at current state
 				// 	go to the variables child
@@ -694,14 +724,14 @@ void DynamicMachineTest()
 						DynamicStateMakeVariable("c_count", makeDataInt(0)));
 
 			Vector* input_string = DynamicMachineAppendState(	my_machine,
-						DynamicStateMakeVariable("input_string", makeDataString("abc") ));
+						DynamicStateMakeVariable("input_string", makeDataString("aabbcc") ));
 			// will not appear in printouts, but does exist in the trie tree
 			// there is no word setup to connect to it
 			Vector* i_1 = DynamicMachineAppendState(	my_machine,
-						DynamicStateMakeVariable("i", makeDataInt(87654)));
-			TrieTreePrintTrie(my_machine->state_names);
-			TrieTreePrintWordTrie(my_machine->state_names);
-
+						DynamicStateMakeVariable("i", makeDataInt(2)));
+			// TrieTreePrintTrie(my_machine->state_names);
+			// TrieTreePrintWordTrie(my_machine->state_names);
+			// works to here
 			// exit(1);
 			// children needs to be a trie tree but constructor has no support for it
 			// DynamicState* initDynamicStateVariableContainer(
@@ -808,9 +838,10 @@ void DynamicMachineTest()
 				all
 					each state can run code in a turing complete language
 			*/
-		TrieTreePrintTrieWords(my_machine->state_names);
-		TrieTreePrintTrie(my_machine->state_names);
-		TrieTreePrintWordTrie(my_machine->state_names);
+		// TrieTreePrintTrieWords(my_machine->state_names);
+		// TrieTreePrintTrie(my_machine->state_names);
+		// exit(1);
+		// TrieTreePrintWordTrie(my_machine->state_names);
 		int state_id = TrieTreeSearch(my_machine->state_names, VectorAddStringToVector1("input_string"));
 
 		DynamicState* x2 = (DynamicState*) VectorGetItem(my_machine->states, state_id);
@@ -828,11 +859,13 @@ void DynamicMachineTest()
 		VectorPrintStrings(my_control_flow_graph->name);
 		string my_variable = getString(getVariable(my_machine, my_control_flow_graph, "input_string"));
 		// printf("%i\n", my_variable);
-		printf("%s\n", my_variable.c_str());
+		printf("input_string = %s\n", my_variable.c_str());
 
-		int my_a_count = getInt(getVariable(my_machine, my_control_flow_graph, "i"));
-		printf("%i\n", my_a_count);
-	
+		Data* my_a_count = (Data*) getVariable(my_machine, my_control_flow_graph, "i");
+		// setInt(my_a_count, 0);
+		printf("i = %i\n", my_a_count->_int);
+		recordA(my_machine, my_control_flow_graph);
+
 		// DynamicState* variables = (DynamicState*) VectorGetItem(my_machine->states, TrieTreeSearch(my_machine->state_names, variables_1));
 
 		// string* y3 = (string*) VectorGetItem(variables->name, 0);

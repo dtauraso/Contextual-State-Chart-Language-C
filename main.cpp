@@ -463,8 +463,10 @@ int main(int argc, char** argv)
 		// printTree2(my_scanner->_lines_graph, 2, 0);
 
 	}
-	TrieTreeTest();
-	// DynamicMachineTest();
+	// TrieTreeTest();
+	DynamicMachineTest();
+	exit(1);
+
 	/*
 	bool insertState1(	Vector** name, // strings
 					Vector*** start_children,  // array of strings

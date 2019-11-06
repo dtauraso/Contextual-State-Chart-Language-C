@@ -86,7 +86,10 @@ void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_p
 
 
 void TrieTreeInsertWord(TrieTree* my_trie_tree, string* new_number_ptr, TrieNode2* node_found2, int state_id);
-Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name /* strings*/, int expected_id);
+// testing this version
+Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name /* strings*/, int expected_id);
+
+// Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name /* strings*/, int expected_id);
 TrieTree* TrieTreeInsertEdges(TrieTree* my_general_tree, TrieTree* my_trie_tree, Vector* names /* vectors of strings*/);
 
 int TrieTreeUpdateId(TrieTree* my_trie_tree, int old_id);
