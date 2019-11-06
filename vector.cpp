@@ -98,6 +98,12 @@ void VectorAppendInt(Vector* container, int element)
 	*element_ptr = element;
 	VectorAppend(container, element_ptr);
 }
+void VectorAppendString(Vector* container, string element)
+{
+	string* element_ptr = (string*) malloc(sizeof(string));
+	*element_ptr = element;
+	VectorAppend(container, element_ptr);
+}
 void VectorAppend(Vector* container, void* element)
 {
 	if(container != NULL)

@@ -109,3 +109,102 @@ char* combineNameAndObjectAddress(char* name, ContextState* address_in)
 
 
 }
+/*
+int VectorSearchItem(Vector* container, void* element, int type)
+{
+	// needs to return wether item was found
+	if(container != NULL)
+	{
+		int low = 0;
+		int high = container->population;
+		int mid = (low + high) / 2;
+		//printf("%i, %i\n", integer, _string);
+		while((low <= high) && (mid < container->population))
+		{
+			//printf("%i, %i, %i\n", low, high, mid);
+			bool is_less_than = false;
+			switch(type)
+			{
+				case integer:
+				{
+					// VectorIsEqualString( element,
+									// ((objec*) dict_container->values[edges->values[mid]])->value)
+					if(VectorIsEqualInt(element, container->values[mid]))
+					{
+						return mid;
+					}
+					is_less_than = VectorIsLessThanInt(element, container->values[mid]);
+					//printf("here %i\n", is_less_than);
+
+					break;
+				}
+				case _string:
+				{
+					if(VectorIsEqualString(element, container->values[mid]))
+					{
+						return mid;
+					}
+					is_less_than = VectorIsLessThanString(element, container->values[mid]);
+					break;
+				}
+				default:
+				{
+
+				}
+			}
+			if(is_less_than)
+			{
+				high = mid - 1;
+			}
+			else
+			{
+				low = mid + 1;
+			}
+			mid = (low + high) / 2;
+
+
+		}
+
+		//printf("item not found %i\n", low);
+		// item didn't get found
+		/*
+		if(low == container->population )
+            return -1 * container->population;
+        if(nums[low] < target) return -(low + 1);
+        return -(low);
+		
+		if(low == container->population)
+		{
+			return -1 * container->population;
+		}
+		else if(low < container->population)
+		{
+			switch(type)
+			{
+				case integer:
+				{
+					if(VectorIsGreaterThanInt(element, container->values[low]))
+					{
+						return -1 * (low + 1);
+					}
+				}
+				case _string:
+				{
+					if(VectorIsGreaterThanString(element, container->values[low]))
+					{
+						return -1 * (low + 1);
+					}
+				}
+				default:
+				{
+
+				}
+			}
+		}
+
+		return -1 * low;
+	}
+	return -200;
+	
+}
+*/

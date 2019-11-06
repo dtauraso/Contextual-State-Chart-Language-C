@@ -121,7 +121,7 @@ typedef struct DynamicMachine
 
 
 }DynamicMachine;
-
+enum container_types {array, trie_tree};
 typedef struct DynamicState
 {
 	Vector* name;
@@ -131,14 +131,17 @@ typedef struct DynamicState
 	// OrderedDict* _start_children;
 
 	Vector* children;
-	// OrderedDict* _children;
+	TrieTree* _children;
 
 	Vector* next_states;
 
 	// OrderedDict* _next_states;
 
 	Data* value;
-	bool container_type;
+	// -1 == NULL
+	// 0 == array
+	// 1 == trie tree
+	int container_type;
 	// int level_number;
 	bool (*function) (DynamicMachine* my_machine, DynamicState* current_state);
 	// bool parent_status;
@@ -167,7 +170,7 @@ void TrieTreeInsertString(TrieTree* my_trie_tree, string element);
 
 
 DynamicMachine* DynamicMachineInitDynamicMachine();
-void DynamicMachineAppendState(DynamicMachine* my_machine, DynamicState* state);
+Vector* DynamicMachineAppendState(DynamicMachine* my_machine, DynamicState* state);
 
 bool recordA(DynamicMachine* my_machine, DynamicState* current_state);
 bool returnTrue(DynamicMachine* my_machine, DynamicState* current_state);

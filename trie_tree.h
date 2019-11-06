@@ -37,6 +37,8 @@ typedef struct TrieNode2
 
 	int word_counterpart; // set in the last character of the word to the word node
 	bool start_of_word;
+	bool end_of_word; // marking the char nodes added so the words can be added in on the second pass
+	int parent;
 
 
 }TrieNode2;
@@ -84,7 +86,9 @@ void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_p
 
 
 void TrieTreeInsertWord(TrieTree* my_trie_tree, string* new_number_ptr, TrieNode2* node_found2, int state_id);
-Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name /* strings*/);
+Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name /* strings*/, int expected_id);
+TrieTree* TrieTreeInsertEdges(TrieTree* my_general_tree, TrieTree* my_trie_tree, Vector* names /* vectors of strings*/);
+
 int TrieTreeUpdateId(TrieTree* my_trie_tree, int old_id);
 
 void TrieTreeCutLinkToFirstNodeInPath(	TrieTree* my_trie_tree,
