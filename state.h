@@ -143,7 +143,7 @@ typedef struct DynamicState
 	// 1 == trie tree
 	int container_type;
 	// int level_number;
-	bool (*function) (DynamicMachine* my_machine, DynamicState* current_state);
+	bool (*function) (DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state);
 	// bool parent_status;
 	// int max_id_for_siblings; // so the max id of machine doesn't grow too fast
 	// int id;
@@ -159,8 +159,9 @@ DynamicState* initDynamicState(	Vector* name, // strings
 								Vector* start_children,  // array of strings
 								Vector* children, // array of strings
 								Vector* next_states, // array of strings
-								bool (*function) (DynamicMachine* my_machine, DynamicState* current_state),
-								Data* value);
+								bool (*function) (	DynamicMachine* my_machine,
+													DynamicState* parent_state,
+													DynamicState* current_state));
 
 // dynamic machine functions
 // final 2 structs for trie ordered dict
@@ -172,11 +173,11 @@ void TrieTreeInsertString(TrieTree* my_trie_tree, string element);
 DynamicMachine* DynamicMachineInitDynamicMachine();
 Vector* DynamicMachineAppendState(DynamicMachine* my_machine, DynamicState* state);
 
-bool recordA(DynamicMachine* my_machine, DynamicState* current_state);
-bool returnTrue(DynamicMachine* my_machine, DynamicState* current_state);
-bool returnATrueValue(DynamicMachine* my_machine, DynamicState* current_state);
+bool recordA(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state);
+bool returnTrue(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state);
+bool returnATrueValue(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state);
 
-int DynamicMachineRunStates(DynamicMachine* my_machine, Vector* state_names);
+DynamicState* DynamicMachineRunStates(DynamicMachine* my_machine, Vector* state_names);
 
 DynamicState* DynamicStateMakeVariable(string variable_name, Data* value);
 

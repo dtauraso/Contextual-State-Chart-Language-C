@@ -320,7 +320,9 @@ DynamicState* initDynamicState(	Vector* name, // strings
 								Vector* start_children,  // array of strings
 								Vector* children, // array of strings
 								Vector* next_states, // array of strings
-								bool (*function) (DynamicMachine* my_machine, DynamicState* current_state),
+								bool (*function) (DynamicMachine* my_machine,
+												  DynamicState* parent_state,
+												  DynamicState* current_state),
 								Data* value)
 {
 	DynamicState* my_dynamic_state = (DynamicState*) malloc(sizeof(DynamicState));
@@ -455,31 +457,69 @@ Vector* DynamicMachineAppendState(DynamicMachine* my_machine, DynamicState* stat
 	}
 	return new_state_name;
 }
+DynamicState* getState(DynamicMachine* my_machine, Vector* name)
+{
+	return (DynamicState*) VectorGetItem(
+									my_machine->states,
+									TrieTreeSearch(	my_machine->state_names,
+													name));
+}
 
-int DynamicMachineRunStates(DynamicMachine* my_machine, DynamicState* current_state, Vector* state_names)
+DynamicState* DynamicMachineRunStates(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state, Vector* state_names)
 {
 	// Vector* state_names is a vector of vectors holding strings
 	// run through a vector of state names and record the index values of the passing states
 	if(state_names != NULL)
 	{
-		int winning_state = 0;
+		// if(parent_state != NULL)
+		// {
+		// 	VectorPrintStrings(parent_state->name);
+
+		// }
+		// if(current_state != NULL)
+		// {
+		// 	VectorPrintStrings(current_state->name);
+
+		// }
+		// VectorPrintStrings(parent_state->name);
+		// VectorPrintStrings(current_state->name);
+
+		Vector* winning_state = NULL;
 		bool state_changed = false;
+		// printf()
+		// 
 		for(int i = 0; i < VectorGetPopulation(state_names); i++)
 		{
 			Vector* state_name = (Vector*) VectorGetItem(state_names, i);
+			// VectorPrintStrings(state_name);
 			if(state_name != NULL)
 			{
 				// get the state id
 				int state_id = TrieTreeSearch(my_machine->state_names, state_name);
+				if(state_id == -1)
+				{
+					printf("this state doesn't exist\n");
+					VectorPrintStrings(state_name);
+					exit(1);
+
+				}
 				// printf("state id %i\n", state_id);
 				// get the state
 				DynamicState* state = (DynamicState*) VectorGetItem(my_machine->states, state_id);
 				// run the state
-				if(state->function(my_machine, current_state))
+				if(state->function(my_machine, parent_state, current_state))
 				{
-					winning_state = i;
+					// printf("winning state\n");
+
+					winning_state = state_name;
+					// VectorPrintStrings(winning_state);
+					// printf("\n");
 					state_changed = true;
 					break;
+				}
+				else
+				{
+					// printf("state failed\n");
 				}
 				
 			}
@@ -487,11 +527,13 @@ int DynamicMachineRunStates(DynamicMachine* my_machine, DynamicState* current_st
 		}
 		if(!state_changed)
 		{
-			return -1;
+			return NULL;
 		}
-		return winning_state;
+		// get the state
+
+		return getState(my_machine, winning_state);
 	}
-	return -1;
+	return NULL;
 }
 
 
@@ -569,48 +611,141 @@ float getFloat(Data* variable)
 {
 	return variable->_float;
 }
-string setString(Data* variable, string new_string)
+void setString(Data* variable, string new_string)
 {
 	variable->_string = new_string;
 }
-int setInt(Data* variable, int new_int)
+void setInt(Data* variable, int new_int)
 {
 	variable->_int = new_int;
 }
-float setFloat(Data* variable, float new_float)
+void setFloat(Data* variable, float new_float)
 {
 	variable->_float = new_float;
 }
-bool recordA(DynamicMachine* my_machine, DynamicState* /*current*/parent_state)
+// what if parent_state is the control flow state(current state is child variable)
+// parent state holds the parent state as a variable(so the machine's parent state can be found and the 
+// varaible obtained)
+bool recordA(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state)
 {
-	printf("first state function\n");
-	string my_variable = getString(getVariable(my_machine, parent_state, "input_string"));
+	printf("recordA\n");
+	string input_string = getString(getVariable(my_machine, parent_state, "input_string"));
 
-	printf("input_string = %s\n", my_variable.c_str());
+	// printf("input_string = %s\n", my_variable.c_str());
 
-	int my_a_count = getInt(getVariable(my_machine, parent_state, "i"));
+	int i = getInt(getVariable(my_machine, parent_state, "i"));
 
-	printf("i = %i\n", my_a_count);
+	int a_count = getInt(getVariable(my_machine, parent_state, "a_count"));
+	// printf("i = %i\n", i);
+	printf("a_count %i\n", a_count);
 
-
-	printf("first character %c\n", my_variable[my_a_count]);
+	// printf("first character %c\n", my_variable[i]);
 	// ++my_a_count returns the value after incrementing it, my_a_count++ returns the value before incrememnting it
-	setInt(getVariable(my_machine, parent_state, "i"), ++my_a_count);
-	int x = getInt(getVariable(my_machine, parent_state, "i"));
-	printf("i = %i\n", x);
+	// setInt(getVariable(my_machine, parent_state, "i"), ++my_a_count);
+	// int x = getInt(getVariable(my_machine, parent_state, "i"));
+	// printf("i = %i\n", x);
 
 	// get vars using current state
+
 	// if the current char at input is 'a'
+	if(i < input_string.size())
+	{
+		if(input_string[i] == 'a')
+		{
+			setInt(getVariable(my_machine, parent_state, "i"), i + 1);
+			setInt(getVariable(my_machine, parent_state, "a_count"), a_count + 1);
+			return true;
+		}
+	}
+	
+	
 		// increment a count
 		// return true
 	// return false
-	return true;
+	return false;
 }
-bool returnTrue(DynamicMachine* my_machine, DynamicState* current_state)
+bool recordB(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state)
+{
+	printf("recordB \n");
+	string input_string = getString(getVariable(my_machine, parent_state, "input_string"));
+
+
+	int i = getInt(getVariable(my_machine, parent_state, "i"));
+	int a_count = getInt(getVariable(my_machine, parent_state, "a_count"));
+	int b_count = getInt(getVariable(my_machine, parent_state, "b_count"));
+
+	// if the current char at input is 'a'
+	if(i < input_string.size())
+	{
+		if(input_string[i] == 'b')
+		{
+			i += 1;
+			b_count += 1;
+
+			if(b_count <= a_count)
+			{
+
+				setInt(getVariable(my_machine, parent_state, "i"), i);
+				setInt(getVariable(my_machine, parent_state, "b_count"), b_count);
+
+				return true;
+			}
+
+			return false;
+		}
+	}
+	
+	
+	return false;
+}
+bool recordC(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state)
+{
+	printf("recordC \n");
+	string input_string = getString(getVariable(my_machine, parent_state, "input_string"));
+
+
+	int i = getInt(getVariable(my_machine, parent_state, "i"));
+	int b_count = getInt(getVariable(my_machine, parent_state, "b_count"));
+	int c_count = getInt(getVariable(my_machine, parent_state, "c_count"));
+	// printf("%i %i %i\n", i, input_string.size(), i < input_string.size());
+	// if the current char at input is 'a'
+	if(i < input_string.size())
+	{
+		if(input_string[i] == 'c')
+		{
+			i += 1;
+			c_count += 1;
+			if(c_count <= b_count)
+			{
+				setInt(getVariable(my_machine, parent_state, "i"), i);
+				setInt(getVariable(my_machine, parent_state, "c_count"), c_count);
+
+				return true;
+			}
+
+			return false;
+		}
+	}
+	
+	return false;
+
+	
+}
+bool endOfInput(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state)
+{
+	printf("endOfInput \n");
+	string input_string = getString(getVariable(my_machine, parent_state, "input_string"));
+
+
+	int i = getInt(getVariable(my_machine, parent_state, "i"));
+	return i >= input_string.size();
+}
+
+bool returnTrue(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state)
 {
 	return true;
 }
-bool returnATrueValue(DynamicMachine* my_machine, DynamicState* current_state)
+bool returnATrueValue(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state)
 {
 	printf("returning false\n");
 	return false;
@@ -704,18 +839,27 @@ void DynamicMachineTest()
 	printf("%i\n", z->_int);
 
 	// x->function = returnATrueValue;
-	x->function(NULL, NULL);
+	x->function(NULL, NULL, NULL);
 	Vector* state_names = VectorInitVector();
 	VectorAppend(state_names, VectorAddStringToVector3(
 							"state 1",
 							"x",
 							"y\""));
 
-	int winning_state = DynamicMachineRunStates(my_machine, x, state_names);
-	printf("winning state %i\n", winning_state);
-
+	DynamicState* winning_state = DynamicMachineRunStates(my_machine, NULL, x, state_names);
+	printf("winning state \n");
+	if(winning_state == NULL)
+	{
+		printf("no state one\n");
+	}
+	// VectorPrintStrings(winning_state->name);
+	// we are going to recognize a context-sensitive grammer
+	// a^nb^nc^n with 4 states without using text rewriting rules
+	// each state is very clear on the expected sequence following it
+	// there is no need for a hierarchy in the state structure
+			// all we know is the variables are addressed by unique names
 			Vector* a_count = DynamicMachineAppendState(	my_machine,
-						DynamicStateMakeVariable("a_count", makeDataInt(234)));
+						DynamicStateMakeVariable("a_count", makeDataInt(0)));
 
 			Vector* b_count = DynamicMachineAppendState(	my_machine,
 						DynamicStateMakeVariable("b_count", makeDataInt(0)));
@@ -728,7 +872,7 @@ void DynamicMachineTest()
 			// will not appear in printouts, but does exist in the trie tree
 			// there is no word setup to connect to it
 			Vector* i_1 = DynamicMachineAppendState(	my_machine,
-						DynamicStateMakeVariable("i", makeDataInt(2)));
+						DynamicStateMakeVariable("i", makeDataInt(0)));
 			// TrieTreePrintTrie(my_machine->state_names);
 			// TrieTreePrintWordTrie(my_machine->state_names);
 			// works to here
@@ -801,6 +945,7 @@ void DynamicMachineTest()
 			// 		recordA
 			// 	next
 			// 		a | (b | c) => a | b
+			// It's assumed the state names are added in as a unique sequence of string literals
 			DynamicMachineAppendState(	my_machine,
 						initDynamicState(VectorAddStringToVector1(
 											"a"),
@@ -814,6 +959,43 @@ void DynamicMachineTest()
 										NULL
 										)
 						);
+			DynamicMachineAppendState(	my_machine,
+						initDynamicState(VectorAddStringToVector1(
+											"b"),
+										NULL,
+										NULL,
+										VectorCombineVectors2(
+											VectorAddStringToVector1("b"),
+											VectorAddStringToVector1("c")
+										),
+										recordB,
+										NULL
+										)
+						);
+			DynamicMachineAppendState(	my_machine,
+						initDynamicState(VectorAddStringToVector1(
+											"c"),
+										NULL,
+										NULL,
+										VectorCombineVectors2(
+											VectorAddStringToVector1("c"),
+											VectorAddStringToVector1("end of input")
+										),
+										recordC,
+										NULL
+										)
+						);
+			DynamicMachineAppendState(	my_machine,
+						initDynamicState(VectorAddStringToVector1(
+											"end of input"),
+										NULL,
+										NULL,
+										VectorInitVector(),
+										endOfInput,
+										NULL
+										)
+						);
+
 			// if current_state == "control flow graph"
 			/*
 				getVariable(current_state, "i")  
@@ -852,6 +1034,8 @@ void DynamicMachineTest()
 
 		printf("find variable\n");
 		// parent of current state
+		// got to be a better way to get the state
+		// getState(my_machine, Vector* name)
 		DynamicState* my_control_flow_graph = (DynamicState*) VectorGetItem(
 																	my_machine->states,
 																	TrieTreeSearch(	my_machine->state_names,
@@ -864,7 +1048,148 @@ void DynamicMachineTest()
 		Data* my_a_count = (Data*) getVariable(my_machine, my_control_flow_graph, "i");
 		// setInt(my_a_count, 0);
 		printf("i = %i\n", my_a_count->_int);
-		recordA(my_machine, my_control_flow_graph);
+		// bool result = recordA(my_machine, my_control_flow_graph, NULL);
+		// printf("recordA is %i and i is %i\n", 	result,
+		// 										getInt(getVariable(my_machine, my_control_flow_graph, "i")));
+	// 	Vector* state_names = VectorInitVector();
+	// 	VectorAppend(state_names, VectorAddStringToVector3(
+		// have to get each item from the next states vector from a state state->next_states
+	// 						"state 1",
+	// 						"x",
+	// 						"y\""));
+
+		printf("\n\nrunning\n");
+		// (parent_state(child state at above level), child_state, ith_child(might need to save when poping), result of machine on current level)
+		// take the current state(a parent state) and run this for the child machine
+		// pretend the state works
+		DynamicState* working_state = getState(my_machine, VectorAddStringToVector1("a"));
+		while(working_state != NULL)
+		{
+			// need terms for handling the different kinds of neighbors for manually running
+			// more than 1 level
+			Vector* next_states = working_state->next_states;
+			working_state = DynamicMachineRunStates(my_machine,
+													// the parent state
+													my_control_flow_graph,
+													working_state,
+													// first time, should be the next states from root
+													working_state->next_states);
+			printf("the winning state is\n");
+			if(working_state == NULL)
+			{
+				// no state won and there are neighbors
+				if(VectorGetPopulation(next_states) > 0)
+				{
+					printf("no state won so shut down machine or return false to the parent machine.\n");
+					// return false to caller
+				}
+				else // no state won but there were no neighbors
+				{
+					printf("at end of machine\n");
+					// return true to caller
+				}
+			}
+			else
+			{
+				VectorPrintStrings(working_state->name);
+
+			}
+		}
+		printf("done\n\n");
+		exit(1);
+		// input tested is "aabbcc"
+		working_state = DynamicMachineRunStates(my_machine,
+													// the parent state
+													my_control_flow_graph,
+													// not state name, entire state
+													working_state,
+													// first time, should be the next states from root
+													working_state->next_states);
+		printf("the winning state is\n");
+		VectorPrintStrings(working_state->name);
+
+
+
+		printf("\n");
+
+		printf("%i %i  %i\n", getInt(getVariable(my_machine, my_control_flow_graph, "a_count")),
+						getInt(getVariable(my_machine, my_control_flow_graph, "b_count")),
+						getInt(getVariable(my_machine, my_control_flow_graph, "i")));
+		working_state = DynamicMachineRunStates(my_machine,
+												my_control_flow_graph,
+												working_state,
+												working_state->next_states);
+		printf("the winning state is\n");
+		VectorPrintStrings(working_state->name);
+		printf("\n");
+
+		printf("%i %i  %i\n", getInt(getVariable(my_machine, my_control_flow_graph, "a_count")),
+						getInt(getVariable(my_machine, my_control_flow_graph, "b_count")),
+						getInt(getVariable(my_machine, my_control_flow_graph, "i")));
+		working_state = DynamicMachineRunStates(my_machine,
+												my_control_flow_graph,
+												working_state,
+												working_state->next_states);
+		printf("the winning state is\n");
+		VectorPrintStrings(working_state->name);
+
+		printf("\n");
+
+		printf("%i %i  %i\n", getInt(getVariable(my_machine, my_control_flow_graph, "a_count")),
+						getInt(getVariable(my_machine, my_control_flow_graph, "b_count")),
+						getInt(getVariable(my_machine, my_control_flow_graph, "i")));
+		working_state = DynamicMachineRunStates(my_machine,
+												my_control_flow_graph,
+												working_state,
+												working_state->next_states);
+		printf("the winning state is\n");
+		VectorPrintStrings(working_state->name);
+		printf("\n");
+
+		printf("%i %i  %i\n", getInt(getVariable(my_machine, my_control_flow_graph, "a_count")),
+						getInt(getVariable(my_machine, my_control_flow_graph, "b_count")),
+						getInt(getVariable(my_machine, my_control_flow_graph, "i")));
+		working_state = DynamicMachineRunStates(my_machine,
+												my_control_flow_graph,
+												working_state,
+												working_state->next_states);
+		printf("the winning state is\n");
+		VectorPrintStrings(working_state->name);
+		printf("\n");
+
+		printf("%i %i  %i\n", getInt(getVariable(my_machine, my_control_flow_graph, "a_count")),
+						getInt(getVariable(my_machine, my_control_flow_graph, "b_count")),
+						getInt(getVariable(my_machine, my_control_flow_graph, "i")));
+		working_state = DynamicMachineRunStates(my_machine,
+												my_control_flow_graph,
+												working_state,
+												working_state->next_states);
+		printf("the winning state is\n");
+		VectorPrintStrings(working_state->name);
+		printf("\n");
+
+		printf("%i %i  %i\n", getInt(getVariable(my_machine, my_control_flow_graph, "a_count")),
+						getInt(getVariable(my_machine, my_control_flow_graph, "b_count")),
+						getInt(getVariable(my_machine, my_control_flow_graph, "i")));
+		working_state = DynamicMachineRunStates(my_machine,
+												my_control_flow_graph,
+												working_state,
+												working_state->next_states);
+		printf("the winning state is\n");
+		if(working_state == NULL)
+		{
+			printf("no state won so shut down machine or return false to the parent machine.\n");
+		}
+		else
+		{
+			VectorPrintStrings(working_state->name);
+
+		}
+		
+		// VectorPrintStrings(working_state->name);
+		// printf("\n");
+
+		// TrieTreePrintTrieWords(my_machine->state_names);
 
 		// DynamicState* variables = (DynamicState*) VectorGetItem(my_machine->states, TrieTreeSearch(my_machine->state_names, variables_1));
 
