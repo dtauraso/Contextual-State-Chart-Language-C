@@ -125,6 +125,12 @@ enum container_types {array, trie_tree};
 typedef struct DynamicState
 {
 	Vector* name;
+	bool is_child;
+	bool is_start_child;
+	bool is_parent;
+	
+	Vector* parents;
+	TrieTree* _parents;
 
 	Vector* start_children;
 
@@ -134,6 +140,7 @@ typedef struct DynamicState
 	TrieTree* _children;
 
 	Vector* next_states;
+
 
 	// OrderedDict* _next_states;
 
@@ -156,6 +163,19 @@ typedef struct DynamicState
 
 // dynamic state funcitons
 DynamicState* initDynamicState(	Vector* name, // strings
+								Vector* parents,  // array of strings
+								Vector* start_children,  // array of strings
+								Vector* children, // array of strings
+								Vector* next_states, // array of strings
+								bool (*function) (	DynamicMachine* my_machine,
+													DynamicState* parent_state,
+													DynamicState* current_state));
+
+DynamicState* initDynamicState2(	Vector* name, // strings
+								bool isChild,
+								bool isStartChild,
+								bool isParent,
+								Vector* parents,  // array of strings
 								Vector* start_children,  // array of strings
 								Vector* children, // array of strings
 								Vector* next_states, // array of strings
@@ -179,7 +199,15 @@ bool returnATrueValue(DynamicMachine* my_machine, DynamicState* parent_state, Dy
 
 DynamicState* DynamicMachineRunStates(DynamicMachine* my_machine, Vector* state_names);
 
-DynamicState* DynamicStateMakeVariable(string variable_name, Data* value);
+DynamicState* DynamicStateMakeVariable(	string variable_name,
+										Vector* parents,  // array of strings
+										Data* value);
+
+DynamicState* DynamicStateMakeVariable2(	string variable_name,
+										Vector* parents,  // array of strings
+										Data* value);
+
+void DynamicMachineTest2();
 
 void DynamicMachineTest();
 

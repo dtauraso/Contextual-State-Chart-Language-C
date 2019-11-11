@@ -464,7 +464,9 @@ int main(int argc, char** argv)
 
 	}
 	// TrieTreeTest();
-	DynamicMachineTest();
+	// DynamicMachineTest();
+	// tests pass so far
+	DynamicMachineTest2();
 	exit(1);
 
 	/*
