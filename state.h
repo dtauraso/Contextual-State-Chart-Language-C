@@ -1,11 +1,11 @@
 #ifndef STATE3
 #define STATE3
 #include <stdbool.h>
-#include <stdlib.h>
+#include "stdlib.h"
 #include <stdio.h>
 #include <string.h>
 #include "trie_node.h"
-#include "multiway_lines_node.h"
+// #include "multiway_lines_node.h"
 #include "vector.h"
 #include "trie_tree.h"
 #include <map>
@@ -162,7 +162,7 @@ typedef struct DynamicState
 
 
 // dynamic state funcitons
-DynamicState* initDynamicState(	Vector* name, // strings
+DynamicState* DynamicStateInitDynamicState(	Vector* name, // strings
 								Vector* parents,  // array of strings
 								Vector* start_children,  // array of strings
 								Vector* children, // array of strings
@@ -171,7 +171,7 @@ DynamicState* initDynamicState(	Vector* name, // strings
 													DynamicState* parent_state,
 													DynamicState* current_state));
 
-DynamicState* initDynamicState2(	Vector* name, // strings
+DynamicState* DynamicStateInitDynamicState2(	Vector* name, // strings
 								bool isChild,
 								bool isStartChild,
 								bool isParent,
@@ -333,12 +333,12 @@ typedef struct ContextState
 		char* debugging_log;
 
 }ContextState;
-Data* makeDataInt(int a);
+Data* DataInitDataInt(int a);
 
-Data* makeDataFloat(float a);
+Data* DataInitDataFloat(float a);
 
-Data* makeDataString(string a);
-void deleteData(Data* variable);
+Data* DataInitDataString(string a);
+void DataDeleteData(Data* variable);
 
 
 ContextState* initContextState();

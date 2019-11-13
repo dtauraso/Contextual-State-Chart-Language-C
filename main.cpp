@@ -744,7 +744,7 @@ int main(int argc, char** argv)
 					VectorCombineVectors(
 							VectorAddStringToVector2("current_state", "children_flag"),
 							VectorAddStringToVector2("current_state", "next_flag")),
-					makeDataInt(50));
+					DataInitDataInt(50));
 		TrieTreePrintTrie(my_dynamic_machine->trie_tree_dict);
 	
 	start
@@ -767,7 +767,7 @@ int main(int argc, char** argv)
 					VectorCombineVectors(
 							VectorAddStringToVector2("current_state", "children_flag"),
 							VectorAddStringToVector2("current_state", "next_flag")),
-					makeDataInt(50));
+					DataInitDataInt(50));
 		TrieTreePrintTrie(my_dynamic_machine->trie_tree_dict);
 	
 	
@@ -795,7 +795,7 @@ int main(int argc, char** argv)
 					VectorCombineVectors(
 							VectorAddStringToVector2("current_state2", "children_flag2"),
 							VectorAddStringToVector2("current_state2", "next_flag2")),
-					makeDataFloat(9.6));
+					DataInitDataFloat(9.6));
 	
 	
 	my_dynamic_machine = insertState1(
@@ -806,7 +806,7 @@ int main(int argc, char** argv)
 					VectorCombineVectors(
 							VectorAddStringToVector2("current_state2", "children_flag2"),
 							VectorAddStringToVector2("current_state2", "next_flag2")),
-					makeDataFloat(9.7));
+					DataInitDataFloat(9.7));
 	
 	// test unique states
 	// test unique state edges

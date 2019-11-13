@@ -1,7 +1,7 @@
 #include "state.h"
 #include "state_machine.h"
-//#include "vector.h"
-#include "trie_tree.h"
+// #include "vector.h"
+// #include "trie_tree.h"
 //#include "jsmn/jsmn.h"
 // this file is compiled last?
 //struct Vector;
@@ -96,7 +96,7 @@ DynamicMachine
 1 int for tallying the strings forming the state names
 1 int* internal_machine_of_operations(child, next states for each state)
 
-getState(name_1, name_2, name_3)
+DynamicStateGetState(name_1, name_2, name_3)
 setStateTypeName(name_1, name_2, name_3, value)
 link(state_1, state_2)
 
@@ -316,7 +316,7 @@ typedef struct OrderedDict
 // 	return NULL;
 // }
 
-DynamicState* initDynamicState(	Vector* name, // strings
+DynamicState* DynamicStateInitDynamicState(	Vector* name, // strings
 								Vector* parents,  // array of strings
 								Vector* start_children,  // array of strings
 								Vector* children, // array of strings
@@ -341,7 +341,7 @@ DynamicState* initDynamicState(	Vector* name, // strings
 	return my_dynamic_state;
 }
 
-DynamicState* initDynamicState2(	Vector* name, // strings
+DynamicState* DynamicStateInitDynamicState2(	Vector* name, // strings
 								bool is_child,
 								bool is_start_child,
 								bool is_parent,
@@ -375,7 +375,7 @@ DynamicState* initDynamicState2(	Vector* name, // strings
 }
 
 
-DynamicState* initDynamicStateVariableContainer(
+DynamicState* DynamicStateInitDynamicStateVariableContainer(
 								Vector* name, // strings
 								Vector* parents,  // array of strings
 								TrieTree* _children,
@@ -405,7 +405,7 @@ DynamicState* DynamicStateMakeVariable(	string variable_name,
 										Data* value)
 {
 
-	return initDynamicState(VectorAddStringToVector1(variable_name),
+	return DynamicStateInitDynamicState(VectorAddStringToVector1(variable_name),
 							parents,
 							NULL,
 							NULL,
@@ -420,7 +420,7 @@ DynamicState* DynamicStateMakeVariable2(	string variable_name,
 										Data* value)
 {
 
-	return initDynamicState2(VectorAddStringToVector1(variable_name),
+	return DynamicStateInitDynamicState2(VectorAddStringToVector1(variable_name),
 							parents,
 							0,
 							0,
@@ -486,7 +486,7 @@ DynamicMachine* DynamicMachineInitDynamicMachine()
 	// my_dynamic_machine->start_children = VectorInitVector();  // array of strings
 	// my_dynamic_machine->children = VectorInitVector(); // array of strings
 	// my_dynamic_machine->next_states = VectorInitVector(); // array of strings
-	// my_dynamic_machine->value = makeDataInt(0);
+	// my_dynamic_machine->value = DataInitDataInt(0);
 
 	// my_dynamic_machine->trie_tree_dict = TrieTreeInitTrieTree();
 	//
@@ -520,7 +520,7 @@ Vector* DynamicMachineAppendState(DynamicMachine* my_machine, DynamicState* stat
 	}
 	return new_state_name;
 }
-DynamicState* getState(DynamicMachine* my_machine, Vector* name)
+DynamicState* DynamicStateGetState(DynamicMachine* my_machine, Vector* name)
 {
 	return (DynamicState*) VectorGetItem(
 									my_machine->states,
@@ -595,7 +595,7 @@ DynamicState* DynamicMachineRunStates(DynamicMachine* my_machine, DynamicState* 
 		}
 		// get the state
 
-		return getState(my_machine, winning_state);
+		return DynamicStateGetState(my_machine, winning_state);
 	}
 	return NULL;
 }
@@ -668,7 +668,7 @@ int DynamicMachineRunStates2(DynamicMachine* my_machine, DynamicState* parent_st
 		}
 		// get the state
 
-		return winning_state_id;//getState(my_machine, winning_state);
+		return winning_state_id;//DynamicStateGetState(my_machine, winning_state);
 	}
 	return -1;
 }
@@ -693,7 +693,7 @@ DynamicState* DynamicStateGetVariable(DynamicMachine* my_machine, TrieTree* vari
 
 }
 
-Data* getVariable(DynamicMachine* my_machine, DynamicState* current_state, string variable)
+Data* DataGetVariable(DynamicMachine* my_machine, DynamicState* current_state, string variable)
 {
 	// machine, parent, variable_name
 	// for each item in current_state.children
@@ -811,27 +811,27 @@ Data* getVariable(DynamicMachine* my_machine, DynamicState* current_state, strin
 // }
 
 
-string getString(Data* variable)
+string DataGetString(Data* variable)
 {
 	return variable->_string;
 }
-int getInt(Data* variable)
+int DataGetInt(Data* variable)
 {
 	return variable->_int;
 }
-float getFloat(Data* variable)
+float DataGetFloat(Data* variable)
 {
 	return variable->_float;
 }
-void setString(Data* variable, string new_string)
+void DataSetString(Data* variable, string new_string)
 {
 	variable->_string = new_string;
 }
-void setInt(Data* variable, int new_int)
+void DataSetInt(Data* variable, int new_int)
 {
 	variable->_int = new_int;
 }
-void setFloat(Data* variable, float new_float)
+void DataSetFloat(Data* variable, float new_float)
 {
 	variable->_float = new_float;
 }
@@ -841,20 +841,20 @@ void setFloat(Data* variable, float new_float)
 bool recordA(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state)
 {
 	printf("recordA\n");
-	string input_string = getString(getVariable(my_machine, parent_state, "input_string"));
+	string input_string = DataGetString(DataGetVariable(my_machine, parent_state, "input_string"));
 
 	// printf("input_string = %s\n", my_variable.c_str());
 
-	int i = getInt(getVariable(my_machine, parent_state, "i"));
+	int i = DataGetInt(DataGetVariable(my_machine, parent_state, "i"));
 
-	int a_count = getInt(getVariable(my_machine, parent_state, "a_count"));
+	int a_count = DataGetInt(DataGetVariable(my_machine, parent_state, "a_count"));
 	// printf("i = %i\n", i);
 	printf("a_count %i\n", a_count);
 
 	// printf("first character %c\n", my_variable[i]);
 	// ++my_a_count returns the value after incrementing it, my_a_count++ returns the value before incrememnting it
-	// setInt(getVariable(my_machine, parent_state, "i"), ++my_a_count);
-	// int x = getInt(getVariable(my_machine, parent_state, "i"));
+	// DataSetInt(DataGetVariable(my_machine, parent_state, "i"), ++my_a_count);
+	// int x = DataGetInt(DataGetVariable(my_machine, parent_state, "i"));
 	// printf("i = %i\n", x);
 
 	// get vars using current state
@@ -864,8 +864,8 @@ bool recordA(DynamicMachine* my_machine, DynamicState* parent_state, DynamicStat
 	{
 		if(input_string[i] == 'a')
 		{
-			setInt(getVariable(my_machine, parent_state, "i"), i + 1);
-			setInt(getVariable(my_machine, parent_state, "a_count"), a_count + 1);
+			DataSetInt(DataGetVariable(my_machine, parent_state, "i"), i + 1);
+			DataSetInt(DataGetVariable(my_machine, parent_state, "a_count"), a_count + 1);
 			return true;
 		}
 	}
@@ -879,12 +879,12 @@ bool recordA(DynamicMachine* my_machine, DynamicState* parent_state, DynamicStat
 bool recordB(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state)
 {
 	printf("recordB \n");
-	string input_string = getString(getVariable(my_machine, parent_state, "input_string"));
+	string input_string = DataGetString(DataGetVariable(my_machine, parent_state, "input_string"));
 
 
-	int i = getInt(getVariable(my_machine, parent_state, "i"));
-	int a_count = getInt(getVariable(my_machine, parent_state, "a_count"));
-	int b_count = getInt(getVariable(my_machine, parent_state, "b_count"));
+	int i = DataGetInt(DataGetVariable(my_machine, parent_state, "i"));
+	int a_count = DataGetInt(DataGetVariable(my_machine, parent_state, "a_count"));
+	int b_count = DataGetInt(DataGetVariable(my_machine, parent_state, "b_count"));
 
 	// if the current char at input is 'a'
 	if(i < input_string.size())
@@ -897,8 +897,8 @@ bool recordB(DynamicMachine* my_machine, DynamicState* parent_state, DynamicStat
 			if(b_count <= a_count)
 			{
 
-				setInt(getVariable(my_machine, parent_state, "i"), i);
-				setInt(getVariable(my_machine, parent_state, "b_count"), b_count);
+				DataSetInt(DataGetVariable(my_machine, parent_state, "i"), i);
+				DataSetInt(DataGetVariable(my_machine, parent_state, "b_count"), b_count);
 
 				return true;
 			}
@@ -913,12 +913,12 @@ bool recordB(DynamicMachine* my_machine, DynamicState* parent_state, DynamicStat
 bool recordC(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state)
 {
 	printf("recordC \n");
-	string input_string = getString(getVariable(my_machine, parent_state, "input_string"));
+	string input_string = DataGetString(DataGetVariable(my_machine, parent_state, "input_string"));
 
 
-	int i = getInt(getVariable(my_machine, parent_state, "i"));
-	int b_count = getInt(getVariable(my_machine, parent_state, "b_count"));
-	int c_count = getInt(getVariable(my_machine, parent_state, "c_count"));
+	int i = DataGetInt(DataGetVariable(my_machine, parent_state, "i"));
+	int b_count = DataGetInt(DataGetVariable(my_machine, parent_state, "b_count"));
+	int c_count = DataGetInt(DataGetVariable(my_machine, parent_state, "c_count"));
 	// printf("%i %i %i\n", i, input_string.size(), i < input_string.size());
 	// if the current char at input is 'a'
 	if(i < input_string.size())
@@ -929,8 +929,8 @@ bool recordC(DynamicMachine* my_machine, DynamicState* parent_state, DynamicStat
 			c_count += 1;
 			if(c_count <= b_count)
 			{
-				setInt(getVariable(my_machine, parent_state, "i"), i);
-				setInt(getVariable(my_machine, parent_state, "c_count"), c_count);
+				DataSetInt(DataGetVariable(my_machine, parent_state, "i"), i);
+				DataSetInt(DataGetVariable(my_machine, parent_state, "c_count"), c_count);
 
 				return true;
 			}
@@ -946,10 +946,10 @@ bool recordC(DynamicMachine* my_machine, DynamicState* parent_state, DynamicStat
 bool endOfInput(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state)
 {
 	printf("endOfInput \n");
-	string input_string = getString(getVariable(my_machine, parent_state, "input_string"));
+	string input_string = DataGetString(DataGetVariable(my_machine, parent_state, "input_string"));
 
 
-	int i = getInt(getVariable(my_machine, parent_state, "i"));
+	int i = DataGetInt(DataGetVariable(my_machine, parent_state, "i"));
 	return i >= input_string.size();
 }
 
@@ -957,13 +957,13 @@ bool returnTrue(DynamicMachine* my_machine, DynamicState* parent_state, DynamicS
 {
 	return true;
 }
-bool returnATrueValue(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state)
+bool returnFalse(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state)
 {
 	printf("returning false\n");
 	return false;
 }
 
-				// getVariable(my_machine, current_state, "i")  
+				// DataGetVariable(my_machine, current_state, "i")  
 				// 	start at current state
 				// 	go to the variables child
 				// 	get the variables child with name starting at "i"
@@ -1025,14 +1025,14 @@ void DynamicMachineTest()
 					none
 	*/
 	DynamicMachineAppendState(	my_machine,
-								initDynamicState(VectorAddStringToVector3(
+								DynamicStateInitDynamicState(VectorAddStringToVector3(
 													"state 1", "x", "y\""),
 												NULL,
 												NULL,
 												NULL,
 												NULL,
-												returnATrueValue,
-												makeDataInt(2)
+												returnFalse,
+												DataInitDataInt(2)
 												)
 								);
 	// state name in trie test
@@ -1051,7 +1051,7 @@ void DynamicMachineTest()
 	Data* z = x1->value;
 	printf("%i\n", z->_int);
 
-	// x->function = returnATrueValue;
+	// x->function = returnFalse;
 	x->function(NULL, NULL, NULL);
 	Vector* state_names = VectorInitVector();
 	VectorAppend(state_names, VectorAddStringToVector3(
@@ -1074,34 +1074,34 @@ void DynamicMachineTest()
 			Vector* a_count = DynamicMachineAppendState(	my_machine,
 						DynamicStateMakeVariable("a_count",
 						VectorCombineVectors1(VectorAddStringToVector1("variables")),
-						makeDataInt(0)));
+						DataInitDataInt(0)));
 
 			Vector* b_count = DynamicMachineAppendState(	my_machine,
 						DynamicStateMakeVariable("b_count",
 						VectorCombineVectors1(VectorAddStringToVector1("variables")),
-						makeDataInt(0)));
+						DataInitDataInt(0)));
 
 			Vector* c_count = DynamicMachineAppendState(	my_machine,
 						DynamicStateMakeVariable("c_count",
 						VectorCombineVectors1(VectorAddStringToVector1("variables")),
-						makeDataInt(0)));
+						DataInitDataInt(0)));
 
 			Vector* input_string = DynamicMachineAppendState(	my_machine,
 						DynamicStateMakeVariable("input_string",
 						VectorCombineVectors1(VectorAddStringToVector1("variables")),
-						makeDataString("aabbcc") ));
+						DataInitDataString("aabbcc") ));
 			// will not appear in printouts, but does exist in the trie tree
 			// there is no word setup to connect to it
 			Vector* i_1 = DynamicMachineAppendState(	my_machine,
 						DynamicStateMakeVariable("i",
 						VectorCombineVectors1(VectorAddStringToVector1("variables")),
-						makeDataInt(0)));
+						DataInitDataInt(0)));
 			// TrieTreePrintTrie(my_machine->state_names);
 			// TrieTreePrintWordTrie(my_machine->state_names);
 			// works to here
 			// exit(1);
 			// children needs to be a trie tree but constructor has no support for it
-			// DynamicState* initDynamicStateVariableContainer(
+			// DynamicState* DynamicStateInitDynamicStateVariableContainer(
 			// 					Vector* name, // strings
 			// 					TrieTree* _children,
 			// 					int container_type)
@@ -1109,7 +1109,7 @@ void DynamicMachineTest()
 
 			// this creates a local scode so the variable name chosen by the user will work
 			Vector* variables_1 = DynamicMachineAppendState(	my_machine,
-							initDynamicStateVariableContainer(	VectorAddStringToVector1("variables"),
+							DynamicStateInitDynamicStateVariableContainer(	VectorAddStringToVector1("variables"),
 												VectorCombineVectors1(VectorAddStringToVector1("control flow graph")),
 																// returns the trie tree with items inserted										
 																TrieTreeInsertEdges(my_machine->state_names,
@@ -1129,7 +1129,7 @@ void DynamicMachineTest()
 							);
 
 			Vector* variables_2 = DynamicMachineAppendState(	my_machine,
-							initDynamicState(VectorAddStringToVector1(
+							DynamicStateInitDynamicState(VectorAddStringToVector1(
 												"variables"),
 												NULL,
 											NULL,
@@ -1149,7 +1149,7 @@ void DynamicMachineTest()
 
 			// control flow graph
 			Vector* control_flow_graph = DynamicMachineAppendState(	my_machine,
-							initDynamicState(VectorAddStringToVector1(
+							DynamicStateInitDynamicState(VectorAddStringToVector1(
 												"control flow graph"),
 												NULL,
 											NULL,
@@ -1166,7 +1166,7 @@ void DynamicMachineTest()
 							);
 
 			DynamicMachineAppendState(	my_machine,
-							initDynamicState(VectorAddStringToVector1(
+							DynamicStateInitDynamicState(VectorAddStringToVector1(
 												"root"),
 												NULL,
 											NULL,
@@ -1184,7 +1184,7 @@ void DynamicMachineTest()
 			// 		a | (b | c) => a | b
 			// It's assumed the state names are added in as a unique sequence of string literals
 			DynamicMachineAppendState(	my_machine,
-						initDynamicState(VectorAddStringToVector1(
+						DynamicStateInitDynamicState(VectorAddStringToVector1(
 											"a"),
 											NULL,
 										NULL,
@@ -1198,7 +1198,7 @@ void DynamicMachineTest()
 										)
 						);
 			DynamicMachineAppendState(	my_machine,
-						initDynamicState(VectorAddStringToVector1(
+						DynamicStateInitDynamicState(VectorAddStringToVector1(
 											"b"),
 											NULL,
 										NULL,
@@ -1212,7 +1212,7 @@ void DynamicMachineTest()
 										)
 						);
 			DynamicMachineAppendState(	my_machine,
-						initDynamicState(VectorAddStringToVector1(
+						DynamicStateInitDynamicState(VectorAddStringToVector1(
 											"c"),
 											NULL,
 										NULL,
@@ -1226,7 +1226,7 @@ void DynamicMachineTest()
 										)
 						);
 			DynamicMachineAppendState(	my_machine,
-						initDynamicState(VectorAddStringToVector1(
+						DynamicStateInitDynamicState(VectorAddStringToVector1(
 											"end of input"),
 											NULL,
 										NULL,
@@ -1239,7 +1239,7 @@ void DynamicMachineTest()
 
 			// if current_state == "control flow graph"
 			/*
-				getVariable(current_state, "i")  
+				DataGetVariable(current_state, "i")  
 					start at current state
 					go to the variables child
 					get the variables child with name starting at "i"
@@ -1276,22 +1276,22 @@ void DynamicMachineTest()
 		printf("find variable\n");
 		// parent of current state
 		// got to be a better way to get the state
-		// getState(my_machine, Vector* name)
+		// DynamicStateGetState(my_machine, Vector* name)
 		DynamicState* my_control_flow_graph = (DynamicState*) VectorGetItem(
 																	my_machine->states,
 																	TrieTreeSearch(	my_machine->state_names,
 																					control_flow_graph));
 		VectorPrintStrings(my_control_flow_graph->name);
-		string my_variable = getString(getVariable(my_machine, my_control_flow_graph, "input_string"));
+		string my_variable = DataGetString(DataGetVariable(my_machine, my_control_flow_graph, "input_string"));
 		// printf("%i\n", my_variable);
 		printf("input_string = %s\n", my_variable.c_str());
 
-		Data* my_a_count = (Data*) getVariable(my_machine, my_control_flow_graph, "i");
-		// setInt(my_a_count, 0);
+		Data* my_a_count = (Data*) DataGetVariable(my_machine, my_control_flow_graph, "i");
+		// DataSetInt(my_a_count, 0);
 		printf("i = %i\n", my_a_count->_int);
 		// bool result = recordA(my_machine, my_control_flow_graph, NULL);
 		// printf("recordA is %i and i is %i\n", 	result,
-		// 										getInt(getVariable(my_machine, my_control_flow_graph, "i")));
+		// 										DataGetInt(DataGetVariable(my_machine, my_control_flow_graph, "i")));
 	// 	Vector* state_names = VectorInitVector();
 	// 	VectorAppend(state_names, VectorAddStringToVector3(
 		// have to get each item from the next states vector from a state state->next_states
@@ -1303,7 +1303,7 @@ void DynamicMachineTest()
 		// (parent_state(child state at above level), child_state, ith_child(might need to save when poping), result of machine on current level)
 		// take the current state(a parent state) and run this for the child machine
 		// pretend the state works
-		DynamicState* working_state = getState(my_machine, VectorAddStringToVector1("root"));
+		DynamicState* working_state = DynamicStateGetState(my_machine, VectorAddStringToVector1("root"));
 		Vector* next_states = working_state->children;
 
 		while(working_state != NULL)
@@ -1376,17 +1376,17 @@ bool checkStateChar(string state, char my_char)
 bool charDispatch(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state)
 {
 	printf("charDispatch\n");
-	string input = getString(getVariable(my_machine, parent_state, "input"));
+	string input = DataGetString(DataGetVariable(my_machine, parent_state, "input"));
 
 
-	int i = getInt(getVariable(my_machine, parent_state, "i"));
+	int i = DataGetInt(DataGetVariable(my_machine, parent_state, "i"));
 	if(i < input.size())
 	{
 		string my_state = *((string*) VectorGetItem(current_state->name, 0));
 		if(checkStateChar(my_state, input[i]))
 		{
 			i += 1;
-			setInt(getVariable(my_machine, parent_state, "i"), i);
+			DataSetInt(DataGetVariable(my_machine, parent_state, "i"), i);
 
 			return true;
 		}
@@ -1399,16 +1399,32 @@ bool isNull(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState
 {
 	printf("isNull\n");
 
-	string input = getString(getVariable(my_machine, parent_state, "input"));
+	string input = DataGetString(DataGetVariable(my_machine, parent_state, "input"));
 
-	int i = getInt(getVariable(my_machine, parent_state, "i"));
+	int i = DataGetInt(DataGetVariable(my_machine, parent_state, "i"));
 	return i >= input.size();
 
 }
 const bool is_child = 1;
 const bool is_start_child = 1;
 const bool is_parent = 1;
-
+Vector* duplicateNestedVectorsOfStrings(Vector* nested_vectors_of_strings)
+{
+	Vector* new_collection_vectors = VectorInitVector();
+	for(int i = 0; i < VectorGetPopulation(nested_vectors_of_strings); i++)
+	{
+		Vector* new_collection_strings = VectorInitVector();
+		Vector* collection_strings = (Vector*) VectorGetItem(nested_vectors_of_strings, i);
+		for(int j = 0; j < VectorGetPopulation(collection_strings); j++)
+		{
+			string old_string = *((string*) VectorGetItem(collection_strings, j));
+			string new_string = old_string;
+			VectorAppendString(new_collection_strings, new_string);
+		}
+		VectorAppend(new_collection_vectors, new_collection_strings);
+	}
+	return new_collection_vectors;
+}
 void appendChildren(DynamicMachine* machine,
 					int last_state_added,
 					
@@ -1418,15 +1434,42 @@ void appendChildren(DynamicMachine* machine,
 					bool current_machine_status
 					)
 {
+	// take the integers and make states holding them as data so last_state_added has the state trackers setup for
+	// the current level
 	if(machine == NULL || last_state_added < 0 || parent < 0 || child < 0)
 	{
 		printf("we have no data to use\n");
 		exit(1);
 	}
+	// storing the state in the memory is different from setting up the parent child relationships
+	// in the _children
+	DynamicState* last_state_added_state = (DynamicState*) VectorGetItem(machine->states, last_state_added);
+	Vector* parent_level_name = last_state_added_state->name;
+	// make another state holding the int as data not retreiving the states that already exist, because we are making trackers
+	Vector* parents = VectorCombineVectors1(parent_level_name);
+	// make separate parent vectors or use same one?
+	// separate so debugging is easier
+	Vector* parents_1 = duplicateNestedVectorsOfStrings(parents);
+	Vector* parents_2 = duplicateNestedVectorsOfStrings(parents);
+	Vector* parents_3 = duplicateNestedVectorsOfStrings(parents);
+
+	DynamicState* parent_data_state = DynamicStateMakeVariable2("parent", parents_1, DataInitDataInt(parent));
+	DynamicMachineAppendState(machine, parent_data_state);
+	DynamicState* child_data_state = DynamicStateMakeVariable2("child", parents_2, DataInitDataInt(child));
+	DynamicMachineAppendState(machine, child_data_state);
+
+	DynamicState* ith_child_data_state = DynamicStateMakeVariable2("ith_child", parents_3, DataInitDataInt(ith_child));
+	DynamicMachineAppendState(machine, ith_child_data_state);
+
+
+	TrieTreeInsertWords2(last_state_added_state->_children, parent_data_state->name, -1);
+	TrieTreeInsertWords2(last_state_added_state->_children, child_data_state->name, -1);
+	TrieTreeInsertWords2(last_state_added_state->_children, ith_child_data_state->name, -1);
+	last_state_added_state->container_type = 1;  // trie tree
 	// get the state variable
 	// add in the integers as state children variable
 	// variable is now a container
-	// DynamicState* initDynamicStateVariableContainer(
+	// DynamicState* DynamicStateInitDynamicStateVariableContainer(
 	// 							Vector* name, // strings
 	// 							Vector* parents,  // array of strings
 	// 							TrieTree* _children,
@@ -1479,25 +1522,28 @@ void DynamicMachineTest2()
 				i
 			(
 				letters_numbers_null
-					null
-					letters##
-					#letters#
+					null (done)
+					letters## (done)
+					#letters# (done)
 
 			)
 		*/
 		DynamicMachine* my_machine_2 = DynamicMachineInitDynamicMachine();
 
 		DynamicMachineAppendState(	my_machine_2,
-						initDynamicState2(VectorAddStringToVector1(
+						DynamicStateInitDynamicState2(VectorAddStringToVector1(
 											"start"),
-											!is_child,
-											!is_start_child,
+											// child and start child of "root" and parent to (, ), variables, and letters_digits_null
+											is_child,
+											is_start_child,
 											is_parent,
-											NULL,
+											// the root is fake
+										VectorCombineVectors1(VectorAddStringToVector1("root")),
 										VectorCombineVectors1(VectorAddStringToVector1("(")),
-										VectorCombineVectors2(
-											// defined name for variables in getVariable
+										VectorCombineVectors3(
+											// defined name for variables in DataGetVariable
 											VectorAddStringToVector1("variables"),
+											VectorAddStringToVector1("letters_digits_null"),
 											VectorAddStringToVector1(")")
 										),
 										NULL,
@@ -1514,14 +1560,14 @@ void DynamicMachineTest2()
 		Vector* input = DynamicMachineAppendState(	my_machine_2,
 			DynamicStateMakeVariable("input",
 			VectorCombineVectors1(VectorAddStringToVector1("variables")),
-			makeDataString("(Im_a_word5)") ));
+			DataInitDataString("(Im_a_word5)") ));
 
 		Vector* i = DynamicMachineAppendState(	my_machine_2,
 			DynamicStateMakeVariable("i",
 			VectorCombineVectors1(VectorAddStringToVector1("variables")),
-			makeDataInt(0)));
+			DataInitDataInt(0)));
 		 DynamicMachineAppendState(	my_machine_2,
-							initDynamicStateVariableContainer(VectorAddStringToVector1(
+							DynamicStateInitDynamicStateVariableContainer(VectorAddStringToVector1(
 												"variables"),
 											VectorCombineVectors1(VectorAddStringToVector1("start")),
 											// assumes input and i already are in the tree
@@ -1546,32 +1592,32 @@ void DynamicMachineTest2()
 
 
 		DynamicMachineAppendState(	my_machine_2,
-						initDynamicState2(VectorAddStringToVector1(
+						DynamicStateInitDynamicState2(VectorAddStringToVector1(
 											"("),
 											is_child,
 											is_start_child,
 											!is_parent,
-											NULL,
+											VectorCombineVectors1(VectorAddStringToVector1("start")),
 										// start children
 										NULL,
 										// children
 										NULL,
 										// next states
-										VectorCombineVectors1(VectorAddStringToVector1("letters_numbers_null")),
+										VectorCombineVectors1(VectorAddStringToVector1("letters_digits_null")),
 										charDispatch,
 										NULL
 										)
 						);
 		DynamicMachineAppendState(	my_machine_2,
-						initDynamicState2(VectorAddStringToVector1(
-											"letters_numbers_null"),
+						DynamicStateInitDynamicState2(VectorAddStringToVector1(
+											"letters_digits_null"),
 											is_child,
 											!is_start_child,
 											is_parent,
-											NULL,
+											VectorCombineVectors1(VectorAddStringToVector1("start")),
 										VectorCombineVectors3(
-											VectorAddStringToVector1("letters"),
-											VectorAddStringToVector1("number"),
+											VectorAddStringToVector2("letters", "0"),
+											VectorAddStringToVector2("digit", "2"),
 											VectorAddStringToVector1("null")
 
 										),
@@ -1581,13 +1627,15 @@ void DynamicMachineTest2()
 										NULL
 										)
 						);
+						// letters 0, digit 0, digit 1
+						// digit 2, letters 1, digit 3
 		DynamicMachineAppendState(	my_machine_2,
-						initDynamicState2(VectorAddStringToVector2(
+						DynamicStateInitDynamicState2(VectorAddStringToVector2(
 											"letters", "0"),
 											is_child,
 											is_start_child,
 											!is_parent,
-											NULL,
+											VectorCombineVectors1(VectorAddStringToVector1("letters_digits_null")),
 										// start children
 										NULL,
 										// children
@@ -1600,18 +1648,18 @@ void DynamicMachineTest2()
 										)
 						);
 		DynamicMachineAppendState(	my_machine_2,
-						initDynamicState2(VectorAddStringToVector2(
+						DynamicStateInitDynamicState2(VectorAddStringToVector2(
 											"letters", "1"),
 											is_child,
 											!is_start_child,
 											!is_parent,
-											NULL,
+											VectorCombineVectors1(VectorAddStringToVector1("letters_digits_null")),
 										// start children
 										NULL,
 										// children
 										NULL,
 										// next states
-										VectorCombineVectors1(VectorAddStringToVector2("digit", "2")),
+										VectorCombineVectors1(VectorAddStringToVector2("digit", "3")),
 										// for now
 										charDispatch,
 										NULL
@@ -1619,12 +1667,12 @@ void DynamicMachineTest2()
 						);
 
 		DynamicMachineAppendState(	my_machine_2,
-						initDynamicState2(VectorAddStringToVector2(
+						DynamicStateInitDynamicState2(VectorAddStringToVector2(
 											"digit", "0"),
 											is_child,
 											is_start_child,
 											!is_parent,
-											NULL,
+											VectorCombineVectors1(VectorAddStringToVector1("letters_digits_null")),
 										// start children
 										NULL,
 										// children
@@ -1638,12 +1686,12 @@ void DynamicMachineTest2()
 						);
 		
 		DynamicMachineAppendState(	my_machine_2,
-						initDynamicState2(VectorAddStringToVector2(
+						DynamicStateInitDynamicState2(VectorAddStringToVector2(
 											"digit", "1"),
 											is_child,
 											!is_start_child,
 											!is_parent,
-											NULL,
+											VectorCombineVectors1(VectorAddStringToVector1("letters_digits_null")),
 										// start children
 										NULL,
 										// children
@@ -1656,30 +1704,12 @@ void DynamicMachineTest2()
 										)
 						);
 		DynamicMachineAppendState(	my_machine_2,
-						initDynamicState2(VectorAddStringToVector2(
+						DynamicStateInitDynamicState2(VectorAddStringToVector2(
 											"digit", "2"),
 											is_child,
 											!is_start_child,
 											!is_parent,
-											NULL,
-										// start children
-										NULL,
-										// children
-										NULL,
-										// next states
-										VectorInitVector(),
-										// for now
-										charDispatch,
-										NULL
-										)
-						);
-		DynamicMachineAppendState(	my_machine_2,
-						initDynamicState2(VectorAddStringToVector1(
-											"number"),
-											is_child,
-											is_start_child,
-											!is_parent,
-											NULL,
+											VectorCombineVectors1(VectorAddStringToVector1("letters_digits_null")),
 										// start children
 										NULL,
 										// children
@@ -1692,12 +1722,30 @@ void DynamicMachineTest2()
 										)
 						);
 		DynamicMachineAppendState(	my_machine_2,
-						initDynamicState2(VectorAddStringToVector1(
+						DynamicStateInitDynamicState2(VectorAddStringToVector2(
+											"digit", "3"),
+											is_child,
+											!is_start_child,
+											!is_parent,
+											VectorCombineVectors1(VectorAddStringToVector1("letters_digits_null")),
+										// start children
+										NULL,
+										// children
+										NULL,
+										// next states
+										VectorInitVector(),
+										// for now
+										charDispatch,
+										NULL
+										)
+						);
+		DynamicMachineAppendState(	my_machine_2,
+						DynamicStateInitDynamicState2(VectorAddStringToVector1(
 											"null"),
 											is_child,
 											is_start_child,
 											!is_parent,
-											NULL,
+											VectorCombineVectors1(VectorAddStringToVector1("letters_digits_null")),
 										// start children
 										NULL,
 										// children
@@ -1722,7 +1770,7 @@ void DynamicMachineTest2()
 		// change pattern to refer to ["stack_item", "level_data", ....]
 		// both items must be added at the same time for a pattern change to work
 		// Vector* control_flow_graph = DynamicMachineAppendState(	my_machine,
-		// 				initDynamicState(VectorAddStringToVector1(
+		// 				DynamicStateInitDynamicState(VectorAddStringToVector1(
 		// 									"control flow graph"),
 		// 									NULL,
 		// 								NULL,
@@ -1738,7 +1786,7 @@ void DynamicMachineTest2()
 		// 								)
 		// 				);
 
-		DynamicState* working_state = getState(my_machine_2, VectorAddStringToVector1("start"));
+		DynamicState* working_state = DynamicStateGetState(my_machine_2, VectorAddStringToVector1("start"));
 		Vector* next_states = working_state->start_children;
 		for(int i = 0; i < VectorGetPopulation(next_states); i++)
 		{
@@ -1807,20 +1855,34 @@ void DynamicMachineTest2()
 		*/
 		// Vector* winning_state_name = (Vector*) VectorGetItem(next_states, winning_state_position);
 
-		working_state = getState( my_machine_2,
+		working_state = DynamicStateGetState( my_machine_2,
 									(Vector*) VectorGetItem(next_states, winning_state_position));
 
+		printf("passing state\n");
 		VectorPrintStrings(working_state->name);
 		printf("child %i start child %i parent %i\n", working_state->is_child,
 													working_state->is_start_child,
 													working_state->is_parent);
+		// parent and start child, but not child?
+		// can have a link to parent but not be a child?
+
+		if(working_state->is_start_child)
+		{
+			// push back working_state	
+		}
+
+		// implies a state can be either a parent or a child
+		// has down_links
 		if(working_state->is_parent)
 		{
 			// get children states
+			printf("get children states\n");
 		}
 		else if(working_state->is_child)
 		{
 			// get next states
+			printf("get next states\n");
+
 			for(int i = 0; i < VectorGetPopulation(working_state->next_states); i++)
 			{
 				VectorPrintStrings( (Vector*) VectorGetItem(working_state->next_states, i) );
@@ -1828,6 +1890,8 @@ void DynamicMachineTest2()
 			}
 
 		}
+
+		
 		
 		// was design to work with a root holding vars and the root of the machine
 		// 2 roots not 1(current system has 1 root with start children and variable category)
@@ -2673,14 +2737,14 @@ typedef struct Data
 
 */
 
-Data* makeDataInt(int a)
+Data* DataInitDataInt(int a)
 {
 	Data* variable = (Data*) malloc(sizeof(Data));
 	variable->type_id = 0;
 	variable->_int = a;
 	return variable;
 }
-Data* makeDataFloat(float a)
+Data* DataInitDataFloat(float a)
 {
 	Data* variable = (Data*) malloc(sizeof(Data));
 	variable->type_id = 2;
@@ -2689,7 +2753,7 @@ Data* makeDataFloat(float a)
 
 }
 
-Data* makeDataString(string a)
+Data* DataInitDataString(string a)
 {
 	Data* variable = (Data*) malloc(sizeof(Data));
 	variable->type_id = 1;
@@ -2697,7 +2761,7 @@ Data* makeDataString(string a)
 	return variable;
 
 }
-void deleteData(Data* variable)
+void DataDeleteData(Data* variable)
 {
 	if(variable->_string.size() > 0)
 	{
@@ -2942,7 +3006,7 @@ void deleteContextState(ContextState* node)
 		free(node->function_pointer_name);
 		node->function_pointer_name = NULL;
 		//Data* var_data(delete)
-		deleteData(node->var_data);
+		DataDeleteData(node->var_data);
 		node->var_data = NULL;
 		//TrieNode* parents
 		deleteTrieNode(node->parents_);
