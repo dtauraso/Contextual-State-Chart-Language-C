@@ -306,6 +306,15 @@ void VectorPrint(Vector* container)
 	
 
 }
+void VectorPrintVectorOfStrings(Vector* container)
+{
+	// assume we are passing in a vector of vectors of strings
+	for(int i = 0; i < VectorGetPopulation(container); i++)
+	{
+		Vector* inner_container = (Vector*) VectorGetItem(container, i);
+		VectorPrintStrings(inner_container);
+	}
+}
 void VectorPrintStrings(Vector* container)
 {
 	//printf("printing container pop %i, size %i\n", container->population, container->size);
@@ -535,6 +544,52 @@ Vector* VectorCombineVectors5(Vector* source_1, Vector* source_2, Vector* source
 	VectorAppend(list_of_lists_of_strings, source_4);
 
 	VectorAppend(list_of_lists_of_strings, source_5);
+
+	return list_of_lists_of_strings;
+
+}
+Vector* VectorCombineVectorsGeneral(Vector* vectors[], int size)
+{
+	// void func(type* values) {
+    //     while(*values) {
+    //         x = *values++;
+    //         /* do whatever with x */
+    //     }
+    // }
+	// assume size is correct as we can't check it.
+	Vector* list_of_lists_of_strings = VectorInitVector();
+	int i = 0;
+	while(i < size) {
+		// printf("%i\n", i);
+		// Vector* my_vector = (Vector*) vectors[i];
+
+		// VectorPrintVectorOfStrings(my_vector);
+		// VectorPrintStrings(my_vector);
+
+		
+		VectorAppend(list_of_lists_of_strings, vectors[i]);
+		i++;
+            /* do whatever with x */
+	}
+	if(VectorGetPopulation(list_of_lists_of_strings) == 0)
+	{
+		return VectorInitVector();
+	}
+	// for(int i = 0; i < VectorGetPopulation(vectors); i++)
+	// {
+	// 	Vector* my_vector = (Vector* ) VectorGetItem(vectors, i);
+	// 	VectorAppend(list_of_lists_of_strings, my_vector);
+	// }
+	// VectorAppend(list_of_lists_of_strings, source_1);
+
+	// VectorAppend(list_of_lists_of_strings, source_2);
+
+	// VectorAppend(list_of_lists_of_strings, source_3);
+
+	// VectorAppend(list_of_lists_of_strings, source_4);
+
+	// VectorAppend(list_of_lists_of_strings, source_5);
+	// VectorPrintVectorOfStrings(list_of_lists_of_strings);
 
 	return list_of_lists_of_strings;
 

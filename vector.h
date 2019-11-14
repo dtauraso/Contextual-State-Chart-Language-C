@@ -50,6 +50,8 @@ void VectorTest();
 
 
 void VectorPrint(Vector* container);
+void VectorPrintVectorOfStrings(Vector* container);
+
 void VectorPrintStrings(Vector* container);
 
 Vector* VectorAddStringToVector1(string string_1);
@@ -64,5 +66,6 @@ Vector* VectorCombineVectors3(Vector* source_1, Vector* source_2, Vector* source
 
 Vector* VectorCombineVectors4(Vector* source_1, Vector* source_2, Vector* source_3, Vector* source_4);
 Vector* VectorCombineVectors5(Vector* source_1, Vector* source_2, Vector* source_3, Vector* source_4, Vector* source_5);
+Vector* VectorCombineVectorsGeneral(Vector* vectors[], int size);
 
 #endif

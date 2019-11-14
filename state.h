@@ -125,13 +125,12 @@ enum container_types {array, trie_tree};
 typedef struct DynamicState
 {
 	Vector* name;
-	bool is_child;
 	bool is_start_child;
-	bool is_parent;
+	bool has_down_links;
 	
 	Vector* parents;
-	TrieTree* _parents;
-
+	// TrieTree* _parents;
+	
 	Vector* start_children;
 
 	// OrderedDict* _start_children;
@@ -150,6 +149,7 @@ typedef struct DynamicState
 	// 1 == trie tree
 	int container_type;
 	// int level_number;
+	string function_name;
 	bool (*function) (DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state);
 	// bool parent_status;
 	// int max_id_for_siblings; // so the max id of machine doesn't grow too fast
@@ -172,9 +172,8 @@ DynamicState* DynamicStateInitDynamicState(	Vector* name, // strings
 													DynamicState* current_state));
 
 DynamicState* DynamicStateInitDynamicState2(	Vector* name, // strings
-								bool isChild,
-								bool isStartChild,
-								bool isParent,
+								bool is_start_child,
+								bool has_down_links,
 								Vector* parents,  // array of strings
 								Vector* start_children,  // array of strings
 								Vector* children, // array of strings
@@ -203,7 +202,7 @@ DynamicState* DynamicStateMakeVariable(	string variable_name,
 										Vector* parents,  // array of strings
 										Data* value);
 
-DynamicState* DynamicStateMakeVariable2(	string variable_name,
+DynamicState* DynamicStateMakeVariable2(string variable_name,
 										Vector* parents,  // array of strings
 										Data* value);
 
