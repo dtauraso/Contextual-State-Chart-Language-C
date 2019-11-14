@@ -1022,17 +1022,18 @@ void DynamicMachineTest()
 				next
 					none
 	*/
-	DynamicMachineAppendState(	my_machine,
-								DynamicStateInitDynamicState(VectorAddStringToVector3(
-													"state 1", "x", "y\""),
-												NULL,
-												NULL,
-												NULL,
-												NULL,
-												returnFalse,
-												DataInitDataInt(2)
-												)
-								);
+	DynamicMachineAppendState(
+		my_machine,
+		DynamicStateInitDynamicState(
+			VectorAddStringToVector3("state 1", "x", "y\""),
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			returnFalse,
+			DataInitDataInt(2)
+		)
+	);
 	// state name in trie test
 	// TrieTreePrintTrieWords(my_machine->state_names);
 	DynamicState* x = (DynamicState*) VectorGetItem(my_machine->states, 0);
@@ -1052,10 +1053,14 @@ void DynamicMachineTest()
 	// x->function = returnFalse;
 	x->function(NULL, NULL, NULL);
 	Vector* state_names = VectorInitVector();
-	VectorAppend(state_names, VectorAddStringToVector3(
-							"state 1",
-							"x",
-							"y\""));
+	VectorAppend(
+		state_names,
+		VectorAddStringToVector3(
+			"state 1",
+			"x",
+			"y\""
+		)
+	);
 
 	DynamicState* winning_state = DynamicMachineRunStates(my_machine, NULL, x, state_names);
 	printf("winning state \n");
@@ -1069,87 +1074,112 @@ void DynamicMachineTest()
 	// each state is very clear on the expected sequence following it
 	// there is no need for a hierarchy in the state structure
 			// all we know is the variables are addressed by unique names
-			Vector* a_count = DynamicMachineAppendState(	my_machine,
-						DynamicStateMakeVariable("a_count",
-						VectorCombineVectors1(VectorAddStringToVector1("variables")),
-						DataInitDataInt(0)));
+	Vector* a_count = 	DynamicMachineAppendState(
+							my_machine,
+							DynamicStateMakeVariable(
+								"a_count",
+								VectorCombineVectors1(VectorAddStringToVector1("variables")),
+								DataInitDataInt(0)
+							)
+						);
 
-			Vector* b_count = DynamicMachineAppendState(	my_machine,
-						DynamicStateMakeVariable("b_count",
-						VectorCombineVectors1(VectorAddStringToVector1("variables")),
-						DataInitDataInt(0)));
+	Vector* b_count = 	DynamicMachineAppendState(
+							my_machine,
+							DynamicStateMakeVariable(
+								"b_count",
+								VectorCombineVectors1(VectorAddStringToVector1("variables")),
+								DataInitDataInt(0)
+							)
+						);
 
-			Vector* c_count = DynamicMachineAppendState(	my_machine,
-						DynamicStateMakeVariable("c_count",
-						VectorCombineVectors1(VectorAddStringToVector1("variables")),
-						DataInitDataInt(0)));
+	Vector* c_count = 	DynamicMachineAppendState(
+							my_machine,
+							DynamicStateMakeVariable(
+								"c_count",
+								VectorCombineVectors1(VectorAddStringToVector1("variables")),
+								DataInitDataInt(0)
+							)
+						);
 
-			Vector* input_string = DynamicMachineAppendState(	my_machine,
-						DynamicStateMakeVariable("input_string",
-						VectorCombineVectors1(VectorAddStringToVector1("variables")),
-						DataInitDataString("aabbcc") ));
-			// will not appear in printouts, but does exist in the trie tree
-			// there is no word setup to connect to it
-			Vector* i_1 = DynamicMachineAppendState(	my_machine,
-						DynamicStateMakeVariable("i",
-						VectorCombineVectors1(VectorAddStringToVector1("variables")),
-						DataInitDataInt(0)));
-			// TrieTreePrintTrie(my_machine->state_names);
-			// TrieTreePrintWordTrie(my_machine->state_names);
-			// works to here
-			// exit(1);
-			// children needs to be a trie tree but constructor has no support for it
-			// DynamicState* DynamicStateInitDynamicStateVariableContainer(
-			// 					Vector* name, // strings
-			// 					TrieTree* _children,
-			// 					int container_type)
-			// TrieTree* TrieTreeInsertEdges(TrieTree* my_trie_tree, Vector* names /* vectors of strings*/)
+	Vector* input_string = 	DynamicMachineAppendState(
+								my_machine,
+								DynamicStateMakeVariable(
+									"input_string",
+									VectorCombineVectors1(VectorAddStringToVector1("variables")),
+									DataInitDataString("aabbcc")
+								)
+							);
+	// will not appear in printouts, but does exist in the trie tree
+	// there is no word setup to connect to it
+	Vector* i_1 = 	DynamicMachineAppendState(
+						my_machine,
+						DynamicStateMakeVariable(
+							"i",
+							VectorCombineVectors1(VectorAddStringToVector1("variables")),
+							DataInitDataInt(0)
+						)
+					);
+	// TrieTreePrintTrie(my_machine->state_names);
+	// TrieTreePrintWordTrie(my_machine->state_names);
+	// works to here
+	// exit(1);
+	// children needs to be a trie tree but constructor has no support for it
+	// DynamicState* DynamicStateInitDynamicStateVariableContainer(
+	// 					Vector* name, // strings
+	// 					TrieTree* _children,
+	// 					int container_type)
+	// TrieTree* TrieTreeInsertEdges(TrieTree* my_trie_tree, Vector* names /* vectors of strings*/)
 
-			// this creates a local scode so the variable name chosen by the user will work
-			Vector* variables_1 = DynamicMachineAppendState(	my_machine,
-							DynamicStateInitDynamicStateVariableContainer(	VectorAddStringToVector1("variables"),
-												VectorCombineVectors1(VectorAddStringToVector1("control flow graph")),
-																// returns the trie tree with items inserted										
-																TrieTreeInsertEdges(my_machine->state_names,
-																					TrieTreeInitTrieTree(),
-																// inserting to the local trie resulted in
-																// new state ids to be generated
-																					VectorCombineVectors5(
-																						a_count,
-																						b_count,
-																						c_count,
-																						input_string,
-																						i_1)
-																					),
-																// container type id
-																trie_tree
-															)
+	// this creates a local scode so the variable name chosen by the user will work
+	Vector* variables_1 = 	DynamicMachineAppendState(
+								my_machine,
+								DynamicStateInitDynamicStateVariableContainer(
+									VectorAddStringToVector1("variables"),
+									VectorCombineVectors1(VectorAddStringToVector1("control flow graph")),
+									// returns the trie tree with items inserted										
+									TrieTreeInsertEdges(
+										my_machine->state_names,
+										TrieTreeInitTrieTree(),
+										// inserting to the local trie resulted in
+										// new state ids to be generated
+										VectorCombineVectors5(
+											a_count,
+											b_count,
+											c_count,
+											input_string,
+											i_1)
+									),
+									// container type id
+									trie_tree
+								)
 							);
 
-			Vector* variables_2 = DynamicMachineAppendState(	my_machine,
-							DynamicStateInitDynamicState(VectorAddStringToVector1(
-												"variables"),
-												NULL,
-											NULL,
-											VectorCombineVectors4(
-												a_count,
-												b_count,
-												c_count,
-												i_1
-											),
-											NULL,
-											returnTrue,
-											NULL
-											)
+	Vector* variables_2 = 	DynamicMachineAppendState(
+								my_machine,
+								DynamicStateInitDynamicState(
+									VectorAddStringToVector1("variables"),
+									NULL,
+									NULL,
+									VectorCombineVectors4(
+										a_count,
+										b_count,
+										c_count,
+										i_1
+									),
+									NULL,
+									returnTrue,
+									NULL
+								)
 							);
 			TrieTreeDeleteWords(my_machine->state_names, variables_2);
 
 
-			// control flow graph
-			Vector* control_flow_graph = DynamicMachineAppendState(	my_machine,
-							DynamicStateInitDynamicState(VectorAddStringToVector1(
-												"control flow graph"),
-												NULL,
+	// control flow graph
+	Vector* control_flow_graph = 	DynamicMachineAppendState(
+										my_machine,
+										DynamicStateInitDynamicState(
+											VectorAddStringToVector1("control flow graph"),
+											NULL,
 											NULL,
 											VectorCombineVectors2(
 												// must be same name as the variables state
@@ -1160,80 +1190,85 @@ void DynamicMachineTest()
 											NULL,
 											returnTrue,
 											NULL
-											)
-							);
+										)
+									);
 
-			DynamicMachineAppendState(	my_machine,
-							DynamicStateInitDynamicState(VectorAddStringToVector1(
-												"root"),
-												NULL,
-											NULL,
-											VectorCombineVectors1(VectorAddStringToVector1("a")),
-											NULL,
-											returnTrue,
-											NULL
-											)
-							);
+	DynamicMachineAppendState(
+		my_machine,
+		DynamicStateInitDynamicState(
+			VectorAddStringToVector1("root"),
+			NULL,
+			NULL,
+			VectorCombineVectors1(VectorAddStringToVector1("a")),
+			NULL,
+			returnTrue,
+			NULL
+		)
+	);
 				
-			// a
-			// 	f
-			// 		recordA
-			// 	next
-			// 		a | (b | c) => a | b
-			// It's assumed the state names are added in as a unique sequence of string literals
-			DynamicMachineAppendState(	my_machine,
-						DynamicStateInitDynamicState(VectorAddStringToVector1(
-											"a"),
-											NULL,
-										NULL,
-										NULL,
-										VectorCombineVectors2(
-											VectorAddStringToVector1("a"),
-											VectorAddStringToVector1("b")
-										),
-										recordA,
-										NULL
-										)
-						);
-			DynamicMachineAppendState(	my_machine,
-						DynamicStateInitDynamicState(VectorAddStringToVector1(
-											"b"),
-											NULL,
-										NULL,
-										NULL,
-										VectorCombineVectors2(
-											VectorAddStringToVector1("b"),
-											VectorAddStringToVector1("c")
-										),
-										recordB,
-										NULL
-										)
-						);
-			DynamicMachineAppendState(	my_machine,
-						DynamicStateInitDynamicState(VectorAddStringToVector1(
-											"c"),
-											NULL,
-										NULL,
-										NULL,
-										VectorCombineVectors2(
-											VectorAddStringToVector1("c"),
-											VectorAddStringToVector1("end of input")
-										),
-										recordC,
-										NULL
-										)
-						);
-			DynamicMachineAppendState(	my_machine,
-						DynamicStateInitDynamicState(VectorAddStringToVector1(
-											"end of input"),
-											NULL,
-										NULL,
-										NULL,
-										VectorInitVector(),
-										endOfInput,
-										NULL
-										)
-						);
+	// a
+	// 	f
+	// 		recordA
+	// 	next
+	// 		a | (b | c) => a | b
+	// It's assumed the state names are added in as a unique sequence of string literals
+	DynamicMachineAppendState(
+		my_machine,
+		DynamicStateInitDynamicState(
+			VectorAddStringToVector1("a"),
+			NULL,
+			NULL,
+			NULL,
+			VectorCombineVectors2(
+				VectorAddStringToVector1("a"),
+				VectorAddStringToVector1("b")
+			),
+			recordA,
+			NULL
+		)
+	);
+	DynamicMachineAppendState(
+		my_machine,
+		DynamicStateInitDynamicState(
+			VectorAddStringToVector1("b"),
+			NULL,
+			NULL,
+			NULL,
+			VectorCombineVectors2(
+				VectorAddStringToVector1("b"),
+				VectorAddStringToVector1("c")
+			),
+			recordB,
+			NULL
+		)
+	);
+	DynamicMachineAppendState(
+		my_machine,
+		DynamicStateInitDynamicState(
+			VectorAddStringToVector1("c"),
+			NULL,
+			NULL,
+			NULL,
+			VectorCombineVectors2(
+				VectorAddStringToVector1("c"),
+				VectorAddStringToVector1("end of input")
+			),
+			recordC,
+			NULL
+		)
+	);
+	DynamicMachineAppendState(
+		my_machine,
+		DynamicStateInitDynamicState(
+			VectorAddStringToVector1("end of input"),
+			NULL,
+			NULL,
+			NULL,
+			VectorInitVector(),
+			endOfInput,
+			NULL
+		)
+	);
 
 			// if current_state == "control flow graph"
 			/*
@@ -1552,7 +1587,7 @@ void DynamicMachinePrintStateTree(DynamicMachine* my_machine, int state_id, int 
 }
 void DynamicMachineTest2()
 {
-// '''
+	// '''
 		// (word##)
 		// (#word#)
 		// ()
@@ -1575,436 +1610,465 @@ void DynamicMachineTest2()
 
 			)
 		*/
-		DynamicMachine* my_machine_2 = DynamicMachineInitDynamicMachine();
+	DynamicMachine* my_machine_2 = DynamicMachineInitDynamicMachine();
 
-		// add a root
+	// add a root
 
+	DynamicMachineAppendState(
+		my_machine_2,
+		DynamicStateInitDynamicState2(
+			VectorAddStringToVector1("start"),
+			// child and start child of "root" and parent to (, ), variables, and letters_digits_null
+			is_start_child,
+			has_down_links,
+			// the root is fake
+			VectorCombineVectors1(
+				VectorAddStringToVector1("root")),
+			VectorCombineVectors1(
+				VectorAddStringToVector1("(")),
+			VectorCombineVectorsGeneral((Vector* []) {
+				// defined name for variables in DataGetVariable
+				VectorAddStringToVector1("variables"),
+				VectorAddStringToVector1("("),
+				VectorAddStringToVector1("letters_digits_null"),
+				VectorAddStringToVector1(")")},
+				4
+			),
+			VectorInitVector(),
+			returnTrue,
+			NULL
+		)
+	);
+
+	Vector* input = DynamicMachineAppendState(
+						my_machine_2,
+						DynamicStateMakeVariable(
+							"input",
+							VectorCombineVectors1(
+								VectorAddStringToVector1("variables")),
+							DataInitDataString("(Im_a_word5)")
+							)
+					);
+
+	Vector* i = DynamicMachineAppendState(
+					my_machine_2,
+					DynamicStateMakeVariable(
+						"i",
+						VectorCombineVectors1(
+							VectorAddStringToVector1("variables")),
+						DataInitDataInt(0)
+					)
+				);
 		DynamicMachineAppendState(	my_machine_2,
-						DynamicStateInitDynamicState2(VectorAddStringToVector1(
-											"start"),
-											// child and start child of "root" and parent to (, ), variables, and letters_digits_null
-											is_start_child,
-											has_down_links,
-											// the root is fake
-										VectorCombineVectors1(VectorAddStringToVector1("root")),
-										VectorCombineVectors1(VectorAddStringToVector1("(")),
-										VectorCombineVectorsGeneral((Vector* []) {
-											// defined name for variables in DataGetVariable
-											VectorAddStringToVector1("variables"),
-											VectorAddStringToVector1("("),
-											VectorAddStringToVector1("letters_digits_null"),
-											VectorAddStringToVector1(")")},
-											4
-										),
-										VectorInitVector(),
-										returnTrue,
-										NULL
-										)
-						);
-		// TrieTreeMakeLocalTrie(my_machine_2,
-		// 				VectorCombineVectors2(
-		// 				VectorAddStringToVector1("input"),
-		// 				VectorAddStringToVector1("i")
-		// 				)
-		// ))
-		Vector* input = DynamicMachineAppendState(	my_machine_2,
-			DynamicStateMakeVariable("input",
-			VectorCombineVectors1(VectorAddStringToVector1("variables")),
-			DataInitDataString("(Im_a_word5)") ));
-
-		Vector* i = DynamicMachineAppendState(	my_machine_2,
-			DynamicStateMakeVariable("i",
-			VectorCombineVectors1(VectorAddStringToVector1("variables")),
-			DataInitDataInt(0)));
-		 DynamicMachineAppendState(	my_machine_2,
-							DynamicStateInitDynamicStateVariableContainer(VectorAddStringToVector1(
-												"variables"),
-											VectorCombineVectors1(VectorAddStringToVector1("start")),
-											// assumes input and i already are in the tree
-											TrieTreeInsertEdges(my_machine_2->state_names,
-																	TrieTreeInitTrieTree(),
-												// inserting to the local trie resulted in
-												// new state ids to be generated
-																	VectorCombineVectors2(
-																		input,
-																		i
-																		)
-																	)
-											// VectorCombineVectors2(
-											// 	VectorAddStringToVector1("input"),
-											// 	VectorAddStringToVector1("i")
-											// )
-											,
-											trie_tree
-											)
-							);
-		
+		DynamicStateInitDynamicStateVariableContainer(
+			VectorAddStringToVector1("variables"),
+			VectorCombineVectors1(
+				VectorAddStringToVector1("start")),
+			// assumes input and i already are in the tree
+			TrieTreeInsertEdges(
+				my_machine_2->state_names,
+				TrieTreeInitTrieTree(),
+				// inserting to the local trie resulted in
+				// new state ids to be generated
+				VectorCombineVectors2(
+					input,
+					i
+					)
+				)
+			,
+			trie_tree
+		)
+	);
+	
 
 
-		DynamicMachineAppendState(	my_machine_2,
-						DynamicStateInitDynamicState2(VectorAddStringToVector1(
-											"("),
-											is_start_child,
-											!has_down_links,
-											VectorCombineVectors1(VectorAddStringToVector1("start")),
-										// start children
-										VectorInitVector(),
-										// children
-										VectorInitVector(),
-										// next states
-										VectorCombineVectors1(VectorAddStringToVector1("letters_digits_null")),
-										charDispatch,
-										NULL
-										)
-						);
-		DynamicMachineAppendState(	my_machine_2,
-						DynamicStateInitDynamicState2(VectorAddStringToVector1(
-											"letters_digits_null"),
-											!is_start_child,
-											has_down_links,
-											VectorCombineVectors1(VectorAddStringToVector1("start")),
-										VectorCombineVectors3(
-											VectorAddStringToVector2("letters", "0"),
-											VectorAddStringToVector2("digit", "2"),
-											VectorAddStringToVector1("null")
+	DynamicMachineAppendState(
+		my_machine_2,
+		DynamicStateInitDynamicState2(
+			VectorAddStringToVector1("("),
+			is_start_child,
+			!has_down_links,
+			VectorCombineVectors1(
+				VectorAddStringToVector1("start")),
+			// start children
+			VectorInitVector(),
+			// children
+			VectorInitVector(),
+			// next states
+			VectorCombineVectors1(
+				VectorAddStringToVector1("letters_digits_null")),
+			charDispatch,
+			NULL
+		)
+	);
+	DynamicMachineAppendState(
+		my_machine_2,
+		DynamicStateInitDynamicState2(
+			VectorAddStringToVector1("letters_digits_null"),
+			!is_start_child,
+			has_down_links,
+			VectorCombineVectors1(
+				VectorAddStringToVector1("start")),
+			VectorCombineVectors3(
+				VectorAddStringToVector2("letters", "0"),
+				VectorAddStringToVector2("digit", "2"),
+				VectorAddStringToVector1("null")
 
-										),
-										// func((type[]){val1,val2,val3,val4,0});
-										VectorCombineVectorsGeneral((Vector* []) {
-											VectorAddStringToVector2("letters", "0"),
-											VectorAddStringToVector2("letters", "1"),
-											VectorAddStringToVector2("digit", "0"),
-											VectorAddStringToVector2("digit", "1"),
-											VectorAddStringToVector2("digit", "2"),
-											VectorAddStringToVector1("null")},
-											6
+			),
+			// func((type[]){val1,val2,val3,val4,0});
+			VectorCombineVectorsGeneral((Vector* []) {
+				VectorAddStringToVector2("letters", "0"),
+				VectorAddStringToVector2("letters", "1"),
+				VectorAddStringToVector2("digit", "0"),
+				VectorAddStringToVector2("digit", "1"),
+				VectorAddStringToVector2("digit", "2"),
+				VectorAddStringToVector1("null")},
+				6
 
-										),
-										VectorInitVector(),
-										returnTrue,
-										NULL
-										)
-						);
-						// letters 0, digit 0, digit 1
-						// digit 2, letters 1, digit 3
-		DynamicMachineAppendState(	my_machine_2,
-						DynamicStateInitDynamicState2(VectorAddStringToVector2(
-											"letters", "0"),
-											is_start_child,
-											!has_down_links,
-											VectorCombineVectors1(VectorAddStringToVector1("letters_digits_null")),
-										// start children
-										VectorInitVector(),
-										// children
-										VectorInitVector(),
-										// next states
-										VectorCombineVectors1(VectorAddStringToVector2("digit", "0")),
-										// for now
-										charDispatch,
-										NULL
-										)
-						);
-		DynamicMachineAppendState(	my_machine_2,
-						DynamicStateInitDynamicState2(VectorAddStringToVector2(
-											"letters", "1"),
-											!is_start_child,
-											!has_down_links,
-											VectorCombineVectors1(VectorAddStringToVector1("letters_digits_null")),
-										// start children
-										VectorInitVector(),
-										// children
-										VectorInitVector(),
-										// next states
-										VectorCombineVectors1(VectorAddStringToVector2("digit", "3")),
-										// for now
-										charDispatch,
-										NULL
-										)
-						);
+			),
+			VectorInitVector(),
+			returnTrue,
+			NULL
+		)
+	);
+	// letters 0, digit 0, digit 1
+	// digit 2, letters 1, digit 3
+	DynamicMachineAppendState(
+		my_machine_2,
+		DynamicStateInitDynamicState2(
+			VectorAddStringToVector2("letters", "0"),
+			is_start_child,
+			!has_down_links,
+			VectorCombineVectors1(
+				VectorAddStringToVector1("letters_digits_null")),
+			// start children
+			VectorInitVector(),
+			// children
+			VectorInitVector(),
+			// next states
+			VectorCombineVectors1(
+				VectorAddStringToVector2("digit", "0")),
+			// for now
+			charDispatch,
+			NULL
+		)
+	);
+	DynamicMachineAppendState(
+		my_machine_2,
+		DynamicStateInitDynamicState2(
+			VectorAddStringToVector2("letters", "1"),
+			!is_start_child,
+			!has_down_links,
+			VectorCombineVectors1(
+				VectorAddStringToVector1("letters_digits_null")),
+			// start children
+			VectorInitVector(),
+			// children
+			VectorInitVector(),
+			// next states
+			VectorCombineVectors1(
+				VectorAddStringToVector2("digit", "3")),
+			// for now
+			charDispatch,
+			NULL
+		)
+	);
 
-		DynamicMachineAppendState(	my_machine_2,
-						DynamicStateInitDynamicState2(VectorAddStringToVector2(
-											"digit", "0"),
-											is_start_child,
-											!has_down_links,
-											VectorCombineVectors1(VectorAddStringToVector1("letters_digits_null")),
-										// start children
-										VectorInitVector(),
-										// children
-										VectorInitVector(),
-										// next states
-										VectorCombineVectors1(VectorAddStringToVector2("digit", "1")),
-										// for now
-										charDispatch,
-										NULL
-										)
-						);
-		
-		DynamicMachineAppendState(	my_machine_2,
-						DynamicStateInitDynamicState2(VectorAddStringToVector2(
-											"digit", "1"),
-											!is_start_child,
-											!has_down_links,
-											VectorCombineVectors1(VectorAddStringToVector1("letters_digits_null")),
-										// start children
-										VectorInitVector(),
-										// children
-										VectorInitVector(),
-										// next states
-										VectorInitVector(),
-										// for now
-										charDispatch,
-										NULL
-										)
-						);
-		DynamicMachineAppendState(	my_machine_2,
-						DynamicStateInitDynamicState2(VectorAddStringToVector2(
-											"digit", "2"),
-											!is_start_child,
-											!has_down_links,
-											VectorCombineVectors1(VectorAddStringToVector1("letters_digits_null")),
-										// start children
-										VectorInitVector(),
-										// children
-										VectorInitVector(),
-										// next states
-										VectorCombineVectors1(VectorAddStringToVector2("letters", "1")),
-										// for now
-										charDispatch,
-										NULL
-										)
-						);
-		DynamicMachineAppendState(	my_machine_2,
-						DynamicStateInitDynamicState2(VectorAddStringToVector2(
-											"digit", "3"),
-											!is_start_child,
-											!has_down_links,
-											VectorCombineVectors1(VectorAddStringToVector1("letters_digits_null")),
-										// start children
-										VectorInitVector(),
-										// children
-										VectorInitVector(),
-										// next states
-										VectorInitVector(),
-										// for now
-										charDispatch,
-										NULL
-										)
-						);
-		DynamicMachineAppendState(	my_machine_2,
-						DynamicStateInitDynamicState2(VectorAddStringToVector1(
-											"null"),
-											is_start_child,
-											!has_down_links,
-											VectorCombineVectors1(VectorAddStringToVector1("letters_digits_null")),
-										// start children
-										VectorInitVector(),
-										// children
-										VectorInitVector(),
-										// next states
-										VectorInitVector(),
-										// for now
-										isNull,
-										NULL
-										)
-						);
-		// TrieTreePrintTrieWords(my_machine_2->state_names);
+	DynamicMachineAppendState(
+		my_machine_2,
+		DynamicStateInitDynamicState2(
+			VectorAddStringToVector2("digit", "0"),
+			is_start_child,
+			!has_down_links,
+			VectorCombineVectors1(
+				VectorAddStringToVector1("letters_digits_null")),
+			// start children
+			VectorInitVector(),
+			// children
+			VectorInitVector(),
+			// next states
+			VectorCombineVectors1(
+				VectorAddStringToVector2("digit", "1")),
+			// for now
+			charDispatch,
+			NULL
+		)
+	);
+	
+	DynamicMachineAppendState(
+		my_machine_2,
+		DynamicStateInitDynamicState2(
+			VectorAddStringToVector2("digit", "1"),
+			!is_start_child,
+			!has_down_links,
+			VectorCombineVectors1(
+				VectorAddStringToVector1("letters_digits_null")),
+			// start children
+			VectorInitVector(),
+			// children
+			VectorInitVector(),
+			// next states
+			VectorInitVector(),
+			// for now
+			charDispatch,
+			NULL
+		)
+	);
+	DynamicMachineAppendState(
+		my_machine_2,
+		DynamicStateInitDynamicState2(
+			VectorAddStringToVector2("digit", "2"),
+			!is_start_child,
+			!has_down_links,
+			VectorCombineVectors1(
+				VectorAddStringToVector1("letters_digits_null")),
+			// start children
+			VectorInitVector(),
+			// children
+			VectorInitVector(),
+			// next states
+			VectorCombineVectors1(
+				VectorAddStringToVector2("letters", "1")),
+			// for now
+			charDispatch,
+			NULL
+		)
+	);
+	DynamicMachineAppendState(
+		my_machine_2,
+		DynamicStateInitDynamicState2(
+			VectorAddStringToVector2("digit", "3"),
+			!is_start_child,
+			!has_down_links,
+			VectorCombineVectors1(
+				VectorAddStringToVector1("letters_digits_null")),
+			// start children
+			VectorInitVector(),
+			// children
+			VectorInitVector(),
+			// next states
+			VectorInitVector(),
+			// for now
+			charDispatch,
+			NULL
+		)
+	);
+	DynamicMachineAppendState(
+		my_machine_2,
+		DynamicStateInitDynamicState2(
+			VectorAddStringToVector1("null"),
+			is_start_child,
+			!has_down_links,
+			VectorCombineVectors1(
+				VectorAddStringToVector1("letters_digits_null")),
+			// start children
+			VectorInitVector(),
+			// children
+			VectorInitVector(),
+			// next states
+			VectorInitVector(),
+			// for now
+			isNull,
+			NULL
+		)
+	);
+	// TrieTreePrintTrieWords(my_machine_2->state_names);
 
-		printf("ready to start machine\n");
-		// need a stack (parent, child, ith_child, did_machine_pass)
-		// each stack item ["stack_item", level_data", stack_item_id]
-			// children => (parent, child, ith_child, did_machine_pass)
+	printf("ready to start machine\n");
+	// need a stack (parent, child, ith_child, did_machine_pass)
+	// each stack item ["stack_item", level_data", stack_item_id]
+		// children => (parent, child, ith_child, did_machine_pass)
 
-		// ["stack_item", "slot", stack_item_id]
-			// children => [["stack_item", "slot", stack_item_id].....]
-		// track ["stack_item", "slot" ,...]
-		// change pattern to refer to ["stack_item", "level_data", ....]
-		// both items must be added at the same time for a pattern change to work
-		// Vector* control_flow_graph = DynamicMachineAppendState(	my_machine,
-		// 				DynamicStateInitDynamicState(VectorAddStringToVector1(
-		// 									"control flow graph"),
-		// 									NULL,
-		// 								NULL,
-		// 								VectorCombineVectors2(
-		// 									// must be same name as the variables state
-		// 									variables_1,
-		// 									VectorAddStringToVector1("root")
+	// ["stack_item", "slot", stack_item_id]
+		// children => [["stack_item", "slot", stack_item_id].....]
+	// track ["stack_item", "slot" ,...]
+	// change pattern to refer to ["stack_item", "level_data", ....]
+	// both items must be added at the same time for a pattern change to work
+	// Vector* control_flow_graph = DynamicMachineAppendState(	my_machine,
+	// 				DynamicStateInitDynamicState(VectorAddStringToVector1(
+	// 									"control flow graph"),
+	// 									NULL,
+	// 								NULL,
+	// 								VectorCombineVectors2(
+	// 									// must be same name as the variables state
+	// 									variables_1,
+	// 									VectorAddStringToVector1("root")
 
-		// 								),
-		// 								NULL,
-		// 								returnTrue,
-		// 								NULL
-		// 								)
-		// 				);
+	// 								),
+	// 								NULL,
+	// 								returnTrue,
+	// 								NULL
+	// 								)
+	// 				);
 
-		DynamicState* working_state = DynamicStateGetState(my_machine_2, VectorAddStringToVector1("start"));
-		// what if a stack item was made
-		Vector* parent = (Vector*) VectorGetItem(working_state->parents, 0);
-		// VectorPrintStrings(parent);
-		// printf("printing state machine\n");
-		// DynamicMachinePrintStateTree(my_machine_2, 0, 0);
-		// make sure the slot sate and level data state are made at the same time and have the same parent(so debugging
-		// 1 to 3 timelines is possible and not a headache problem)
-		// need to append a slot state before running this
+	DynamicState* working_state = DynamicStateGetState(my_machine_2, VectorAddStringToVector1("start"));
+	// what if a stack item was made
+	Vector* parent = (Vector*) VectorGetItem(working_state->parents, 0);
+	// VectorPrintStrings(parent);
+	// printf("printing state machine\n");
+	DynamicMachinePrintStateTree(my_machine_2, 0, 0);
+	// make sure the slot sate and level data state are made at the same time and have the same parent(so debugging
+	// 1 to 3 timelines is possible and not a headache problem)
+	// need to append a slot state before running this
 
-		// void appendChildren(DynamicMachine* machine,
-		// 			int last_state_added,
-					
-		// 			int parent,
-		// 			int child,
-		// 			int ith_child,
-		// 			bool current_machine_status
-		// 			)
+	// void appendChildren(DynamicMachine* machine,
+	// 			int last_state_added,
+				
+	// 			int parent,
+	// 			int child,
+	// 			int ith_child,
+	// 			bool current_machine_status
+	// 			)
 
-		// (root, start, 0, false)
-		// keep tracke of bottom
-		// use the coordinate swap to access the data at bottom of stack
-		Vector* next_states = working_state->start_children;
-		for(int i = 0; i < VectorGetPopulation(next_states); i++)
+	// (root, start, 0, false)
+	// keep tracke of bottom
+	// use the coordinate swap to access the data at bottom of stack
+	Vector* next_states = working_state->start_children;
+	for(int i = 0; i < VectorGetPopulation(next_states); i++)
+	{
+		VectorPrintStrings( (Vector*) VectorGetItem(next_states, i) );
+
+	}
+
+	// if i was returned it could be stored and the correct state could be found from next_states
+	int winning_state_position = DynamicMachineRunStates2(my_machine_2,
+											// the parent state
+											working_state,
+											// first time, should be the next states from root
+											next_states);
+	if(winning_state_position == -1)
+	{
+		printf("no state worked\n");
+		exit(1);
+	}
+	// make a secondary possibility so digits letters null can go for a while then fail so the 
+	// next option can be tried
+	// ("start", "(", 0, false ) -> ("start", "digits letters null", 0, false )
+	/*
+
+	test one part at a time
+	stack_item pair 1
+	stack_item pair 2
+	tracker pair
+	["stack_item", "history_slot", id......]
+	setup for 1 timeline
+	push(StateMachine* machine, State* parent, State* child, int ith_child, State* parent_slot_state )
+	{
+		append(state("stack_item", "level_data"]))
+		appendChilren(state_added, parent, child, ith_child, false)
+
+		append(state(["stack_item", "slot"]))
+		appendParent(machine, ["stack_item", "slot"], parent_slot_state)
+
+		history tree
+		append(state(["stack_item", "history_level_data"]))
+		appendStateChilren(parent, child, ith_child, false)
+
+		append(state(["stack_item", "history_slot"]))
+		appendParent(machine, ["stack_item", "history_slot"], parent_slot_state)
+
+		getChildCounterpart(machine, ["control trackers"], "history_slot") -> 	
+		state having children set as (parent, child, ith_child, false) from history_leveL_data
+	
+		["control trackers"]
+			["stack_item", "history_slot", id.......]
+			["stack_item", "slot", id......]
+
+		// return history tracker and slot tracker
+
+		return last state in machine(top of stack["stack_item", "slot", id......] because it was the last one added)
+	}
+	push
+	("start", "digits letters null", 0, false )
+	(["start"], ["letter" "0"], 0, false )
+
+	pop
+	("start", "digits letters null", 0, false )
+
+	get next one to test because the one below it(["letter" "0"]) was false
+	("start", "option 2", 1, false )
+	
+	*/
+	// Vector* winning_state_name = (Vector*) VectorGetItem(next_states, winning_state_position);
+
+	working_state = DynamicStateGetState( my_machine_2,
+								(Vector*) VectorGetItem(next_states, winning_state_position));
+
+	printf("passing state\n");
+	VectorPrintStrings(working_state->name);
+	printf("start child %i parent %i\n",
+												working_state->is_start_child,
+												working_state->has_down_links);
+	// (root, start, 0, false)
+	// (start, (, 0, false)
+
+	// parent and start child, but not child?
+	// can have a link to parent but not be a child?
+
+	if(working_state->is_start_child)
+	{
+		// push back working_state	
+	}
+
+	// implies a state can be either a parent or a child
+	// has_down_links
+	if(working_state->has_down_links)
+	{
+		// get children states
+		printf("get children states\n");
+	}
+	else
+	{
+		// get next states
+		printf("get next states\n");
+
+		for(int i = 0; i < VectorGetPopulation(working_state->next_states); i++)
 		{
-			VectorPrintStrings( (Vector*) VectorGetItem(next_states, i) );
+			VectorPrintStrings( (Vector*) VectorGetItem(working_state->next_states, i) );
 
 		}
 
-		// if i was returned it could be stored and the correct state could be found from next_states
-		int winning_state_position = DynamicMachineRunStates2(my_machine_2,
-												// the parent state
-												working_state,
-												// first time, should be the next states from root
-												next_states);
-		if(winning_state_position == -1)
-		{
-			printf("no state worked\n");
-			exit(1);
-		}
-		// make a secondary possibility so digits letters null can go for a while then fail so the 
-		// next option can be tried
-		// ("start", "(", 0, false ) -> ("start", "digits letters null", 0, false )
-		/*
+	}
 
-		test one part at a time
-		stack_item pair 1
-		stack_item pair 2
-		tracker pair
-		["stack_item", "history_slot", id......]
-		setup for 1 timeline
-		push(StateMachine* machine, State* parent, State* child, int ith_child, State* parent_slot_state )
-		{
-			append(state("stack_item", "level_data"]))
-			appendChilren(state_added, parent, child, ith_child, false)
+	
+	
+	// was design to work with a root holding vars and the root of the machine
+	// 2 roots not 1(current system has 1 root with start children and variable category)
+	// while(working_state != NULL)
+	// {
+	// 	// need terms for handling the different kinds of neighbors for manually running
+	// 	// more than 1 level
+	// 	// the state that doesn't exists is ||?
+	// 	working_state = DynamicMachineRunStates(my_machine,
+	// 											// the parent state
+	// 											my_control_flow_graph,
+	// 											// this state is supposed to have a function associated with it
+	// 											working_state,
+	// 											// first time, should be the next states from root
+	// 											next_states);
+	// 	printf("the winning state is\n");
+	// 	if(working_state == NULL)
+	// 	{
+	// 		// no state won and there are neighbors
+	// 		if(VectorGetPopulation(next_states) > 0)
+	// 		{
+	// 			printf("no state won so shut down machine or return false to the parent machine.\n");
+	// 			// return false to caller
+	// 		}
+	// 		else // no state won but there were no neighbors
+	// 		{
+	// 			printf("at end of machine\n");
+	// 			// return true to caller
+	// 		}
+	// 	}
+	// 	else
+	// 	{
+	// 		VectorPrintStrings(working_state->name);
+	// 		next_states = working_state->next_states;
 
-			append(state(["stack_item", "slot"]))
-			appendParent(machine, ["stack_item", "slot"], parent_slot_state)
-
-			history tree
-			append(state(["stack_item", "history_level_data"]))
-			appendStateChilren(parent, child, ith_child, false)
-
-			append(state(["stack_item", "history_slot"]))
-			appendParent(machine, ["stack_item", "history_slot"], parent_slot_state)
-
-			getChildCounterpart(machine, ["control trackers"], "history_slot") -> 	
-			state having children set as (parent, child, ith_child, false) from history_leveL_data
-		
-			["control trackers"]
-				["stack_item", "history_slot", id.......]
-				["stack_item", "slot", id......]
-
-			// return history tracker and slot tracker
-
-			return last state in machine(top of stack["stack_item", "slot", id......] because it was the last one added)
-		}
-		push
-		("start", "digits letters null", 0, false )
-		(["start"], ["letter" "0"], 0, false )
-
-		pop
-		("start", "digits letters null", 0, false )
-
-		get next one to test because the one below it(["letter" "0"]) was false
-		("start", "option 2", 1, false )
-		
-		*/
-		// Vector* winning_state_name = (Vector*) VectorGetItem(next_states, winning_state_position);
-
-		working_state = DynamicStateGetState( my_machine_2,
-									(Vector*) VectorGetItem(next_states, winning_state_position));
-
-		printf("passing state\n");
-		VectorPrintStrings(working_state->name);
-		printf("start child %i parent %i\n",
-													working_state->is_start_child,
-													working_state->has_down_links);
-		// (root, start, 0, false)
-		// (start, (, 0, false)
-
-		// parent and start child, but not child?
-		// can have a link to parent but not be a child?
-
-		if(working_state->is_start_child)
-		{
-			// push back working_state	
-		}
-
-		// implies a state can be either a parent or a child
-		// has_down_links
-		if(working_state->has_down_links)
-		{
-			// get children states
-			printf("get children states\n");
-		}
-		else
-		{
-			// get next states
-			printf("get next states\n");
-
-			for(int i = 0; i < VectorGetPopulation(working_state->next_states); i++)
-			{
-				VectorPrintStrings( (Vector*) VectorGetItem(working_state->next_states, i) );
-
-			}
-
-		}
-
-		
-		
-		// was design to work with a root holding vars and the root of the machine
-		// 2 roots not 1(current system has 1 root with start children and variable category)
-		// while(working_state != NULL)
-		// {
-		// 	// need terms for handling the different kinds of neighbors for manually running
-		// 	// more than 1 level
-		// 	// the state that doesn't exists is ||?
-		// 	working_state = DynamicMachineRunStates(my_machine,
-		// 											// the parent state
-		// 											my_control_flow_graph,
-		// 											// this state is supposed to have a function associated with it
-		// 											working_state,
-		// 											// first time, should be the next states from root
-		// 											next_states);
-		// 	printf("the winning state is\n");
-		// 	if(working_state == NULL)
-		// 	{
-		// 		// no state won and there are neighbors
-		// 		if(VectorGetPopulation(next_states) > 0)
-		// 		{
-		// 			printf("no state won so shut down machine or return false to the parent machine.\n");
-		// 			// return false to caller
-		// 		}
-		// 		else // no state won but there were no neighbors
-		// 		{
-		// 			printf("at end of machine\n");
-		// 			// return true to caller
-		// 		}
-		// 	}
-		// 	else
-		// 	{
-		// 		VectorPrintStrings(working_state->name);
-		// 		next_states = working_state->next_states;
-
-		// 	}
-		// }
-		// printf("done\n\n");
+	// 	}
+	// }
+	// printf("done\n\n");
 
 
 }
