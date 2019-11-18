@@ -2056,10 +2056,25 @@ void TrieTreePrintTrieWords(TrieTree* my_trie_tree)
 
 void TrieTreePrintTrieRecursive(TrieTree* my_trie_tree, int root, string indents)
 {
-
+	if(my_trie_tree == NULL)
+	{
+		return;
+	}
+	if(VectorGetPopulation(my_trie_tree->trie_tree) == 0)
+	{
+		return;
+	}
 	TrieNode2* node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, root);
-
+	if(node == NULL)
+	{
+		return;
+	}
+	if(node->value == NULL)
+	{
+		return;
+	}
 	string my_string = *((string*) node->value);
+
 	if(node->state_id > -1)
 	{
 		printf("%s %s -> %i\n\n", indents.c_str(), my_string.c_str(), node->state_id);

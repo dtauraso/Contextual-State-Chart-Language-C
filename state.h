@@ -57,6 +57,7 @@ typedef struct Data
 
 	Vector* container;
 	int vector_type_id;
+	int container_nesting_level;
 
 
 }Data;
@@ -338,6 +339,11 @@ Data* DataInitDataFloat(float a);
 
 Data* DataInitDataString(string a);
 void DataDeleteData(Data* variable);
+
+Data* DataInitDataVector(Vector* container);
+void DataDeleteDataVector(Data* variable);
+
+
 
 
 ContextState* initContextState();
