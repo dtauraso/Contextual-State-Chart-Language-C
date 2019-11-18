@@ -2023,6 +2023,7 @@ DynamicMachineAppendState(
 		// separate files
 		// make all functions bullet proof(at least quit with error message)
 		// generalize all functios with multi object used(like using the trie tree print to print assuming there are indents from a state print function)
+		// comment on assumptions the functions use
 	Vector* root_name = variable->container;
 	VectorPrintStrings(root_name);
 	// DynamicMachinePrintStateTree(my_machine_2, 0, 0);
