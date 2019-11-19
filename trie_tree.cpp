@@ -2114,10 +2114,37 @@ void TrieTreeTest()
 
 	Vector* name4 = TrieTreeInsertWords2(my_trie_tree, VectorAddStringToVector3("abvf", "tgrfede", "hijk"), -1);
 	
-	Vector* name5 = TrieTreeInsertWords2(my_trie_tree, VectorAddStringToVector4("abvf", "tgrfede", "hijk", "i"), -1);
-	TrieTreeDeleteWords(my_trie_tree, VectorAddStringToVector3("abvf", "tgrfede", "hijk"));
+	Vector* name5 = TrieTreeInsertWords2(
+						my_trie_tree,
+						VectorAddStringToVectorGeneral(
+							(string [])
+							{
+								"abvf", "tgrfede", "hijk", "i"
+							}, 4
+						),
+						-1
+					);
+	TrieTreeDeleteWords(
+		my_trie_tree,
+		VectorAddStringToVectorGeneral(
+			(string [])
+			{
+				"abvf", "tgrfede", "hijk"
+			}, 3
+		)
 
-	TrieTreeDeleteWords(my_trie_tree, VectorAddStringToVector4("abvf", "tgrfede", "hijk", "i"));
+	);
+
+	TrieTreeDeleteWords(
+		my_trie_tree,
+		VectorAddStringToVectorGeneral(
+			(string [])
+			{
+				"abvf", "tgrfede", "hijk", "i"
+			}, 4
+		)
+						
+	);
 
 	Vector* name6 = TrieTreeInsertWords2(my_trie_tree, VectorAddStringToVector1("input_string"), -1);
 	Vector* name7 = TrieTreeInsertWords2(my_trie_tree, VectorAddStringToVector1("i"), -1);
@@ -2126,7 +2153,7 @@ void TrieTreeTest()
 	// TrieTreePrintWordTrie(my_trie_tree);
 	TrieTreePrintTrieWords(my_trie_tree);
 	printf("passes this far\n");
-	exit(1);
+	// exit(1);
 	// //TrieTreeSearch
 	
 	// Vector* name6 = TrieTreeInsertWords(my_trie_tree, VectorAddStringToVector3("a", "e", "g"));

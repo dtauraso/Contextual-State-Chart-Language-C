@@ -460,11 +460,11 @@ int main(int argc, char** argv)
 		//printf("here\n");
 
 		makeTreeStateMachine(my_scanner);
-		// printTree2(my_scanner->_lines_graph, 2, 0);
+		printTree2(my_scanner->_lines_graph, 2, 0);
 
 	}
-	// TrieTreeTest();
-	// DynamicMachineTest();
+	TrieTreeTest();
+	DynamicMachineTest();
 	// tests pass so far
 	DynamicMachineTest2();
 	exit(1);

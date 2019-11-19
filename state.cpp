@@ -1129,6 +1129,7 @@ void DynamicMachineTest()
 	// 					TrieTree* _children,
 	// 					int container_type)
 	// TrieTree* TrieTreeInsertEdges(TrieTree* my_trie_tree, Vector* names /* vectors of strings*/)
+// Vector* VectorCombineVectorsGeneral(Vector* vectors[], int size)
 
 	// this creates a local scode so the variable name chosen by the user will work
 	Vector* variables_1 = 	DynamicMachineAppendState(
@@ -1142,12 +1143,15 @@ void DynamicMachineTest()
 										TrieTreeInitTrieTree(),
 										// inserting to the local trie resulted in
 										// new state ids to be generated
-										VectorCombineVectors5(
-											a_count,
-											b_count,
-											c_count,
-											input_string,
-											i_1)
+										VectorCombineVectorsGeneral( (Vector* []) {
+												a_count,
+												b_count,
+												c_count,
+												input_string,
+												i_1
+											},
+											5
+										)
 									),
 									// container type id
 									trie_tree
@@ -1160,11 +1164,14 @@ void DynamicMachineTest()
 									VectorAddStringToVector1("variables"),
 									NULL,
 									NULL,
-									VectorCombineVectors4(
+									VectorCombineVectorsGeneral((Vector* []) {
 										a_count,
 										b_count,
 										c_count,
 										i_1
+										},
+										4
+										
 									),
 									NULL,
 									returnTrue,
@@ -1374,7 +1381,7 @@ void DynamicMachineTest()
 			}
 		}
 		printf("done\n\n");
-		exit(1);
+		// exit(1);
 		// input tested is "aabbcc"
 		
 
@@ -1738,11 +1745,13 @@ DynamicMachineAppendState(
 			has_down_links,
 			VectorCombineVectors1(
 				VectorAddStringToVector1("start")),
-			VectorCombineVectors3(
-				VectorAddStringToVector2("letters", "0"),
-				VectorAddStringToVector2("digit", "2"),
-				VectorAddStringToVector1("null")
-
+			VectorCombineVectorsGeneral(
+				(Vector* [])
+				{
+					VectorAddStringToVector2("letters", "0"),
+					VectorAddStringToVector2("digit", "2"),
+					VectorAddStringToVector1("null")
+				}, 3
 			),
 			// func((type[]){val1,val2,val3,val4,0});
 			VectorCombineVectorsGeneral((Vector* []) {

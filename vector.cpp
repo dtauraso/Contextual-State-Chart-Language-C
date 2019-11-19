@@ -453,32 +453,79 @@ Vector* VectorAddStringToVector3(string string_1, string string_2, string string
 
 	return list_of_strings_1;
 }
-Vector* VectorAddStringToVector4(string string_1, string string_2, string string_3, string string_4)
+
+Vector* VectorAddStringToVectorGeneral(string strings[], int size)
 {
-	Vector* list_of_strings_1 = VectorInitVector();
+	// void func(type* values) {
+    //     while(*values) {
+    //         x = *values++;
+    //         /* do whatever with x */
+    //     }
+    // }
+	// assume size is correct as we can't check it.
+	Vector* list_of_strings = VectorInitVector();
+	int i = 0;
+	while(i < size) {
+		// printf("%i\n", i);
+		// Vector* my_vector = (Vector*) vectors[i];
 
-	string* string_1_ptr = (string*) malloc(sizeof(string));
-	*string_1_ptr = string_1;
-	VectorAppend(list_of_strings_1, string_1_ptr);
+		// VectorPrintVectorOfStrings(my_vector);
+		// VectorPrintStrings(my_vector);
 
-	string* string_2_ptr = (string*) malloc(sizeof(string));
-	*string_2_ptr = string_2;
+		
+		VectorAppendString(list_of_strings, strings[i]);
+		i++;
+            /* do whatever with x */
+	}
+	if(VectorGetPopulation(list_of_strings) == 0)
+	{
+		return VectorInitVector();
+	}
+	// for(int i = 0; i < VectorGetPopulation(vectors); i++)
+	// {
+	// 	Vector* my_vector = (Vector* ) VectorGetItem(vectors, i);
+	// 	VectorAppend(list_of_lists_of_strings, my_vector);
+	// }
+	// VectorAppend(list_of_lists_of_strings, source_1);
 
-	VectorAppend(list_of_strings_1, string_2_ptr);
+	// VectorAppend(list_of_lists_of_strings, source_2);
 
-	string* string_3_ptr = (string*) malloc(sizeof(string));
-	*string_3_ptr = string_3;
+	// VectorAppend(list_of_lists_of_strings, source_3);
 
-	VectorAppend(list_of_strings_1, string_3_ptr);
+	// VectorAppend(list_of_lists_of_strings, source_4);
 
+	// VectorAppend(list_of_lists_of_strings, source_5);
+	// VectorPrintVectorOfStrings(list_of_lists_of_strings);
 
-	string* string_4_ptr = (string*) malloc(sizeof(string));
-	*string_4_ptr = string_4;
+	return list_of_strings;
 
-	VectorAppend(list_of_strings_1, string_4_ptr);
-
-	return list_of_strings_1;
 }
+// Vector* VectorAddStringToVector4(string string_1, string string_2, string string_3, string string_4)
+// {
+// 	Vector* list_of_strings_1 = VectorInitVector();
+
+// 	string* string_1_ptr = (string*) malloc(sizeof(string));
+// 	*string_1_ptr = string_1;
+// 	VectorAppend(list_of_strings_1, string_1_ptr);
+
+// 	string* string_2_ptr = (string*) malloc(sizeof(string));
+// 	*string_2_ptr = string_2;
+
+// 	VectorAppend(list_of_strings_1, string_2_ptr);
+
+// 	string* string_3_ptr = (string*) malloc(sizeof(string));
+// 	*string_3_ptr = string_3;
+
+// 	VectorAppend(list_of_strings_1, string_3_ptr);
+
+
+// 	string* string_4_ptr = (string*) malloc(sizeof(string));
+// 	*string_4_ptr = string_4;
+
+// 	VectorAppend(list_of_strings_1, string_4_ptr);
+
+// 	return list_of_strings_1;
+// }
 
 Vector* VectorCombineVectors1(Vector* source_1)
 {
@@ -515,39 +562,39 @@ Vector* VectorCombineVectors3(Vector* source_1, Vector* source_2, Vector* source
 
 }
 
-Vector* VectorCombineVectors4(Vector* source_1, Vector* source_2, Vector* source_3, Vector* source_4)
-{
-	Vector* list_of_lists_of_strings = VectorInitVector();
+// Vector* VectorCombineVectors4(Vector* source_1, Vector* source_2, Vector* source_3, Vector* source_4)
+// {
+// 	Vector* list_of_lists_of_strings = VectorInitVector();
 
-	VectorAppend(list_of_lists_of_strings, source_1);
+// 	VectorAppend(list_of_lists_of_strings, source_1);
 
-	VectorAppend(list_of_lists_of_strings, source_2);
+// 	VectorAppend(list_of_lists_of_strings, source_2);
 
-	VectorAppend(list_of_lists_of_strings, source_3);
+// 	VectorAppend(list_of_lists_of_strings, source_3);
 
-	VectorAppend(list_of_lists_of_strings, source_4);
+// 	VectorAppend(list_of_lists_of_strings, source_4);
 
-	return list_of_lists_of_strings;
+// 	return list_of_lists_of_strings;
 
-}
+// }
 
-Vector* VectorCombineVectors5(Vector* source_1, Vector* source_2, Vector* source_3, Vector* source_4, Vector* source_5)
-{
-	Vector* list_of_lists_of_strings = VectorInitVector();
+// Vector* VectorCombineVectors5(Vector* source_1, Vector* source_2, Vector* source_3, Vector* source_4, Vector* source_5)
+// {
+// 	Vector* list_of_lists_of_strings = VectorInitVector();
 
-	VectorAppend(list_of_lists_of_strings, source_1);
+// 	VectorAppend(list_of_lists_of_strings, source_1);
 
-	VectorAppend(list_of_lists_of_strings, source_2);
+// 	VectorAppend(list_of_lists_of_strings, source_2);
 
-	VectorAppend(list_of_lists_of_strings, source_3);
+// 	VectorAppend(list_of_lists_of_strings, source_3);
 
-	VectorAppend(list_of_lists_of_strings, source_4);
+// 	VectorAppend(list_of_lists_of_strings, source_4);
 
-	VectorAppend(list_of_lists_of_strings, source_5);
+// 	VectorAppend(list_of_lists_of_strings, source_5);
 
-	return list_of_lists_of_strings;
+// 	return list_of_lists_of_strings;
 
-}
+// }
 Vector* VectorCombineVectorsGeneral(Vector* vectors[], int size)
 {
 	// void func(type* values) {
