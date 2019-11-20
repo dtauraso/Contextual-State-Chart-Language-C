@@ -2108,11 +2108,30 @@ void TrieTreeTest()
 
 	TrieTreeDeleteWords(my_trie_tree, VectorAddStringToVector2("abvf", "tgrfede"));
 
-	Vector* name3 = TrieTreeInsertWords2(my_trie_tree, VectorAddStringToVector3("abvf", "tgrfede", "f"), -1);
+	Vector* name3 = TrieTreeInsertWords2(
+						my_trie_tree,
+						VectorAddStringToVectorGeneral(
+							(string [])
+							{
+								"abvf", "tgrfede", "f"
+							}, 3
+						),
+
+						-1
+					);
 
 
 
-	Vector* name4 = TrieTreeInsertWords2(my_trie_tree, VectorAddStringToVector3("abvf", "tgrfede", "hijk"), -1);
+	Vector* name4 = TrieTreeInsertWords2(
+						my_trie_tree,
+						VectorAddStringToVectorGeneral(
+							(string [])
+							{
+								"abvf", "tgrfede", "hijk"
+							}, 3
+						),
+						
+						-1);
 	
 	Vector* name5 = TrieTreeInsertWords2(
 						my_trie_tree,

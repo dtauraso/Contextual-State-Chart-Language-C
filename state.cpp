@@ -1025,7 +1025,14 @@ void DynamicMachineTest()
 	DynamicMachineAppendState(
 		my_machine,
 		DynamicStateInitDynamicState(
-			VectorAddStringToVector3("state 1", "x", "y\""),
+			VectorAddStringToVectorGeneral(
+				(string [])
+				{
+					"state 1", "x", "y\""
+				}, 3
+			),
+			// VectorAddStringToVector3("state 1", "x", "y\""),
+
 			NULL,
 			NULL,
 			NULL,
@@ -1055,11 +1062,13 @@ void DynamicMachineTest()
 	Vector* state_names = VectorInitVector();
 	VectorAppend(
 		state_names,
-		VectorAddStringToVector3(
-			"state 1",
-			"x",
-			"y\""
+		VectorAddStringToVectorGeneral(
+			(string [])
+			{
+				"state 1", "x", "y\""
+			}, 3
 		)
+
 	);
 
 	DynamicState* winning_state = DynamicMachineRunStates(my_machine, NULL, x, state_names);
