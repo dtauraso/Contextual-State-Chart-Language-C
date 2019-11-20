@@ -1,14 +1,6 @@
 #ifndef VECTOR
 #define VECTOR
 #include "standard_headers.h"
-//#include "trie_tree.h"
-
-typedef struct Match
-{
-	bool exists;
-	int index;
-}Match;
-Match* MatchInitMatch();
 
 typedef struct Vector
 {
