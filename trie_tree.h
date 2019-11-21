@@ -98,8 +98,8 @@ typedef struct TrieTree
 		The languages do their job very well and I'm not interested in replacing them.  My interest
 		is to give them flexible features to provide more clarity and expressability to the programmer.
 
-		I could be misguided about how much the field can be improved, but making languages better than they
-		are seems like a good idea if it can be done.
+		I could be misguided about how much the field can be improved, but adding meaningful and valuable features
+		to programming languages seems like a good idea if it can be done.
 
 
 
