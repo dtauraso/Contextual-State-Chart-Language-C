@@ -94,6 +94,13 @@ typedef struct TrieTree
 		and still maintain high efficiency.  This happens to be exactly what the programming languages and frameworks
 		represent.
 
+		I see this as a very high level inefficiency that may be addressed more in the comming decades.
+		The languages do their job very well and I'm not interested in replacing them.  My interest
+		is to give them flexible features to provide more clarity and expressability to the programmer.
+
+		I could be misguided about how much the field can be improved, but making languages better than they
+		are seems like a good idea if it can be done.
+
 
 
 	*/
