@@ -229,43 +229,45 @@ bool VectorDeleteItem(Vector* container, int index)
 	// printf("delete at %i\n", index);
 	// set container[index] to null
 	// shift all values from [index + 1, end] to the left by 1
-	if(container != NULL)
+	if(container == NULL)
 	{
-		//printf("%i\n", container->population);
-		//printf("%i\n", index);
-		//int* x = (int*) container->values[index];
-		//printf("%i\n", *x);
-		free(container->values[index]);
-		container->values[index] = NULL;
-		if(index < container->population)
-		{
-			// printf("%i %i\n", index + 1, container->population);
-			for(int i = index + 1; i < container->population; i++)
-			{
-				container->values[i - 1] = container->values[i];
-
-				container->values[i] = NULL;
-
-			}
-			// VectorPrint(container);
-
-			container->population--;
-			// printf("%i\n", container->population);
-		}
-		return true;
+		return false;
 	}
-	return false;
+	//printf("%i\n", container->population);
+	//printf("%i\n", index);
+	//int* x = (int*) container->values[index];
+	//printf("%i\n", *x);
+	free(container->values[index]);
+	container->values[index] = NULL;
+	if(index < container->population)
+	{
+		// printf("%i %i\n", index + 1, container->population);
+		for(int i = index + 1; i < container->population; i++)
+		{
+			container->values[i - 1] = container->values[i];
+
+			container->values[i] = NULL;
+
+		}
+		// VectorPrint(container);
+
+		container->population--;
+		// printf("%i\n", container->population);
+	}
+	return true;
+
 }
 bool VectorDeleteAllItems(Vector* container)
 {
 	// assuems all elements are primitives
-	if(container != NULL)
+	if(container == NULL)
 	{
-		for(int i = 0; i < container->population; i++)
-		{
-			free(container->values[i]);
-			container->values[i] = NULL;
-		}
+		return false;
+	}
+	for(int i = 0; i < container->population; i++)
+	{
+		free(container->values[i]);
+		container->values[i] = NULL;
 	}
 	free(container->values);
 	container->values = NULL;
@@ -275,26 +277,33 @@ bool VectorDeleteAllItems(Vector* container)
 }
 void VectorShiftItems(Vector* container, int index)
 {
-	if(container != NULL)
+	if(container == NULL || index >= container->population)
 	{
-		if(index < container->population)
-		{
-			for(int i = index + 1; i < container->population; i++)
-			{
-				container->values[i - 1] = container->values[i];
-
-				container->values[i] = NULL;
-
-			}
-			container->population--;
-		}
+		return;
 	}
+
+	for(int i = index + 1; i < container->population; i++)
+	{
+		container->values[i - 1] = container->values[i];
+
+		container->values[i] = NULL;
+
+	}
+	container->population--;
 	
 }
 
 void VectorShiftLeft(Vector* container, int start, int end)
 {
 	//printf("insert location bounds %i %i\n", start, end);
+	if(container == NULL || start < 0 || end > start)
+	{
+		return;
+	}
+	if(container->population <= start + 1)
+	{
+		return;
+	}
 	// assume start >= end
 	// assume container size > start+1
 	for(int i = start + 1; i >= end; i--)
@@ -310,41 +319,44 @@ void VectorShiftLeft(Vector* container, int start, int end)
 
 void VectorPrint(Vector* container)
 {
-	if(container != NULL)
+	if(container == NULL)
 	{
-		//printf("printing container pop %i, size %i\n", container->population, container->size);
-		for(int i = 0; i < container->population; i++)
-		{
-			//printf("i %i\n", i);
-			if(container->values[i] == NULL)
-			{
-				printf("|NULL|\n");
-			}
-			else
-			{
-				//printf("|%x|", container->values[i]);
-				void* a = container->values[i];
-				int* b = (int*) a;
-				printf("|%i|", *b);
-				
-				//printf("|item|");
-			}
-		}
-		if(container->population == 0)
-		{
-			printf("none");
-		}
-		printf("\n\n");
-	}
-	else
-	{
+
 		printf("empty container\n");
+		return;
 	}
+	//printf("printing container pop %i, size %i\n", container->population, container->size);
+	for(int i = 0; i < container->population; i++)
+	{
+		//printf("i %i\n", i);
+		if(container->values[i] == NULL)
+		{
+			printf("|NULL|\n");
+		}
+		else
+		{
+			//printf("|%x|", container->values[i]);
+			void* a = container->values[i];
+			int* b = (int*) a;
+			printf("|%i|", *b);
+			
+			//printf("|item|");
+		}
+	}
+	if(container->population == 0)
+	{
+		printf("none");
+	}
+	printf("\n\n");
 	
 
 }
 void VectorPrintVectorOfStrings(Vector* container)
 {
+	if(container == NULL)
+	{
+		return;
+	}
 	// assume we are passing in a vector of vectors of strings
 	for(int i = 0; i < VectorGetPopulation(container); i++)
 	{
@@ -354,6 +366,10 @@ void VectorPrintVectorOfStrings(Vector* container)
 }
 void VectorPrintStrings(Vector* container)
 {
+	if(container == NULL)
+	{
+		return;
+	}
 	//printf("printing container pop %i, size %i\n", container->population, container->size);
 	for(int i = 0; i < container->population; i++)
 	{
