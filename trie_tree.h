@@ -9,14 +9,18 @@ struct Vector;
 
 typedef struct TrieNode2
 {
-	// assumptions for this class
+	// assumptions for this struct
 	// Each word the chars spell out will end with a unique node(holding a letter), hence the branching in the trie tree
 	// Each unique node will link to the corresponding word node
 	// Each word node will have a list of children, where each child corresponds to the char from the 
 	// char trie tree.
-	// This enables a few things: printing out the char trie letters as words,
+	
+	// This enables a few things:
+
+	// printing out the char trie letters as words,
 	// adding new char nodes and tracking them in the char trie and the word trie
-	// 
+	// deleting char nodes and tracking them in the char trie and the word trie
+
 
 	// all links are integers
 	// don't use this variable
@@ -50,6 +54,51 @@ void* TrieNode2GetValue(TrieNode2* node);
 
 typedef struct TrieTree
 {
+	// features the user should be able to do with state "variables"
+	// add variable
+	// add same variable n times
+	// all variables have a unique name
+	// conditions we want for this
+	// each instance of a class has local variables unique to that instance
+	// global scope is the entire state machine
+	// each state(class) will have local scope for the submachine
+	// 
+	/*
+		i, 0
+		i, 1
+		i, 2
+		That way the user can make as many "i"'s as they want as long as each
+		"i" will be stored in a different submachine
+		this is like having many instances of a class each having their own "i"
+
+		This is needed because the state machine represents all control flow elements(if, while)
+		and all data elements(class, int, string, container) so we must have the ability for the user
+		to treat making variables in the state machine to be as close as possible to how variables
+		are made in programming languages
+
+		This is a trie tree to enable n dimensions when describing a state
+
+		["I am a state", "I am a little bit more detailed", "I am describing 3 dimentions of complexity"]
+
+		We want any complexity level to approximate the complex states of mind present in a humand mind
+		That requires represening complex states in a general way(General AI).  Numenta has done a great job
+		with this, and while AGI isn't here, parts of it are here and can be used as a programming tool
+		to aid the programmer.
+
+		Why would we want this?  We already have many programming languages that can do any computable task.
+		There are many different kinds of languages for different tasks.
+
+		That is true, but computers hardly have a way of relating to how we think.  Based on the current
+		general ai thought, we have a single way of representing all kinds of information.  It's much harder
+		for the brain to have hundreds of different kinds of representations in the same organ
+		and still maintain high efficiency.  This happens to be exactly what the programming languages and frameworks
+		represent.
+
+
+
+	*/
+
+
 	int root;
 	// will be unsorted
 	// trie tree of characters
