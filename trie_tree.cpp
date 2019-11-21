@@ -37,6 +37,7 @@ TrieNode2* TrieNode2initTrieNode2()
 	my_node->state_id = -1;
 	my_node->start_of_word = 0;
 	my_node->word_counterpart = -1;
+
 	// set the word_letters to null
 	// that way only the word nodes have a non-null copy
 	my_node->word_letters = NULL;
@@ -69,30 +70,19 @@ bool TrieNode2DeleteTrieNode2(TrieNode2* node)
 	VectorDeleteAllItems(node->chars_from_edges);
 	node->chars_from_edges = NULL;
 
-	//printf("word letters %x\n", *((int*) node->word_letters) );
+
 	if(node->word_letters == NULL)
 	{
 		return false;
 	}
 
-	//printf("about to erase\n");
-	// needs to be initialized for all TrieNode Objects(fix insert)
+
 	VectorDeleteAllItems(node->word_letters);
 	node->word_letters = NULL;
-	//printf("erased\n");
+
 	free(node);
 	return true;
-	/*
-	if(VectorDeleteAllItems(node->links))
-	{
-		//printf("erased links\n");
-		free(node);
-		//node = NULL;
-		return true;
-	}
-
-	return false;
-	*/
+	
 
 }
 void* TrieNode2GetValue(TrieNode2* node)
@@ -123,7 +113,6 @@ TrieTree* TrieTreeInitTrieTree()
 	my_trie_tree->word_tree = VectorInitVector();
 
 	// add a node called "root"
-	// root is not the last word
 	char root = 'r';
 	TrieTreeInsertString(my_trie_tree, root, -1);
 
@@ -131,12 +120,6 @@ TrieTree* TrieTreeInitTrieTree()
 
 	node->word_letters = VectorInitVector();
 	node->links = VectorInitVector();
-	//string* node_string = (string*) malloc(sizeof(string));
-	//node_string = element;
-	//node->value = element;
-	//node->my_value = 'r';
-	//node->value_type = 1;
-	//node->state_id = state_id;
 
 	VectorAppend(my_trie_tree->word_tree, node);
 
@@ -144,6 +127,7 @@ TrieTree* TrieTreeInitTrieTree()
 	my_trie_tree->root = 0;
 	my_trie_tree->max_state_id = -1;
 
+	// quickly print the root
 	//printf("%s\n", ((string*) ((TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, my_trie_tree->root))->value)->c_str());
 	return my_trie_tree;
 

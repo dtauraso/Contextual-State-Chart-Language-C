@@ -6,18 +6,19 @@
 // int char_limit = 93 possible visible characters as edges
 
 struct Vector;
-// only for ensuring insert follows a linear control flow from searching to inserting
-typedef struct TrieMatch
-{
-	// (id of parent node, ith string, did we find a match for the ith string, location to insert the link for the child node)
-	int parent_node;
-	int ith_string;
-	bool did_find_a_match;
-	int exptected_location_in_parent_node_children;
-}TrieMatch;
+
 typedef struct TrieNode2
 {
-	// the links are integers
+	// assumptions for this class
+	// Each word the chars spell out will end with a unique node(holding a letter), hence the branching in the trie tree
+	// Each unique node will link to the corresponding word node
+	// Each word node will have a list of children, where each child corresponds to the char from the 
+	// char trie tree.
+	// This enables a few things: printing out the char trie letters as words,
+	// adding new char nodes and tracking them in the char trie and the word trie
+	// 
+
+	// all links are integers
 	// don't use this variable
 	void* value; // has been a string*
 	char my_value;
@@ -26,16 +27,16 @@ typedef struct TrieNode2
 	int char_links[243]; // any number > 242 doesn't cause a catastrophic error for the program
 
 	Vector* chars_from_edges;
-	// will be sorted
-	//Vector* sorted_link_indecies; // ints
 
-	Vector* word_letters; // ints for word nodes to char nodes
+	Vector* word_letters; // ints for word nodes to link to char nodes
 	int value_type;
 	// 0 -> int
 	// 1 -> string
 	int state_id; // location of state in state vector
 
 	int word_counterpart; // set in the last character of the word to the word node
+
+	// probably not being used
 	bool start_of_word;
 	bool end_of_word; // marking the char nodes added so the words can be added in on the second pass
 	int parent;
