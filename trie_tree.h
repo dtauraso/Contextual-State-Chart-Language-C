@@ -74,9 +74,9 @@ typedef struct TrieTree
 		This is needed because the state machine represents all control flow elements(if, while)
 		and all data elements(class, int, string, container) so we must have the ability for the user
 		to treat making variables in the state machine to be as close as possible to how variables
-		are made in programming languages
+		are made in programming languages.
 
-		This is a trie tree to enable n dimensions when describing a state
+		This is a trie tree to enable n dimensions when describing a state.
 
 		["I am a state", "I am a little bit more detailed", "I am describing 3 dimentions of complexity"]
 
