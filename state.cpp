@@ -501,7 +501,7 @@ Vector* DynamicMachineAppendState(DynamicMachine* my_machine, DynamicState* stat
 	VectorAppend(my_machine->states, state);
 	// insert word into trie
 
-	Vector* new_state_name = TrieTreeInsertWords2(my_machine->state_names, state->name, -1);
+	Vector* new_state_name = TrieTreeInsertWords2(my_machine->state_names, state->name);
 
 	// update the state's name
 	// copy the extra parts over
@@ -1510,9 +1510,9 @@ void appendChildren(DynamicMachine* machine,
 	DynamicMachineAppendState(machine, ith_child_data_state);
 
 
-	TrieTreeInsertWords2(last_state_added_state->_children, parent_data_state->name, -1);
-	TrieTreeInsertWords2(last_state_added_state->_children, child_data_state->name, -1);
-	TrieTreeInsertWords2(last_state_added_state->_children, ith_child_data_state->name, -1);
+	TrieTreeInsertWords2(last_state_added_state->_children, parent_data_state->name);
+	TrieTreeInsertWords2(last_state_added_state->_children, child_data_state->name);
+	TrieTreeInsertWords2(last_state_added_state->_children, ith_child_data_state->name);
 	last_state_added_state->container_type = 1;  // trie tree
 	// get the state variable
 	// add in the integers as state children variable
@@ -1958,47 +1958,29 @@ DynamicMachineAppendState(
 	// 1 to 3 timelines is possible and not a headache problem)
 	// just make it all here then put it into a function
 	// what do we have?
-<<<<<<< HEAD
 	// parent state (no)
-=======
-	// parent state (yes, root)
->>>>>>> ad42c7d4817fbf5e75e0e537bd4c49e72ae38216
 	// child state (yes, start)
 	// ith child (yes, 0)
 	// value of machine when it's over (yes, false for now)
 	// slot state for the stack (no)
 	// level state for the data associated with a slot (no)
 	// root of stack
-<<<<<<< HEAD
-	DynamicMachineAppendState(	my_machine_2,
-=======
 	Vector* stack_item_name = DynamicMachineAppendState(	my_machine_2,
->>>>>>> ad42c7d4817fbf5e75e0e537bd4c49e72ae38216
 	// name, parents, _children
 		DynamicStateInitDynamicStateVariableContainer(
 			VectorAddStringToVector2("stack item", "slot"),
 			VectorCombineVectors1(
-<<<<<<< HEAD
-				VectorAddStringToVector1("none")),
-=======
 				VectorAddStringToVector1("root")),
->>>>>>> ad42c7d4817fbf5e75e0e537bd4c49e72ae38216
 			TrieTreeInitTrieTree(),
 			trie_tree
 		)
 	);
-<<<<<<< HEAD
-
-	// slot 1 of stack
-	DynamicMachineAppendState(	my_machine_2,
-=======
 	// get the root
 	DynamicState* root = (DynamicState*) VectorGetItem(my_machine_2->states, 0);
 	// set roots child to
 	VectorAppend(root->children, stack_item_name);
 	// slot 1 of stack
 	Vector* stack_item_name_1 = DynamicMachineAppendState(	my_machine_2,
->>>>>>> ad42c7d4817fbf5e75e0e537bd4c49e72ae38216
 	// name, parents, _children
 		DynamicStateInitDynamicStateVariableContainer(
 			VectorAddStringToVector2("stack item", "slot"),
@@ -2009,21 +1991,6 @@ DynamicMachineAppendState(
 			trie_tree
 		)
 	);
-<<<<<<< HEAD
-
-
-	DynamicMachineAppendState(	my_machine_2,
-	// name, parents, _children
-		DynamicStateInitDynamicStateVariableContainer(
-			VectorAddStringToVector2("stack item", "level_data"),
-			VectorCombineVectors1(
-				VectorAddStringToVector2("stack item", "slot")),
-			TrieTreeInitTrieTree(),
-			trie_tree
-		)
-	);
-
-=======
 	DynamicState* root_stack_item = (DynamicState*) VectorGetItem(my_machine_2->states,
 		TrieTreeSearch(my_machine_2->state_names, stack_item_name));
 	
@@ -2078,7 +2045,6 @@ DynamicMachineAppendState(
 	Vector* root_name = variable->container;
 	VectorPrintStrings(root_name);
 	// DynamicMachinePrintStateTree(my_machine_2, 0, 0);
->>>>>>> ad42c7d4817fbf5e75e0e537bd4c49e72ae38216
 
 
 	// need to append a slot state before running this

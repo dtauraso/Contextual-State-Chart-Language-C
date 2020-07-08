@@ -26,6 +26,11 @@ typedef struct TrieNode2
 	// don't use this variable
 	char my_value;
 
+	// the first char starts at 33
+	// if we put in the first char as the first item
+	// links[current_char_input - 33]
+	// will not work unless the items are 
+	//
 	Vector* links;  // ints
 
 	int state_id; // location of state in state vector
@@ -37,7 +42,7 @@ typedef struct TrieNode2
 TrieNode2* TrieNode2initTrieNode2();
 bool TrieNode2DeleteTrieNode2(TrieNode2* node);
 
-void* TrieNode2GetValue(TrieNode2* node);
+char TrieNode2GetValue(TrieNode2* node);
 
 typedef struct TrieTree
 {
@@ -131,7 +136,7 @@ void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_p
 
 void TrieTreeInsertWord(TrieTree* my_trie_tree, string* new_number_ptr, TrieNode2* node_found2, int state_id);
 // testing this version
-Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name /* strings*/, int expected_id);
+Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name /* strings*/);
 
 // Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name /* strings*/, int expected_id);
 TrieTree* TrieTreeInsertEdges(TrieTree* my_general_tree, TrieTree* my_trie_tree, Vector* names /* vectors of strings*/);
