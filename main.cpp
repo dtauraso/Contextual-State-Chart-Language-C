@@ -459,12 +459,21 @@ int main(int argc, char** argv)
 	// 	Scanner* my_scanner = initScanner(trimmed_input);
 	// 	//printf("here\n");
 
+<<<<<<< HEAD
 	// 	makeTreeStateMachine(my_scanner);
 	// 	// printTree2(my_scanner->_lines_graph, 2, 0);
 
 	// }
 	TrieTreeTest();
 	// DynamicMachineTest();
+=======
+		makeTreeStateMachine(my_scanner);
+		printTree2(my_scanner->_lines_graph, 2, 0);
+
+	}
+	TrieTreeTest();
+	DynamicMachineTest();
+>>>>>>> ad42c7d4817fbf5e75e0e537bd4c49e72ae38216
 	// tests pass so far
 	// DynamicMachineTest2();
 	exit(1);

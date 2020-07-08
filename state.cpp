@@ -1025,7 +1025,14 @@ void DynamicMachineTest()
 	DynamicMachineAppendState(
 		my_machine,
 		DynamicStateInitDynamicState(
-			VectorAddStringToVector3("state 1", "x", "y\""),
+			VectorAddStringToVectorGeneral(
+				(string [])
+				{
+					"state 1", "x", "y\""
+				}, 3
+			),
+			// VectorAddStringToVector3("state 1", "x", "y\""),
+
 			NULL,
 			NULL,
 			NULL,
@@ -1055,11 +1062,13 @@ void DynamicMachineTest()
 	Vector* state_names = VectorInitVector();
 	VectorAppend(
 		state_names,
-		VectorAddStringToVector3(
-			"state 1",
-			"x",
-			"y\""
+		VectorAddStringToVectorGeneral(
+			(string [])
+			{
+				"state 1", "x", "y\""
+			}, 3
 		)
+
 	);
 
 	DynamicState* winning_state = DynamicMachineRunStates(my_machine, NULL, x, state_names);
@@ -1129,6 +1138,7 @@ void DynamicMachineTest()
 	// 					TrieTree* _children,
 	// 					int container_type)
 	// TrieTree* TrieTreeInsertEdges(TrieTree* my_trie_tree, Vector* names /* vectors of strings*/)
+// Vector* VectorCombineVectorsGeneral(Vector* vectors[], int size)
 
 	// this creates a local scode so the variable name chosen by the user will work
 	Vector* variables_1 = 	DynamicMachineAppendState(
@@ -1142,12 +1152,15 @@ void DynamicMachineTest()
 										TrieTreeInitTrieTree(),
 										// inserting to the local trie resulted in
 										// new state ids to be generated
-										VectorCombineVectors5(
-											a_count,
-											b_count,
-											c_count,
-											input_string,
-											i_1)
+										VectorCombineVectorsGeneral( (Vector* []) {
+												a_count,
+												b_count,
+												c_count,
+												input_string,
+												i_1
+											},
+											5
+										)
 									),
 									// container type id
 									trie_tree
@@ -1160,11 +1173,14 @@ void DynamicMachineTest()
 									VectorAddStringToVector1("variables"),
 									NULL,
 									NULL,
-									VectorCombineVectors4(
+									VectorCombineVectorsGeneral((Vector* []) {
 										a_count,
 										b_count,
 										c_count,
 										i_1
+										},
+										4
+										
 									),
 									NULL,
 									returnTrue,
@@ -1374,7 +1390,7 @@ void DynamicMachineTest()
 			}
 		}
 		printf("done\n\n");
-		exit(1);
+		// exit(1);
 		// input tested is "aabbcc"
 		
 
@@ -1561,6 +1577,12 @@ void DynamicStatePrintState(DynamicMachine* my_machine, int state_id, int indent
 	printf("%schildren:\n%s", my_indents.c_str(), my_indents.c_str());
 	VectorPrintVectorOfStrings(state->children);
 
+	// _children
+	printf("%s_children:\n%s", my_indents.c_str(), my_indents.c_str());
+
+	TrieTreePrintTrieRecursive(my_machine->state_names, 0, my_indents);
+
+
 	// next states
 	printf("%snext states:\n%s", my_indents.c_str(), my_indents.c_str());
 	VectorPrintVectorOfStrings(state->next_states);
@@ -1732,11 +1754,13 @@ DynamicMachineAppendState(
 			has_down_links,
 			VectorCombineVectors1(
 				VectorAddStringToVector1("start")),
-			VectorCombineVectors3(
-				VectorAddStringToVector2("letters", "0"),
-				VectorAddStringToVector2("digit", "2"),
-				VectorAddStringToVector1("null")
-
+			VectorCombineVectorsGeneral(
+				(Vector* [])
+				{
+					VectorAddStringToVector2("letters", "0"),
+					VectorAddStringToVector2("digit", "2"),
+					VectorAddStringToVector1("null")
+				}, 3
 			),
 			// func((type[]){val1,val2,val3,val4,0});
 			VectorCombineVectorsGeneral((Vector* []) {
@@ -1929,31 +1953,52 @@ DynamicMachineAppendState(
 	Vector* parent = (Vector*) VectorGetItem(working_state->parents, 0);
 	// VectorPrintStrings(parent);
 	// printf("printing state machine\n");
-	DynamicMachinePrintStateTree(my_machine_2, 0, 0);
+	// DynamicMachinePrintStateTree(my_machine_2, 0, 0);
 	// make sure the slot sate and level data state are made at the same time and have the same parent(so debugging
 	// 1 to 3 timelines is possible and not a headache problem)
 	// just make it all here then put it into a function
 	// what do we have?
+<<<<<<< HEAD
 	// parent state (no)
+=======
+	// parent state (yes, root)
+>>>>>>> ad42c7d4817fbf5e75e0e537bd4c49e72ae38216
 	// child state (yes, start)
 	// ith child (yes, 0)
 	// value of machine when it's over (yes, false for now)
 	// slot state for the stack (no)
 	// level state for the data associated with a slot (no)
 	// root of stack
+<<<<<<< HEAD
 	DynamicMachineAppendState(	my_machine_2,
+=======
+	Vector* stack_item_name = DynamicMachineAppendState(	my_machine_2,
+>>>>>>> ad42c7d4817fbf5e75e0e537bd4c49e72ae38216
 	// name, parents, _children
 		DynamicStateInitDynamicStateVariableContainer(
 			VectorAddStringToVector2("stack item", "slot"),
 			VectorCombineVectors1(
+<<<<<<< HEAD
 				VectorAddStringToVector1("none")),
+=======
+				VectorAddStringToVector1("root")),
+>>>>>>> ad42c7d4817fbf5e75e0e537bd4c49e72ae38216
 			TrieTreeInitTrieTree(),
 			trie_tree
 		)
 	);
+<<<<<<< HEAD
 
 	// slot 1 of stack
 	DynamicMachineAppendState(	my_machine_2,
+=======
+	// get the root
+	DynamicState* root = (DynamicState*) VectorGetItem(my_machine_2->states, 0);
+	// set roots child to
+	VectorAppend(root->children, stack_item_name);
+	// slot 1 of stack
+	Vector* stack_item_name_1 = DynamicMachineAppendState(	my_machine_2,
+>>>>>>> ad42c7d4817fbf5e75e0e537bd4c49e72ae38216
 	// name, parents, _children
 		DynamicStateInitDynamicStateVariableContainer(
 			VectorAddStringToVector2("stack item", "slot"),
@@ -1964,6 +2009,7 @@ DynamicMachineAppendState(
 			trie_tree
 		)
 	);
+<<<<<<< HEAD
 
 
 	DynamicMachineAppendState(	my_machine_2,
@@ -1977,6 +2023,62 @@ DynamicMachineAppendState(
 		)
 	);
 
+=======
+	DynamicState* root_stack_item = (DynamicState*) VectorGetItem(my_machine_2->states,
+		TrieTreeSearch(my_machine_2->state_names, stack_item_name));
+	
+	VectorAppend(root_stack_item->children, stack_item_name_1);
+
+	// make the data states
+	// make a state holding the name of the root
+	// need a vector container constructor for the Data* type
+	// Data* DataInitDataVector(Vector* container)
+	Vector* saved_root = DynamicMachineAppendState(
+							my_machine_2,
+							DynamicStateMakeVariable(
+								"root",
+								VectorInitVector(),
+								DataInitDataVector(root->name)
+							)
+						);
+
+	Vector* stack_item_level_data = DynamicMachineAppendState(	my_machine_2,
+										// name, parents, _children
+										DynamicStateInitDynamicStateVariableContainer(
+											VectorAddStringToVector2("stack item", "level_data"),
+											VectorInitVector(),
+											TrieTreeInsertEdges(
+												my_machine_2->state_names,
+												TrieTreeInitTrieTree(),
+												// inserting to the local trie resulted in
+												// new state ids to be generated
+												VectorCombineVectors1(
+													saved_root
+													)
+												),
+											trie_tree
+										)
+									);
+	VectorAppend(root_stack_item->children, stack_item_level_data);
+
+	DynamicState* stack_item_level_data_item = (DynamicState*) VectorGetItem(my_machine_2->states,
+		TrieTreeSearch(my_machine_2->state_names, stack_item_level_data));
+	int location = TrieTreeSearch(stack_item_level_data_item->_children, saved_root);
+	printf("location %i\n", location);
+	DynamicState* saved_root_state = (DynamicState*) VectorGetItem(my_machine_2->states, location);
+	Data* variable = saved_root_state->value;
+	// can store the data in a level data item and show it
+	// can store the slot data items in a linear sequence and show it
+	// before continuing
+		// clean up files
+		// separate files
+		// make all functions bullet proof(at least quit with error message)
+		// generalize all functios with multi object used(like using the trie tree print to print assuming there are indents from a state print function)
+		// comment on assumptions the functions use
+	Vector* root_name = variable->container;
+	VectorPrintStrings(root_name);
+	// DynamicMachinePrintStateTree(my_machine_2, 0, 0);
+>>>>>>> ad42c7d4817fbf5e75e0e537bd4c49e72ae38216
 
 
 	// need to append a slot state before running this
@@ -2980,6 +3082,30 @@ void DataDeleteData(Data* variable)
 	}
 	free(variable);
 	variable = NULL;
+}
+
+Data* DataInitDataVector(Vector* container)
+{
+	Data* variable = (Data* ) malloc(sizeof(Data));
+	variable->type_id = 3;
+	
+	variable->container = container;
+	variable->vector_type_id = 1;
+	variable->container_nesting_level = 1;
+	return variable;
+
+}
+
+void DataDeleteDataVector(Data* variable)
+{
+	if(variable == NULL)
+	{
+		return;
+	}
+	// not doing deep delete now
+	// for(int i = 0; i < )
+	VectorDeleteVector(variable->container);
+
 }
 ContextState* initContextState()
 {

@@ -1,14 +1,6 @@
 #ifndef VECTOR
 #define VECTOR
 #include "standard_headers.h"
-//#include "trie_tree.h"
-
-typedef struct Match
-{
-	bool exists;
-	int index;
-}Match;
-Match* MatchInitMatch();
 
 typedef struct Vector
 {
@@ -56,16 +48,15 @@ void VectorPrintStrings(Vector* container);
 
 Vector* VectorAddStringToVector1(string string_1);
 Vector* VectorAddStringToVector2(string string_1, string string_2);
-Vector* VectorAddStringToVector3(string string_1, string string_2, string string_3);
-Vector* VectorAddStringToVector4(string string_1, string string_2, string string_3, string string_4);
+
+Vector* VectorAddStringToVectorGeneral(string strings[], int size);
+
 
 Vector* VectorCombineVectors1(Vector* source_1);
 
 Vector* VectorCombineVectors2(Vector* source_1, Vector* source_2);
-Vector* VectorCombineVectors3(Vector* source_1, Vector* source_2, Vector* source_3);
 
-Vector* VectorCombineVectors4(Vector* source_1, Vector* source_2, Vector* source_3, Vector* source_4);
-Vector* VectorCombineVectors5(Vector* source_1, Vector* source_2, Vector* source_3, Vector* source_4, Vector* source_5);
+
 Vector* VectorCombineVectorsGeneral(Vector* vectors[], int size);
 
 #endif
