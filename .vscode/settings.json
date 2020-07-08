@@ -1,6 +1,17 @@
 {
-    "C_Cpp.dimInactiveRegions": false,
     "files.associations": {
-        "visit_functions.h": "c"
+        "unordered_map": "cpp",
+        "array": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp",
+        "utility": "cpp",
+        "random": "cpp",
+        "optional": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "system_error": "cpp",
+        "functional": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp"
     }
 }

@@ -1614,6 +1614,29 @@ void DynamicMachineTest2()
 
 	// add a root
 
+DynamicMachineAppendState(
+		my_machine_2,
+		DynamicStateInitDynamicState2(
+			VectorAddStringToVector1("root"),
+			// child and start child of "root" and parent to (, ), variables, and letters_digits_null
+			!is_start_child,
+			has_down_links,
+			// the none state is fake
+			VectorCombineVectors1(
+				VectorAddStringToVector1("none")),
+			VectorCombineVectors1(
+				VectorAddStringToVector1("start")),
+			VectorCombineVectorsGeneral((Vector* []) {
+				// defined name for variables in DataGetVariable
+				VectorAddStringToVector1("start")},
+				1
+			),
+			VectorInitVector(),
+			returnTrue,
+			NULL
+		)
+	);
+
 	DynamicMachineAppendState(
 		my_machine_2,
 		DynamicStateInitDynamicState2(
@@ -1659,7 +1682,7 @@ void DynamicMachineTest2()
 						DataInitDataInt(0)
 					)
 				);
-		DynamicMachineAppendState(	my_machine_2,
+	DynamicMachineAppendState(	my_machine_2,
 		DynamicStateInitDynamicStateVariableContainer(
 			VectorAddStringToVector1("variables"),
 			VectorCombineVectors1(
@@ -1909,6 +1932,53 @@ void DynamicMachineTest2()
 	DynamicMachinePrintStateTree(my_machine_2, 0, 0);
 	// make sure the slot sate and level data state are made at the same time and have the same parent(so debugging
 	// 1 to 3 timelines is possible and not a headache problem)
+	// just make it all here then put it into a function
+	// what do we have?
+	// parent state (no)
+	// child state (yes, start)
+	// ith child (yes, 0)
+	// value of machine when it's over (yes, false for now)
+	// slot state for the stack (no)
+	// level state for the data associated with a slot (no)
+	// root of stack
+	DynamicMachineAppendState(	my_machine_2,
+	// name, parents, _children
+		DynamicStateInitDynamicStateVariableContainer(
+			VectorAddStringToVector2("stack item", "slot"),
+			VectorCombineVectors1(
+				VectorAddStringToVector1("none")),
+			TrieTreeInitTrieTree(),
+			trie_tree
+		)
+	);
+
+	// slot 1 of stack
+	DynamicMachineAppendState(	my_machine_2,
+	// name, parents, _children
+		DynamicStateInitDynamicStateVariableContainer(
+			VectorAddStringToVector2("stack item", "slot"),
+			VectorCombineVectors1(
+				VectorAddStringToVector2("stack item", "slot")),
+			// slot 2 of all timelines would go here
+			TrieTreeInitTrieTree(),
+			trie_tree
+		)
+	);
+
+
+	DynamicMachineAppendState(	my_machine_2,
+	// name, parents, _children
+		DynamicStateInitDynamicStateVariableContainer(
+			VectorAddStringToVector2("stack item", "level_data"),
+			VectorCombineVectors1(
+				VectorAddStringToVector2("stack item", "slot")),
+			TrieTreeInitTrieTree(),
+			trie_tree
+		)
+	);
+
+
+
 	// need to append a slot state before running this
 
 	// void appendChildren(DynamicMachine* machine,

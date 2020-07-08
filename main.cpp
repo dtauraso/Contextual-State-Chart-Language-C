@@ -448,25 +448,25 @@ int main(int argc, char** argv)
 	//printf("make tree\n");
 	// get rid of all blank lines
 	//test();
-	string trimmed_input = trimEndOfInput(input);
-	if(trimmed_input.size() > 0)
-	{
-		//free(input);
-		//input = NULL;
-		//printf("|%s|\n", trimmed_input.c_str());
-		//exit(1);
+	// string trimmed_input = trimEndOfInput(input);
+	// if(trimmed_input.size() > 0)
+	// {
+	// 	//free(input);
+	// 	//input = NULL;
+	// 	//printf("|%s|\n", trimmed_input.c_str());
+	// 	//exit(1);
 		
-		Scanner* my_scanner = initScanner(trimmed_input);
-		//printf("here\n");
+	// 	Scanner* my_scanner = initScanner(trimmed_input);
+	// 	//printf("here\n");
 
-		makeTreeStateMachine(my_scanner);
-		// printTree2(my_scanner->_lines_graph, 2, 0);
+	// 	makeTreeStateMachine(my_scanner);
+	// 	// printTree2(my_scanner->_lines_graph, 2, 0);
 
-	}
-	// TrieTreeTest();
+	// }
+	TrieTreeTest();
 	// DynamicMachineTest();
 	// tests pass so far
-	DynamicMachineTest2();
+	// DynamicMachineTest2();
 	exit(1);
 
 	/*

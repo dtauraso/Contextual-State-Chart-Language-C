@@ -28,69 +28,32 @@ TrieNode2* TrieNode2initTrieNode2()
 	// assume the dafault type to be stored is an integer
 	TrieNode2* my_node = (TrieNode2*) malloc(sizeof(TrieNode2));
 
-	my_node->value = NULL;
 	my_node->links = VectorInitVector();
 
-	memset(my_node->char_links, -1, sizeof(int) * 256);
-	my_node->chars_from_edges = VectorInitVector();
-	my_node->value_type = 0;
-	my_node->state_id = -1;
-	my_node->start_of_word = 0;
-	my_node->word_counterpart = -1;
-	// set the word_letters to null
-	// that way only the word nodes have a non-null copy
-	my_node->word_letters = NULL;
 	return my_node;
 
 }
 bool TrieNode2DeleteTrieNode2(TrieNode2* node)
 {
-	if(node != NULL)
+	if(node == NULL)
 	{
-		free(node->value);
-		if(node->links != NULL)
-		{
-				VectorDeleteAllItems(node->links);
-				node->links = NULL;
-
-		}
-		if(node->chars_from_edges != NULL)
-		{
-				VectorDeleteAllItems(node->chars_from_edges);
-				node->chars_from_edges = NULL;
-
-		}
-		//printf("word letters %x\n", *((int*) node->word_letters) );
-		if(node->word_letters != NULL)
-		{
-			//printf("about to erase\n");
-			// needs to be initialized for all TrieNode Objects(fix insert)
-			VectorDeleteAllItems(node->word_letters);
-			node->word_letters = NULL;
-			//printf("erased\n");
-		}
-		free(node);
-		return true;
-		/*
-		if(VectorDeleteAllItems(node->links))
-		{
-			//printf("erased links\n");
-			free(node);
-			//node = NULL;
-			return true;
-		}
-
 		return false;
-		*/
 	}
-	return false;
+	if(node->links == NULL)
+	{
+		return false;
+	}
+	VectorDeleteAllItems(node->links);
+	node->links = NULL;
+	free(node);
+	return true;
 
 }
 void* TrieNode2GetValue(TrieNode2* node)
 {
 	if(node != NULL)
 	{
-		return node->value;
+		// return node->value;
 
 	}
 	return NULL;
@@ -120,7 +83,7 @@ TrieTree* TrieTreeInitTrieTree()
 
 	TrieNode2* node = TrieNode2initTrieNode2();
 
-	node->word_letters = VectorInitVector();
+	// node->word_letters = VectorInitVector();
 	node->links = VectorInitVector();
 	//string* node_string = (string*) malloc(sizeof(string));
 	//node_string = element;
@@ -204,19 +167,19 @@ int TrieTreeGetVariable(TrieTree* my_trie_tree, string name)
 		// make sure this is valid
 		// are there chars_from_edges?
 	
-		int edge = prev_node->char_links[letter];
+		// int edge = prev_node->char_links[letter];
 
 
-		if(edge == -1)
-		{
-			return -1;
-		}
+		// if(edge == -1)
+		// {
+		// 	return -1;
+		// }
 		
-		else
-		{
-			prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, edge);
+		// else
+		// {
+		// 	prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, edge);
 
-		}
+		// }
 		
 	}
 	// the name is matched
@@ -233,22 +196,22 @@ int TrieTreeGetVariable(TrieTree* my_trie_tree, string name)
 	*/
 	while(prev_node->state_id == -1)
 	{
-		int edge_count = VectorGetPopulation(prev_node->chars_from_edges);
-		if(edge_count > 1)
-		{
-			return -1;
-		}
-		else if(edge_count == 1 && prev_node->state_id > -1)
-		{
-			return -1;
-		}
-		else if(edge_count == 1 && prev_node->state_id == -1)
-		{
-			int letter = *((int*) VectorGetItem(prev_node->chars_from_edges, 0));
-			int edge = prev_node->char_links[letter];
-			prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, edge);
+		// int edge_count = VectorGetPopulation(prev_node->chars_from_edges);
+		// if(edge_count > 1)
+		// {
+		// 	return -1;
+		// }
+		// else if(edge_count == 1 && prev_node->state_id > -1)
+		// {
+		// 	return -1;
+		// }
+		// else if(edge_count == 1 && prev_node->state_id == -1)
+		// {
+		// 	// int letter = *((int*) VectorGetItem(prev_node->chars_from_edges, 0));
+		// 	// int edge = prev_node->char_links[letter];
+		// 	prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, edge);
 
-		}
+		// }
 	}
 
 	return prev_node->state_id;
@@ -279,21 +242,21 @@ int TrieTreeSearch(TrieTree* my_trie_tree, Vector* name /* strings*/)
 
 			char letter = (*((string*) name->values[i]))[j];
 
-			int edge = prev_node->char_links[letter];
+			// int edge = prev_node->char_links[letter];
 
 			int* item_found_location_ptr = (int*) malloc(sizeof(int));
-			*item_found_location_ptr = edge;
+			// *item_found_location_ptr = edge;
 
-			if(edge == -1)
-			{
-				return -1;
-			}
+			// if(edge == -1)
+			// {
+			// 	return -1;
+			// }
 			
-			else
-			{
-				prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, edge);
+			// else
+			// {
+			// 	prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, edge);
 
-			}
+			// }
 		}		
 		
 	}
@@ -310,7 +273,7 @@ void TrieTreeInsertString2(TrieTree* my_trie_tree,
 	//node_string = element;
 	//node->value = element;
 	node->my_value = element;
-	node->value_type = 1;
+	// node->value_type = 1;
 	node->end_of_word = false;
 	if(is_end_of_string)
 	{
@@ -330,8 +293,8 @@ void TrieTreeInsertString(TrieTree* my_trie_tree, char element, int state_id)
 	//node_string = element;
 	//node->value = element;
 	node->my_value = element;
-	node->value_type = 1;
-	node->parent = -1;
+	// node->value_type = 1;
+	// node->parent = -1;
 	node->state_id = state_id;
 	VectorAppend(my_trie_tree->trie_tree, node);
 
@@ -343,17 +306,17 @@ int TrieNode2GetLastNode(TrieTree* my_trie_tree, int prev_node_id)
 	// create nodes that already exist
 	TrieNode2* prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, prev_node_id);
 	// int edge_index = VectorGetPopulation(prev_node->chars_from_edges) - 1;
-	int size = VectorGetPopulation(prev_node->chars_from_edges);
+	// int size = VectorGetPopulation(prev_node->chars_from_edges);
 	int edge_index = 0;
-	if(size > 0)
-	{
-		edge_index = size - 1;
+	// if(size > 0)
+	// {
+	// 	edge_index = size - 1;
 
-	}
+	// }
 	// this is the "letter"
-	int letter = *((int*) VectorGetItem(prev_node->chars_from_edges, edge_index));
-	int next_node = prev_node->char_links[letter];
-	return next_node;
+	// int letter = *((int*) VectorGetItem(prev_node->chars_from_edges, edge_index));
+	// int next_node = prev_node->char_links[letter];
+	// return next_node;
 }
 
 int TrieNode2GetLastEdge(TrieTree* my_trie_tree, int prev_node_id)
@@ -363,19 +326,19 @@ int TrieNode2GetLastEdge(TrieTree* my_trie_tree, int prev_node_id)
 	// printf("entered TrieNode2GetLastEdge\n");
 	TrieNode2* prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, prev_node_id);
 	// printf("got this far\n");
-	int size = VectorGetPopulation(prev_node->chars_from_edges);
+	// int size = VectorGetPopulation(prev_node->chars_from_edges);
 	int edge_index = 0;
-	if(size > 0)
-	{
-		edge_index = size - 1;
-		// printf("got this far 2\n");
-		// printf("edge index %i \n", edge_index);
-		// this is the "letter"
-		int letter = *((int*) VectorGetItem(prev_node->chars_from_edges, edge_index));
-		// printf("letter %i\n", letter);
-		return letter;
+	// if(size > 0)
+	// {
+	// 	edge_index = size - 1;
+	// 	// printf("got this far 2\n");
+	// 	// printf("edge index %i \n", edge_index);
+	// 	// this is the "letter"
+	// 	int letter = *((int*) VectorGetItem(prev_node->chars_from_edges, edge_index));
+	// 	// printf("letter %i\n", letter);
+	// 	return letter;
 
-	}
+	// }
 	return -1;
 	// if size == 0 there are no edges to collect
 }
@@ -383,21 +346,21 @@ int TrieNode2GetLastEdge(TrieTree* my_trie_tree, int prev_node_id)
 int TrieNode2GetWordCounterpart(TrieTree* my_trie_tree, int prev_node_id)
 {
 	TrieNode2* prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, prev_node_id);
-	if(prev_node->word_counterpart > -1)
-	{
-		return prev_node->word_counterpart;
-	}
+	// if(prev_node->word_counterpart > -1)
+	// {
+	// 	return prev_node->word_counterpart;
+	// }
 	return -1;
 }
 
 TrieNode2* TrieNode2GetWord(TrieTree* my_trie_tree, int prev_node_id)
 {
 	TrieNode2* prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, prev_node_id);
-	if(prev_node->word_counterpart > -1)
-	{
+	// if(prev_node->word_counterpart > -1)
+	// {
 
-		return (TrieNode2*) VectorGetItem(my_trie_tree->word_tree, prev_node->word_counterpart);
-	}
+	// 	return (TrieNode2*) VectorGetItem(my_trie_tree->word_tree, prev_node->word_counterpart);
+	// }
 	return NULL;
 }
 string* TrieNode2MakeStringFromWord(TrieTree* my_trie_tree, int prev_node_id)
@@ -428,28 +391,28 @@ string* TrieNode2MakeStringFromWord(TrieTree* my_trie_tree, int prev_node_id)
 	// }
 	if(prev_proxy != NULL)
 	{
-		if(prev_proxy->word_letters != NULL)
-		{
-			// printf("got here %i\n", VectorGetPopulation(prev_proxy->word_letters));
+		// if(prev_proxy->word_letters != NULL)
+		// {
+		// 	// printf("got here %i\n", VectorGetPopulation(prev_proxy->word_letters));
 
-			for(int j = 0; j < VectorGetPopulation(prev_proxy->word_letters); j++)
-			{
-				// printf("%i\n", j);
-				// printf("population %i\n", prev_proxy->word_letters->population);
-				int k = *((int*) VectorGetItem(prev_proxy->word_letters, j));
-				// printf("%i\n", k);
-				TrieNode2* char_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, k);
-				//printf("char_node %x\n", char_node);
+		// 	for(int j = 0; j < VectorGetPopulation(prev_proxy->word_letters); j++)
+		// 	{
+		// 		// printf("%i\n", j);
+		// 		// printf("population %i\n", prev_proxy->word_letters->population);
+		// 		int k = *((int*) VectorGetItem(prev_proxy->word_letters, j));
+		// 		// printf("%i\n", k);
+		// 		TrieNode2* char_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, k);
+		// 		//printf("char_node %x\n", char_node);
 
-				//printf("|%i|", k);
-				if(char_node != NULL)
-				{
-					// printf("%c\n", char_node->my_value);
-					word += char_node->my_value;
+		// 		//printf("|%i|", k);
+		// 		if(char_node != NULL)
+		// 		{
+		// 			// printf("%c\n", char_node->my_value);
+		// 			word += char_node->my_value;
 
-				}
-			}
-		}
+		// 		}
+		// 	}
+		// }
 	}
 	
 	string* new_context_word = (string*) malloc(sizeof(string));
@@ -515,12 +478,12 @@ int TrieTreeFindLastPrevNode(TrieTree* my_trie_tree, Vector* path)
 			TrieNode2* char_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, penultimate_node_id);
 			// starting at the penultimate node
 			// working so far
-			while(char_node->word_counterpart == -1)
-			{
-				penultimate_node_index--;
-				penultimate_node_id =  *((int*) VectorGetItem(path, penultimate_node_index));
-				char_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, penultimate_node_id);
-			}
+			// while(char_node->word_counterpart == -1)
+			// {
+			// 	penultimate_node_index--;
+			// 	penultimate_node_id =  *((int*) VectorGetItem(path, penultimate_node_index));
+			// 	char_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, penultimate_node_id);
+			// }
 			// printf("node stopped at %i\n", penultimate_node_id);
 			return penultimate_node_id;
 		}
@@ -552,8 +515,8 @@ int TrieTreeFindLastWordNode(TrieTree* my_trie_tree, Vector* path)
 		int parent_index = 0;
 		parent_location = *((int*) VectorGetItem(path, parent_index));
 		TrieNode2* node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, parent_location);
-		int word_node_id = node->word_counterpart;
-		return word_node_id;
+		// int word_node_id = node->word_counterpart;
+		// return word_node_id;
 	}
 	else if(VectorGetPopulation(path) > 1)
 	{
@@ -574,22 +537,22 @@ int TrieTreeFindLastWordNode(TrieTree* my_trie_tree, Vector* path)
 			TrieNode2* char_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, penultimate_node_id);
 			// starting at the penultimate node
 			// working so far
-			while(char_node->word_counterpart == -1)
-			{
-				penultimate_node_index--;
-				penultimate_node_id =  *((int*) VectorGetItem(path, penultimate_node_index));
-				char_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, penultimate_node_id);
-			}
+			// while(char_node->word_counterpart == -1)
+			// {
+			// 	penultimate_node_index--;
+			// 	penultimate_node_id =  *((int*) VectorGetItem(path, penultimate_node_index));
+			// 	char_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, penultimate_node_id);
+			// }
 			// printf("node stopped at %i\n", penultimate_node_id);
 			// worked earlier cause the counterpart id == the char node id
-			return char_node->word_counterpart;//penultimate_node_id;
+			// return char_node->word_counterpart;//penultimate_node_id;
 		}
 		else if(letter == 126)
 		{
 			penultimate_node_index = VectorGetPopulation(path) - 1;
 			penultimate_node_id =  *((int*) VectorGetItem(path, penultimate_node_index));
 			TrieNode2* char_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, penultimate_node_id);
-			return char_node->word_counterpart;
+			// return char_node->word_counterpart;
 		}
 		
 
@@ -713,24 +676,24 @@ void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_p
 	// store the char id into the word links
 	// if there are no links?
 	// why am I using the word nodes to get the letter edge that needs to be incremented?
-	int link_count = VectorGetPopulation(last_prev_char_node->chars_from_edges);
+	// int link_count = VectorGetPopulation(last_prev_char_node->chars_from_edges);
 	// printf("got here 2\n");
 	char dummy_value = (char) 33;
-	if(link_count > 0)
-	{
+	// if(link_count > 0)
+	// {
 
-		int last_index = VectorGetPopulation(last_prev_char_node->chars_from_edges) - 1;
-		int last_letter = *((int*) VectorGetItem(last_prev_char_node->chars_from_edges, last_index));
-		// printf("last letter %c\n", last_letter);
-		if(last_letter < 126 && last_letter >= 0)
-		{
+	// 	// int last_index = VectorGetPopulation(last_prev_char_node->chars_from_edges) - 1;
+	// 	// int last_letter = *((int*) VectorGetItem(last_prev_char_node->chars_from_edges, last_index));
+	// 	// printf("last letter %c\n", last_letter);
+	// 	if(last_letter < 126 && last_letter >= 0)
+	// 	{
 
-			// new dimention name
-			dummy_value = (char) (last_letter + 1);  // 0 <= last_index < 256
-		}
+	// 		// new dimention name
+	// 		dummy_value = (char) (last_letter + 1);  // 0 <= last_index < 256
+	// 	}
 		
 
-	}
+	// }
 	// printf("got here 3\n");
 	// printf("dummy value %c\n", dummy_value);
 	// last index  VectorGetPopulation(prev_node->links) - 1
@@ -757,19 +720,19 @@ void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_p
 
 		// need to add an edge from prev_node and an edge from prev_proxy
 
-	VectorAppend(last_prev_char_node->chars_from_edges, dummy_value_ptr);
+	// VectorAppend(last_prev_char_node->chars_from_edges, dummy_value_ptr);
 
-	last_prev_char_node->char_links[dummy_value] = char_id;
+	// last_prev_char_node->char_links[dummy_value] = char_id;
 	// haven't linked prev_node with new node
 	// printf("got here 5\n");
 	// make word node
 	TrieNode2* word = TrieNode2initTrieNode2();
-	word->word_letters = VectorInitVector();
+	// word->word_letters = VectorInitVector();
 	// word node -> char node
 	// store char_id into word node
 	int* char_id_ptr = (int*) malloc(sizeof(int));
 	*char_id_ptr = char_id;
-	VectorAppend(word->word_letters, char_id_ptr);
+	// VectorAppend(word->word_letters, char_id_ptr);
 	// printf("char id %i\n", char_id);
 	// VectorPrint(word->word_letters);
 	// printf("got here 6\n");
@@ -785,7 +748,7 @@ void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_p
 	// frogot the word counterpart
 	TrieNode2* added_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, char_id);
 	// word node  <- char node
-	added_node->word_counterpart = word_id;
+	// added_node->word_counterpart = word_id;
 	// printf("got here 8\n");
 	int* word_id_ptr = (int*) malloc(sizeof(int));
 	*word_id_ptr = word_id;
@@ -894,40 +857,40 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name /* strings*/, 
 			// printf("letter to add %i\n", letter);
 			//string letter_str;
 			//letter_str += letter;
-			int edge = current_node->char_links[letter];
+			// int edge = current_node->char_links[letter];
 			// printf("|%c| %i\n", letter, edge);
 
 			// TrieNode2* current_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current_node_id);
-			if(edge == -1)  // if this is true once it's always true for this function call
-			{
-				// make new node
-				TrieTreeInsertString2(my_trie_tree, letter, -1, j == size - 1);
+			// if(edge == -1)  // if this is true once it's always true for this function call
+			// {
+			// 	// make new node
+			// 	TrieTreeInsertString2(my_trie_tree, letter, -1, j == size - 1);
 				
-				// prev_node_id = current_node_id;
-				int next_edge = VectorGetPopulation(my_trie_tree->trie_tree) - 1;
+			// 	// prev_node_id = current_node_id;
+			// 	int next_edge = VectorGetPopulation(my_trie_tree->trie_tree) - 1;
 
 
 
-				// TrieNode2* current_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current_node_id);
+			// 	// TrieNode2* current_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current_node_id);
 
-				current_node->char_links[letter] = next_edge;
-				VectorAppendInt(current_node->chars_from_edges, letter);
+			// 	// current_node->char_links[letter] = next_edge;
+			// 	// VectorAppendInt(current_node->chars_from_edges, letter);
 
-				current_node_id = next_edge;
-				// prev_node_id = current_edge;
+			// 	current_node_id = next_edge;
+			// 	// prev_node_id = current_edge;
 
 
-			}
-			// starts out being true or never being true
-			else if(edge > 0)
-			{
+			// }
+			// // starts out being true or never being true
+			// else if(edge > 0)
+			// {
 				
-				// keep moving
+			// 	// keep moving
 				
-				current_node_id = edge;
+			// 	current_node_id = edge;
 
 
-			}
+			// }
 
 		}
 	}
@@ -953,69 +916,69 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name /* strings*/, 
 			// printf("letter to add %i\n", letter);
 			//string letter_str;
 			//letter_str += letter;
-			int edge = current_node_2->char_links[letter];
+			// int edge = current_node_2->char_links[letter];
 			// printf("|%c| %i\n", letter, edge);
-			if(edge == -1)
-			{
-				// we have no where else to go and the input should be already done
-				printf("should not be happening |%c| %i\n", letter, edge);
-			}
-			else if(edge > 0)
-			{
-				// what if our word already exists?
-				// collect everything then find out if a word already exists
+			// if(edge == -1)
+			// {
+			// 	// we have no where else to go and the input should be already done
+			// 	printf("should not be happening |%c| %i\n", letter, edge);
+			// }
+			// else if(edge > 0)
+			// {
+			// 	// what if our word already exists?
+			// 	// collect everything then find out if a word already exists
 
-				if(j == 0)
-				{
-					new_word_node->word_letters = VectorInitVector();
-				}
+			// 	if(j == 0)
+			// 	{
+			// 		// new_word_node->word_letters = VectorInitVector();
+			// 	}
 
-				// [0, size - 2] only if size > 1
-				if(j < size - 1)
-				{
-					// collect the edge
-					VectorAppendInt(new_word_node->word_letters, edge);
-				}
-				// [size - 1]
-				else if(j < size)
-				{
-					// collect the edge
-					VectorAppendInt(new_word_node->word_letters, edge);
-					// is the word node already there?
-					TrieNode2* next_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, edge);
-					if(next_node->word_counterpart == -1)
-					{
-						// add word to word trie
-						VectorAppend(my_trie_tree->word_tree, new_word_node);
+			// 	// [0, size - 2] only if size > 1
+			// 	if(j < size - 1)
+			// 	{
+			// 		// collect the edge
+			// 		VectorAppendInt(new_word_node->word_letters, edge);
+			// 	}
+			// 	// [size - 1]
+			// 	else if(j < size)
+			// 	{
+			// 		// collect the edge
+			// 		VectorAppendInt(new_word_node->word_letters, edge);
+			// 		// is the word node already there?
+			// 		TrieNode2* next_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, edge);
+			// 		if(next_node->word_counterpart == -1)
+			// 		{
+			// 			// add word to word trie
+			// 			VectorAppend(my_trie_tree->word_tree, new_word_node);
 
-						// add word's node id as the edge nodes's word counterpart
-						next_node->word_counterpart = VectorGetPopulation(my_trie_tree->word_tree) - 1;
+			// 			// add word's node id as the edge nodes's word counterpart
+			// 			next_node->word_counterpart = VectorGetPopulation(my_trie_tree->word_tree) - 1;
 
-						// append the added word to the end of the current word node's edges
-						VectorAppendInt(current_word_node->links, next_node->word_counterpart);
+			// 			// append the added word to the end of the current word node's edges
+			// 			VectorAppendInt(current_word_node->links, next_node->word_counterpart);
 
-						// set the current word node to the added word node
-						// current_word_node_id = next_node->word_counterpart;
-						current_word_node_id = next_node->word_counterpart;
-						// current_node_id_2 = edge;
+			// 			// set the current word node to the added word node
+			// 			// current_word_node_id = next_node->word_counterpart;
+			// 			current_word_node_id = next_node->word_counterpart;
+			// 			// current_node_id_2 = edge;
 
-					}
-					else if(next_node->word_counterpart > -1)
-					{
-						// erase the sequence
-						VectorDeleteAllItems(new_word_node->word_letters);
+			// 		}
+			// 		else if(next_node->word_counterpart > -1)
+			// 		{
+			// 			// erase the sequence
+			// 			VectorDeleteAllItems(new_word_node->word_letters);
 
-						free(new_word_node);
+			// 			free(new_word_node);
 
-						// set the current word node to whatever word node the counterpart is
-						current_word_node_id = next_node->word_counterpart;
-						// current_node_id_2 = edge;
+			// 			// set the current word node to whatever word node the counterpart is
+			// 			current_word_node_id = next_node->word_counterpart;
+			// 			// current_node_id_2 = edge;
 
-					}
-				}
-				current_node_id_2 = edge;
+			// 		}
+			// 	}
+			// 	current_node_id_2 = edge;
 
-			}
+			// }
 		}
 	}
 
@@ -1153,175 +1116,175 @@ Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name /* strings*/, i
 		// printf("i %i\n", i);
 		TrieNode2* proxy_node = TrieNode2initTrieNode2();
 
-		proxy_node->word_letters = VectorInitVector();
-		proxy_node->links = VectorInitVector();
+		// proxy_node->word_letters = VectorInitVector();
+		// proxy_node->links = VectorInitVector();
 
 
-		// search through string and make path
-		int number_of_new_letters = 0;
-		int size = ((string*) name->values[i])->size();
-		for(int j = 0; j < size; j++)
-		{
-			char letter = (*((string*) name->values[i]))[j];
-			// printf("letter to add %i\n", letter);
-			//string letter_str;
-			//letter_str += letter;
-			int edge = prev_node->char_links[letter];
-			printf("|%c| %i\n", letter, edge);
+		// // search through string and make path
+		// int number_of_new_letters = 0;
+		// int size = ((string*) name->values[i])->size();
+		// for(int j = 0; j < size; j++)
+		// {
+		// 	char letter = (*((string*) name->values[i]))[j];
+		// 	// printf("letter to add %i\n", letter);
+		// 	//string letter_str;
+		// 	//letter_str += letter;
+		// 	int edge = prev_node->char_links[letter];
+		// 	printf("|%c| %i\n", letter, edge);
 
-			// didn't find a match
-			// passes
-			if(edge == -1)
-			{
-				number_of_new_letters++;
-				// add node
-				//string new_number;
-				//new_number += letter;
-				//new_number_ptr->resize(new_number_ptr->size() + 1);
-				//string x = new_number_ptr->VectorAppend(new_number);
-				//(*new_number_ptr) += new_number;
-				//new_number_ptr = 
-				//printf("new data item %c\n", letter);
+		// 	// didn't find a match
+		// 	// passes
+		// 	if(edge == -1)
+		// 	{
+		// 		number_of_new_letters++;
+		// 		// add node
+		// 		//string new_number;
+		// 		//new_number += letter;
+		// 		//new_number_ptr->resize(new_number_ptr->size() + 1);
+		// 		//string x = new_number_ptr->VectorAppend(new_number);
+		// 		//(*new_number_ptr) += new_number;
+		// 		//new_number_ptr = 
+		// 		//printf("new data item %c\n", letter);
 
-				TrieTreeInsertString(my_trie_tree, letter, -1);
+		// 		TrieTreeInsertString(my_trie_tree, letter, -1);
 				
-				int* sequence_id = (int*) malloc(sizeof(int));
-				*sequence_id = VectorGetPopulation(my_trie_tree->trie_tree) - 1;
+		// 		int* sequence_id = (int*) malloc(sizeof(int));
+		// 		*sequence_id = VectorGetPopulation(my_trie_tree->trie_tree) - 1;
 
-				VectorAppend(proxy_node->word_letters, sequence_id);
-				//printf("sequence id %i\n", VectorGetPopulation(my_trie_tree->trie_tree) - 1);
-				prev_node->char_links[letter] = VectorGetPopulation(my_trie_tree->trie_tree) - 1;
+		// 		VectorAppend(proxy_node->word_letters, sequence_id);
+		// 		//printf("sequence id %i\n", VectorGetPopulation(my_trie_tree->trie_tree) - 1);
+		// 		prev_node->char_links[letter] = VectorGetPopulation(my_trie_tree->trie_tree) - 1;
 
-				int next_edge = prev_node->char_links[letter];
+		// 		int next_edge = prev_node->char_links[letter];
 
-				// VectorAppend letter to the end of the char_edges(for the printing function)
-				int* letter_number = (int*) malloc(sizeof(int));
-				*letter_number = letter;
-				VectorAppend(prev_node->chars_from_edges, letter_number);
+		// 		// VectorAppend letter to the end of the char_edges(for the printing function)
+		// 		int* letter_number = (int*) malloc(sizeof(int));
+		// 		*letter_number = letter;
+		// 		VectorAppend(prev_node->chars_from_edges, letter_number);
 
-				// if(j == 0)
-				// {
-					// get item inserted
-					// TrieNode2* new_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree,
-					// 										   next_edge);
-					//printf("here %i\n", j);
+		// 		// if(j == 0)
+		// 		// {
+		// 			// get item inserted
+		// 			// TrieNode2* new_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree,
+		// 			// 										   next_edge);
+		// 			//printf("here %i\n", j);
 
-					// new_node->start_of_word = 1;
-					// start of word is total size of word
-					/*
-					if(j == size - 1)
-					{
-						my_trie_tree->max_state_id++;
-						new_node->state_id = my_trie_tree->max_state_id;
+		// 			// new_node->start_of_word = 1;
+		// 			// start of word is total size of word
+		// 			/*
+		// 			if(j == size - 1)
+		// 			{
+		// 				my_trie_tree->max_state_id++;
+		// 				new_node->state_id = my_trie_tree->max_state_id;
 
-					}
-					*/
-					//printf("here 2 %i\n", j);
+		// 			}
+		// 			*/
+		// 			//printf("here 2 %i\n", j);
 
-					// set start of word flag
-				// }
+		// 			// set start of word flag
+		// 		// }
 
-				// what if last char is not found?
-				/*
-				else if(i == name->population - 1 && j == size - 1)
-				{
-					TrieNode2* just_added_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree,
-										   next_edge);
+		// 		// what if last char is not found?
+		// 		/*
+		// 		else if(i == name->population - 1 && j == size - 1)
+		// 		{
+		// 			TrieNode2* just_added_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree,
+		// 								   next_edge);
 
-					my_trie_tree->max_state_id++;
-					just_added_node->state_id = my_trie_tree->max_state_id;
+		// 			my_trie_tree->max_state_id++;
+		// 			just_added_node->state_id = my_trie_tree->max_state_id;
 
-				}*/
-				prev_node_id = next_edge;  //////
-				// visit node added
-				prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree,
-												 prev_node_id);
+		// 		}*/
+		// 		prev_node_id = next_edge;  //////
+		// 		// visit node added
+		// 		prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree,
+		// 										 prev_node_id);
 
-			}
-			// |i| 69 <- edge
-			// the single letter word doesn't map to a word becasue the edge already exists
-			// if edge already exists but at last char in word
-				// number_of_new_letters++
-			// else if(edge > -1 && size == 1)
-			// {
-			// 	// our node already exists
-			// 	// add to proxy_node
-			// 	int* sequence_id = (int*) malloc(sizeof(int));
-			// 	*sequence_id = edge;
+		// 	}
+		// 	// |i| 69 <- edge
+		// 	// the single letter word doesn't map to a word becasue the edge already exists
+		// 	// if edge already exists but at last char in word
+		// 		// number_of_new_letters++
+		// 	// else if(edge > -1 && size == 1)
+		// 	// {
+		// 	// 	// our node already exists
+		// 	// 	// add to proxy_node
+		// 	// 	int* sequence_id = (int*) malloc(sizeof(int));
+		// 	// 	*sequence_id = edge;
 
-			// 	VectorAppend(proxy_node->word_letters, sequence_id);
-			// 	prev_proxy_id = edge;
-			// 	int* sequence_id2 = (int*) malloc(sizeof(int));
-			// 	*sequence_id2 = prev_proxy_id;
-			// 	//printf("letters saved %i\n", prev_proxy_id);
-			// 	VectorAppend(proxy_node->word_letters, sequence_id2);
+		// 	// 	VectorAppend(proxy_node->word_letters, sequence_id);
+		// 	// 	prev_proxy_id = edge;
+		// 	// 	int* sequence_id2 = (int*) malloc(sizeof(int));
+		// 	// 	*sequence_id2 = prev_proxy_id;
+		// 	// 	//printf("letters saved %i\n", prev_proxy_id);
+		// 	// 	VectorAppend(proxy_node->word_letters, sequence_id2);
 
-			// }
+		// 	// }
 
-			// untested
-			// last char was found
-			/*else if(i == name->population - 1 && j == size - 1)
-			{
-				//printf("%c\n", letter);
-				TrieNode2* node_found = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, edge);
-				if(node_found != NULL)
-				{
-					// no key
-					if(node_found->state_id == -1)
-					{
+		// 	// untested
+		// 	// last char was found
+		// 	/*else if(i == name->population - 1 && j == size - 1)
+		// 	{
+		// 		//printf("%c\n", letter);
+		// 		TrieNode2* node_found = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, edge);
+		// 		if(node_found != NULL)
+		// 		{
+		// 			// no key
+		// 			if(node_found->state_id == -1)
+		// 			{
 
-						my_trie_tree->max_state_id++;
-						node_found->state_id = my_trie_tree->max_state_id;
+		// 				my_trie_tree->max_state_id++;
+		// 				node_found->state_id = my_trie_tree->max_state_id;
 
-					}
-					// has a key
-					else
-					{
-						printf("already exists so making a new dimension\n");
+		// 			}
+		// 			// has a key
+		// 			else
+		// 			{
+		// 				printf("already exists so making a new dimension\n");
 						
-						make another node
-						store a '0' in it
-						make an edge from node_found to another node at char = '0'
+		// 				make another node
+		// 				store a '0' in it
+		// 				make an edge from node_found to another node at char = '0'
 
-						TrieNode2* node_found2 = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, last_item_on_stack);
-						int number_of_neighbors = VectorGetPopulation(node_found2->links);
+		// 				TrieNode2* node_found2 = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, last_item_on_stack);
+		// 				int number_of_neighbors = VectorGetPopulation(node_found2->links);
 
-						stringstream s;
-						s << number_of_neighbors;
-						string new_number;
-						s >> new_number;
-						string* new_number_ptr = (string*) malloc(sizeof(string));
-						*new_number_ptr = new_number;
-						*/
-					//}
-					/*
-					if no key
-						put in key
-					else
-						add a 0 to the end of the sequence
-						insert the next item to the end of last char found at tree[edge]
-					*/
-				//}
+		// 				stringstream s;
+		// 				s << number_of_neighbors;
+		// 				string new_number;
+		// 				s >> new_number;
+		// 				string* new_number_ptr = (string*) malloc(sizeof(string));
+		// 				*new_number_ptr = new_number;
+		// 				*/
+		// 			//}
+		// 			/*
+		// 			if no key
+		// 				put in key
+		// 			else
+		// 				add a 0 to the end of the sequence
+		// 				insert the next item to the end of last char found at tree[edge]
+		// 			*/
+		// 		//}
 				
-			//}
-			// untested
-			// match was found
-			else
-			{
-				// collect letter
-				prev_proxy_id = edge;
-				int* sequence_id = (int*) malloc(sizeof(int));
-				*sequence_id = prev_proxy_id;
-				//printf("letters saved %i\n", prev_proxy_id);
-				VectorAppend(proxy_node->word_letters, sequence_id);
+		// 	//}
+		// 	// untested
+		// 	// match was found
+		// 	else
+		// 	{
+		// 		// collect letter
+		// 		prev_proxy_id = edge;
+		// 		int* sequence_id = (int*) malloc(sizeof(int));
+		// 		*sequence_id = prev_proxy_id;
+		// 		//printf("letters saved %i\n", prev_proxy_id);
+		// 		VectorAppend(proxy_node->word_letters, sequence_id);
 
-				prev_node_id = edge; ///////
-				prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, prev_node_id);
+		// 		prev_node_id = edge; ///////
+		// 		prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, prev_node_id);
 
-			}
+		// 	}
 
 
-		}
+		// }
 
 		// add any new proxy(word) nodes needed
 		//VectorPrint(proxy_node->word_letters);
@@ -1329,61 +1292,61 @@ Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name /* strings*/, i
 		// prev_node is now the node holding the last letter
 		// # of new letters > 0 and on last letter
 		//printf("%s %i %i\n", (*((string*) name->values[i])).c_str(), number_of_new_letters, VectorGetPopulation(proxy_node->word_letters));
-		if(number_of_new_letters > 0)
-		{
-			// entire word is new, so add as the next word from prev word
-			// set last prev letter's word counterpart to the id of the new word added
+		// if(number_of_new_letters > 0)
+		// {
+		// 	// entire word is new, so add as the next word from prev word
+		// 	// set last prev letter's word counterpart to the id of the new word added
 
 
-			// have to connect prev_node to proxy_node
-			VectorAppend(my_trie_tree->word_tree, proxy_node);
-			// will be used to find the next prev_proxy(next word node)
-			// It's the one place guaranteed to point to a single word reguardless of how many siblings there are or where you are in the sequence(many different sequences, but same single ansestor is stored). as long as the last node corresponds with the last letter in the search word, there should be no confusion as to what the next word is
-			prev_node->word_counterpart = VectorGetPopulation(my_trie_tree->word_tree) - 1;
+		// 	// have to connect prev_node to proxy_node
+		// 	VectorAppend(my_trie_tree->word_tree, proxy_node);
+		// 	// will be used to find the next prev_proxy(next word node)
+		// 	// It's the one place guaranteed to point to a single word reguardless of how many siblings there are or where you are in the sequence(many different sequences, but same single ansestor is stored). as long as the last node corresponds with the last letter in the search word, there should be no confusion as to what the next word is
+		// 	// prev_node->word_counterpart = VectorGetPopulation(my_trie_tree->word_tree) - 1;
 
-			int* link = (int*) malloc(sizeof(int));
-			*link = VectorGetPopulation(my_trie_tree->word_tree) - 1;
+		// 	int* link = (int*) malloc(sizeof(int));
+		// 	*link = VectorGetPopulation(my_trie_tree->word_tree) - 1;
 
-			// VectorAppend population - 1 to prev proxy node's links
-			VectorAppend(prev_proxy->links, link);
+		// 	// VectorAppend population - 1 to prev proxy node's links
+		// 	VectorAppend(prev_proxy->links, link);
 
-			// get last proxy node added (proxy_node)
-			prev_proxy_id = VectorGetPopulation(my_trie_tree->word_tree) - 1;
-			prev_proxy = (TrieNode2*) VectorGetItem(my_trie_tree->word_tree, prev_proxy_id);
+		// 	// get last proxy node added (proxy_node)
+		// 	prev_proxy_id = VectorGetPopulation(my_trie_tree->word_tree) - 1;
+		// 	prev_proxy = (TrieNode2*) VectorGetItem(my_trie_tree->word_tree, prev_proxy_id);
 
-		}
-		else
-		{
-			// if(size == 1)
-			// {
-			// 				VectorAppend(my_trie_tree->word_tree, proxy_node);
-			// // will be used to find the next prev_proxy(next word node)
-			// // It's the one place guaranteed to point to a single word reguardless of how many siblings there are or where you are in the sequence(many different sequences, but same single ansestor is stored). as long as the last node corresponds with the last letter in the search word, there should be no confusion as to what the next word is
-			// prev_node->word_counterpart = VectorGetPopulation(my_trie_tree->word_tree) - 1;
+		// }
+		// else
+		// {
+		// 	// if(size == 1)
+		// 	// {
+		// 	// 				VectorAppend(my_trie_tree->word_tree, proxy_node);
+		// 	// // will be used to find the next prev_proxy(next word node)
+		// 	// // It's the one place guaranteed to point to a single word reguardless of how many siblings there are or where you are in the sequence(many different sequences, but same single ansestor is stored). as long as the last node corresponds with the last letter in the search word, there should be no confusion as to what the next word is
+		// 	// prev_node->word_counterpart = VectorGetPopulation(my_trie_tree->word_tree) - 1;
 
-			// int* link = (int*) malloc(sizeof(int));
-			// *link = edge;
+		// 	// int* link = (int*) malloc(sizeof(int));
+		// 	// *link = edge;
 
-			// // VectorAppend population - 1 to prev proxy node's links
-			// VectorAppend(prev_proxy->links, link);
+		// 	// // VectorAppend population - 1 to prev proxy node's links
+		// 	// VectorAppend(prev_proxy->links, link);
 
-			// get last proxy node added (proxy_node)
-			// prev_proxy_id = VectorGetPopulation(my_trie_tree->word_tree) - 1;
-			// prev_proxy = (TrieNode2*) VectorGetItem(my_trie_tree->word_tree, prev_proxy_id);
+		// 	// get last proxy node added (proxy_node)
+		// 	// prev_proxy_id = VectorGetPopulation(my_trie_tree->word_tree) - 1;
+		// 	// prev_proxy = (TrieNode2*) VectorGetItem(my_trie_tree->word_tree, prev_proxy_id);
 
-			// }
-			// entire word is old, so visit it by using the prev letter's id of the next word and erasing the word collected
+		// 	// }
+		// 	// entire word is old, so visit it by using the prev letter's id of the next word and erasing the word collected
 
-			// delete proxy_node
+		// 	// delete proxy_node
 
-			VectorDeleteAllItems(proxy_node->word_letters);
-			VectorDeleteAllItems(proxy_node->links);
-			free(proxy_node);
+		// 	// VectorDeleteAllItems(proxy_node->word_letters);
+		// 	VectorDeleteAllItems(proxy_node->links);
+		// 	free(proxy_node);
 
-			prev_proxy_id = prev_node->word_counterpart;   ///////
-			prev_proxy = (TrieNode2*) VectorGetItem(my_trie_tree->word_tree, prev_proxy_id);
+		// 	// prev_proxy_id = prev_node->word_counterpart;   ///////
+		// 	prev_proxy = (TrieNode2*) VectorGetItem(my_trie_tree->word_tree, prev_proxy_id);
 
-		}
+		// }
 		
 	}
 	// prev_node should be last node checked so check for state there
@@ -1447,19 +1410,19 @@ void TrieTreeEraseEdgeToTopCharNode(Vector* char_nodes_matching,
 		char prev_edge_letter = top_node_value;
 		int id_of_edge_to_delete = 0;
 		// 
-		for(int i = 0; i < VectorGetPopulation(prev_node_2->chars_from_edges); i++)
-		{
-			//printf("%i, ", *((int* )  VectorGetItem(prev_node_2->chars_from_edges, i) ));
-			char letter_edge = ((char) *((int* )  VectorGetItem(prev_node_2->chars_from_edges, i) ) );
-			if(letter_edge == prev_edge_letter)
-			{
-				//printf("found match %i\n", i);
-				id_of_edge_to_delete = i;
-			}
+		// for(int i = 0; i < VectorGetPopulation(prev_node_2->chars_from_edges); i++)
+		// {
+		// 	//printf("%i, ", *((int* )  VectorGetItem(prev_node_2->chars_from_edges, i) ));
+		// 	char letter_edge = ((char) *((int* )  VectorGetItem(prev_node_2->chars_from_edges, i) ) );
+		// 	if(letter_edge == prev_edge_letter)
+		// 	{
+		// 		//printf("found match %i\n", i);
+		// 		id_of_edge_to_delete = i;
+		// 	}
 
-		}
-		VectorDeleteItem(prev_node_2->chars_from_edges, id_of_edge_to_delete);
-		prev_node_2->char_links[prev_edge_letter] = -1;
+		// }
+		// VectorDeleteItem(prev_node_2->chars_from_edges, id_of_edge_to_delete);
+		// prev_node_2->char_links[prev_edge_letter] = -1;
 	}
 	
 
@@ -1512,30 +1475,30 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 		{
 			char letter = (*((string*) name->values[i]))[j];
 
-			int edge = prev_node->char_links[letter];
+			// int edge = prev_node->char_links[letter];
 			// printf("%c ", letter);
 
 			// printf("%i\n", edge);
 
-			if(edge > -1)
-			{
-				TrieTreePush(char_nodes_matching, edge);
+			// if(edge > -1)
+			// {
+			// 	TrieTreePush(char_nodes_matching, edge);
 
-			}
-			else
-			{
-				// exit cause there is no match
-				printf("can't delete because it doesn't exist\n");
-				return -1;
-			}
-			prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, edge);
+			// }
+			// else
+			// {
+			// 	// exit cause there is no match
+			// 	printf("can't delete because it doesn't exist\n");
+			// 	return -1;
+			// }
+			// prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, edge);
 
 		}
 		
-		if(prev_node->word_counterpart > -1)
-		{
-			TrieTreePush(word_nodes_matching, prev_node->word_counterpart);
-		}
+		// if(prev_node->word_counterpart > -1)
+		// {
+		// 	TrieTreePush(word_nodes_matching, prev_node->word_counterpart);
+		// }
 	}
 	// there will be at least 1 word represented by char_nodes_matching
 	// VectorPrint(char_nodes_matching);
@@ -1551,12 +1514,12 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	int top_edge = *((int*) VectorGetItem(char_nodes_matching, j));
 	TrieNode2* top_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, top_edge);
 	
-	if(top_node->state_id > -1 && VectorGetPopulation(top_node->chars_from_edges) >= 1)
-	{
-		// printf("at internal node\n");
-		top_node->state_id = -1;
-		return -1;
-	}
+	// if(top_node->state_id > -1 && VectorGetPopulation(top_node->chars_from_edges) >= 1)
+	// {
+	// 	// printf("at internal node\n");
+	// 	top_node->state_id = -1;
+	// 	return -1;
+	// }
 
 	// for deleting the hanging edge
 	char poped_node_value;
@@ -1577,34 +1540,34 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	// the item shares a path with other items
 	// top_node->state_id will be > -1 for this case
 	// deleting char nodes and poping from char stack
-	while(VectorGetPopulation(top_node->chars_from_edges) <= 1 && top_node->state_id == -1 )
-	{
+	// while(VectorGetPopulation(top_node->chars_from_edges) <= 1 && top_node->state_id == -1 )
+	// {
 
 			
-		//VectorPrint(char_nodes_matching);
+	// 	//VectorPrint(char_nodes_matching);
 
-		// this will always the the last char deleted from char trie tree
-		poped_node_value = top_node->my_value;
-		//printf("here %x\n", top_node);
-		TrieNode2DeleteTrieNode2(top_node);
-		//printf("last edge %i, j %i\n", top_edge, j);
+	// 	// this will always the the last char deleted from char trie tree
+	// 	poped_node_value = top_node->my_value;
+	// 	//printf("here %x\n", top_node);
+	// 	TrieNode2DeleteTrieNode2(top_node);
+	// 	//printf("last edge %i, j %i\n", top_edge, j);
 
-		VectorSetItemToNull(my_trie_tree->trie_tree, top_edge);
-		top_node = NULL;
+	// 	VectorSetItemToNull(my_trie_tree->trie_tree, top_edge);
+	// 	top_node = NULL;
 
-		VectorPopItem(char_nodes_matching);
-		// can't delete the root node
-		// wrong
-		if(VectorGetPopulation(char_nodes_matching) == 1)
-		{
-			// printf("last j %i\n", j);
-			break;
-		}
+	// 	VectorPopItem(char_nodes_matching);
+	// 	// can't delete the root node
+	// 	// wrong
+	// 	if(VectorGetPopulation(char_nodes_matching) == 1)
+	// 	{
+	// 		// printf("last j %i\n", j);
+	// 		break;
+	// 	}
 
-		j = VectorGetPopulation(char_nodes_matching) - 1;
-		top_edge = *((int*) VectorGetItem(char_nodes_matching, j));
-		top_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, top_edge);
-	}
+	// 	j = VectorGetPopulation(char_nodes_matching) - 1;
+	// 	top_edge = *((int*) VectorGetItem(char_nodes_matching, j));
+	// 	top_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, top_edge);
+	// }
 		//VectorPrint(char_nodes_matching);
 	// delete the hanging edge
 	if(VectorGetPopulation(char_nodes_matching) > 0)
@@ -1626,7 +1589,7 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	// VectorPrint(word_nodes_matching);
 	// VectorPrint(char_nodes_matching);
 
-	int word_counterpart = top_node->word_counterpart;
+	// int word_counterpart = top_node->word_counterpart;
 	// printf("word counterpart %i\n", word_counterpart);
 	// check each word as it is erase and find out if it's = the id on the stack
 	// the char node on the top of the char stack always links to a word node
@@ -1644,31 +1607,31 @@ int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	// loop is still wrong
 	// printf("start\n");
 	int prev_deleted_word_edge = 0;
-	while(VectorGetPopulation(word_nodes_matching) > 1 && deleted_word_edge != word_counterpart)
-	{
-		// seems to go 1 iteration too far and the target value is rest with the lin before it
-		// VectorPrint(word_nodes_matching);
-		// printf("deleted word edge %i\n", deleted_word_edge);
-	//TrieTreePrintWordTrie(my_trie_tree);
+	// while(VectorGetPopulation(word_nodes_matching) > 1 && deleted_word_edge != word_counterpart)
+	// {
+	// 	// seems to go 1 iteration too far and the target value is rest with the lin before it
+	// 	// VectorPrint(word_nodes_matching);
+	// 	// printf("deleted word edge %i\n", deleted_word_edge);
+	// //TrieTreePrintWordTrie(my_trie_tree);
 	
-		TrieNode2DeleteTrieNode2(top_word);
-		//			printf("here\n");
-		//printf("deleted_word_edge %i\n", deleted_word_edge);
-		// node 5 is erased and node 2's links are erased
-		VectorSetItemToNull(my_trie_tree->word_tree, deleted_word_edge);
-		top_word = NULL;
-		//TrieTreePrintWordTrie(my_trie_tree);
-		VectorPopItem(word_nodes_matching);
-		if(VectorGetPopulation(word_nodes_matching) == 1)
-		{
-			break;
-		}
-		top_word_id = VectorGetPopulation(word_nodes_matching) - 1;
-		prev_deleted_word_edge = deleted_word_edge;
-		deleted_word_edge = *((int*) VectorGetItem(word_nodes_matching, top_word_id));
-		top_word = (TrieNode2*) VectorGetItem(my_trie_tree->word_tree, deleted_word_edge);
+	// 	TrieNode2DeleteTrieNode2(top_word);
+	// 	//			printf("here\n");
+	// 	//printf("deleted_word_edge %i\n", deleted_word_edge);
+	// 	// node 5 is erased and node 2's links are erased
+	// 	VectorSetItemToNull(my_trie_tree->word_tree, deleted_word_edge);
+	// 	top_word = NULL;
+	// 	//TrieTreePrintWordTrie(my_trie_tree);
+	// 	VectorPopItem(word_nodes_matching);
+	// 	if(VectorGetPopulation(word_nodes_matching) == 1)
+	// 	{
+	// 		break;
+	// 	}
+	// 	top_word_id = VectorGetPopulation(word_nodes_matching) - 1;
+	// 	prev_deleted_word_edge = deleted_word_edge;
+	// 	deleted_word_edge = *((int*) VectorGetItem(word_nodes_matching, top_word_id));
+	// 	top_word = (TrieNode2*) VectorGetItem(my_trie_tree->word_tree, deleted_word_edge);
 
-	}
+	// }
 		
 
 	/*
@@ -1741,14 +1704,14 @@ void TrieTreePrintTrie(TrieTree* my_trie_tree)
 		{
 			//printf("printing array\n");
 
-			printf("%i |%c| word %i state %i\n", i, node->my_value, node->word_counterpart, node->state_id);
-			printf("links\n");
-			for(int j = 0; j < VectorGetPopulation(node->chars_from_edges); j++)
-			{
-				int k = *((int*) VectorGetItem(node->chars_from_edges, j));
-				printf("|%i|", node->char_links[k]);
+			// printf("%i |%c| word %i state %i\n", i, node->my_value, node->word_counterpart, node->state_id);
+			// printf("links\n");
+			// for(int j = 0; j < VectorGetPopulation(node->chars_from_edges); j++)
+			// {
+			// 	int k = *((int*) VectorGetItem(node->chars_from_edges, j));
+			// 	printf("|%i|", node->char_links[k]);
 
-			}
+			// }
 			
 			printf("\n\n");
 
@@ -1781,23 +1744,23 @@ void TrieTreePrintWordTrie(TrieTree* my_trie_tree)
 			//printf("here\n");
 			//VectorPrint(node->word_letters);
 			//printf("done\n");
-			if(node->word_letters != NULL)
-			{
-				for(int j = 0; j < VectorGetPopulation(node->word_letters); j++)
-				{
-					int k = *((int*) VectorGetItem(node->word_letters, j));
-					// printf("%i", k);
-					TrieNode2* char_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, k);
-					//printf("char_node %x\n", char_node);
+			// if(node->word_letters != NULL)
+			// {
+			// 	for(int j = 0; j < VectorGetPopulation(node->word_letters); j++)
+			// 	{
+			// 		int k = *((int*) VectorGetItem(node->word_letters, j));
+			// 		// printf("%i", k);
+			// 		TrieNode2* char_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, k);
+			// 		//printf("char_node %x\n", char_node);
 
-					//printf("|%i|", k);
-					if(char_node != NULL)
-					{
-						printf("%c", char_node->my_value);
+			// 		//printf("|%i|", k);
+			// 		if(char_node != NULL)
+			// 		{
+			// 			printf("%c", char_node->my_value);
 
-					}
-				}
-			}
+			// 		}
+			// 	}
+			// }
 			
 			printf("|\nlinks\n");
 			if(node->links != NULL)
@@ -1951,28 +1914,28 @@ void TrieTreePrintTrieWords(TrieTree* my_trie_tree)
 
 		// VectorPrint word
 		printf("%s|", makeSpaces(indent_level).c_str());
-		for(int j = 0; j < VectorGetPopulation(next_letter_node->word_letters); j++)
-		{
-			int k = *((int*) VectorGetItem(next_letter_node->word_letters, j));
-			//printf("|%i|", k);
+		// for(int j = 0; j < VectorGetPopulation(next_letter_node->word_letters); j++)
+		// {
+		// 	int k = *((int*) VectorGetItem(next_letter_node->word_letters, j));
+		// 	//printf("|%i|", k);
 
-			TrieNode2* char_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, k);
+		// 	TrieNode2* char_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, k);
 
-			printf("%c", char_node->my_value);
-			if(j == VectorGetPopulation(next_letter_node->word_letters) - 1)
-			{
-				if(char_node->state_id > -1)
-				{
-					printf("| -> %i", char_node->state_id);
-				}
-				else
-				{
-					printf("|");
-				}
+		// 	printf("%c", char_node->my_value);
+		// 	if(j == VectorGetPopulation(next_letter_node->word_letters) - 1)
+		// 	{
+		// 		if(char_node->state_id > -1)
+		// 		{
+		// 			printf("| -> %i", char_node->state_id);
+		// 		}
+		// 		else
+		// 		{
+		// 			printf("|");
+		// 		}
 
-			}
+		// 	}
 
-		}
+		// }
 
 		printf("\n");
 		//printf("got here\n");
@@ -2059,15 +2022,15 @@ void TrieTreePrintTrieRecursive(TrieTree* my_trie_tree, int root, string indents
 
 	TrieNode2* node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, root);
 
-	string my_string = *((string*) node->value);
+	// string my_string = *((string*) node->value);
 	if(node->state_id > -1)
 	{
-		printf("%s %s -> %i\n\n", indents.c_str(), my_string.c_str(), node->state_id);
+		// printf("%s %s -> %i\n\n", indents.c_str(), my_string.c_str(), node->state_id);
 
 	}
 	else
 	{
-		printf("%s %s\n\n", indents.c_str(), my_string.c_str());
+		// printf("%s %s\n\n", indents.c_str(), my_string.c_str());
 
 	}
 	for(int j = 0; j < VectorGetPopulation(node->links); j++)
@@ -2082,6 +2045,7 @@ void TrieTreeTest()
 {
 	TrieTree* my_trie_tree = TrieTreeInitTrieTree();
 	printf("inserting\n");
+	exit(1);
 	Vector* name2 = TrieTreeInsertWords2(my_trie_tree, VectorAddStringToVector2("abvf", "tgrfede"), -1);
 	VectorPrintStrings(VectorAddStringToVector2("abvf", "tgrfede"));
 	int a = TrieTreeSearch(my_trie_tree, VectorAddStringToVector2("abvf", "tgrfede"));

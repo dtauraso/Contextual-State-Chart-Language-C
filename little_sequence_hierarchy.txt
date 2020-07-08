@@ -25,6 +25,8 @@ letters_and_digits
 	Next
 		)
 	Children
+	make dummy states so backtracking can be tested
+
 		digit
 			-0
 				Function

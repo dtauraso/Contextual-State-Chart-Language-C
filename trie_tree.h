@@ -19,26 +19,13 @@ typedef struct TrieNode2
 {
 	// the links are integers
 	// don't use this variable
-	void* value; // has been a string*
 	char my_value;
-	// will be unsorted
-	Vector* links;  // ints, word node links to each other
-	int char_links[243]; // any number > 242 doesn't cause a catastrophic error for the program
 
-	Vector* chars_from_edges;
-	// will be sorted
-	//Vector* sorted_link_indecies; // ints
+	Vector* links;  // ints
 
-	Vector* word_letters; // ints for word nodes to char nodes
-	int value_type;
-	// 0 -> int
-	// 1 -> string
 	int state_id; // location of state in state vector
 
-	int word_counterpart; // set in the last character of the word to the word node
-	bool start_of_word;
-	bool end_of_word; // marking the char nodes added so the words can be added in on the second pass
-	int parent;
+	bool end_of_word;
 
 
 }TrieNode2;
