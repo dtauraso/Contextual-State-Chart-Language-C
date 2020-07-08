@@ -236,18 +236,20 @@ int TrieTreeSearch(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	// int prev_node_id = 0;
 	TrieNode2* node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, 0);
 	//Vector* stack = VectorInitVector();
-	int* prev_node_id_ptr = (int*) malloc(sizeof(int));
-	*prev_node_id_ptr = 0;
+	// int* prev_node_id_ptr = (int*) malloc(sizeof(int));
+	// *prev_node_id_ptr = 0;
 	// VectorAppend(stack, prev_node_id_ptr);
 	// search untill no match is possible, or input is empty
-	// insert untill input runs out
+
 	for(int i = 0; i < input_string->size(); i++)
 	{
 
-		int size = ((string*) name->values[i])->size();
+		// int size = ((string*) name->values[i])->size();
+		char letter = (*((string*) name->values[i]))[j];
+
 		for(int j = 0; j < size; j++)
 		{
-
+			// loop through the links for a match to the letter
 			char letter = (*((string*) name->values[i]))[j];
 
 			// int edge = prev_node->char_links[letter];
