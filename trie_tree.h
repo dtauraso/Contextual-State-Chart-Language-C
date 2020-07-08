@@ -26,28 +26,11 @@ typedef struct TrieNode2
 	// don't use this variable
 	char my_value;
 
-<<<<<<< HEAD
 	Vector* links;  // ints
 
 	int state_id; // location of state in state vector
 
 	bool end_of_word;
-=======
-	Vector* chars_from_edges;
-
-	Vector* word_letters; // ints for word nodes to link to char nodes
-	int value_type;
-	// 0 -> int
-	// 1 -> string
-	int state_id; // location of state in state vector
-
-	int word_counterpart; // set in the last character of the word to the word node
-
-	// probably not being used
-	bool start_of_word;
-	bool end_of_word; // marking the char nodes added so the words can be added in on the second pass
-	int parent;
->>>>>>> ad42c7d4817fbf5e75e0e537bd4c49e72ae38216
 
 
 }TrieNode2;

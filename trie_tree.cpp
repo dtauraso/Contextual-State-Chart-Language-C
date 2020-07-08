@@ -53,7 +53,7 @@ void* TrieNode2GetValue(TrieNode2* node)
 {
 	if(node == NULL)
 	{
-		// return node->value;
+		return node->value;
 
 	}
 
