@@ -23,14 +23,11 @@ typedef struct TrieNode2
 
 
 	// all links are integers
-	// don't use this variable
+
 	char my_value;
 
-	// the first char starts at 33
-	// if we put in the first char as the first item
-	// links[current_char_input - 33]
-	// will not work unless the items are 
-	//
+
+	// save memory for the links in the trie by only storing necessary edges
 	Vector* links;  // ints
 
 	int state_id; // location of state in state vector

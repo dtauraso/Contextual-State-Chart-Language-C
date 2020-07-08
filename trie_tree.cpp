@@ -223,6 +223,27 @@ int TrieTreeGetVariable(TrieTree* my_trie_tree, string name)
 
 }
 
+int doLinksPointToLeter(TrieTree* my_trie_tree, TrieNode2* node, char letter)
+{
+	if(my_trie_tree == NULL || node == NULL)
+	{
+		return -1;
+	}
+	int size = VectorGetPopulation(node->links);
+
+	// loop through the links for a match to the letter
+	for(int j = 0; j < size; j++)
+	{
+		TrieNode2* node = (TrieNode2*) my_trie_tree[ node->links[j] ];
+		if(node == NULL){}
+		else if(node->my_value == NULL){}
+		else if(node->my_value == letter)
+		{
+			return j;
+		}
+	}
+	return -1;
+}
 int TrieTreeSearch(TrieTree* my_trie_tree, Vector* name /* strings*/)
 {
 	if(my_trie_tree == NULL || name == NULL)
@@ -233,44 +254,26 @@ int TrieTreeSearch(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	// for now name only has 1 item due to changes in the design
 	string* input_string = (string*) name->values[0];
 
-	// int prev_node_id = 0;
 	TrieNode2* node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, 0);
-	//Vector* stack = VectorInitVector();
-	// int* prev_node_id_ptr = (int*) malloc(sizeof(int));
-	// *prev_node_id_ptr = 0;
-	// VectorAppend(stack, prev_node_id_ptr);
-	// search untill no match is possible, or input is empty
 
+	// search untill no match is possible, or input is empty
+	int j = 0;
 	for(int i = 0; i < input_string->size(); i++)
 	{
 
 		// int size = ((string*) name->values[i])->size();
-		char letter = (*((string*) name->values[i]))[j];
-
-		for(int j = 0; j < size; j++)
+		char letter = input_string[i];
+		j = doLinksPointToLeter(my_trie_tree, node, letter);
+		if(j == -1)
 		{
-			// loop through the links for a match to the letter
-			char letter = (*((string*) name->values[i]))[j];
-
-			// int edge = prev_node->char_links[letter];
-
-			int* item_found_location_ptr = (int*) malloc(sizeof(int));
-			// *item_found_location_ptr = edge;
-
-			// if(edge == -1)
-			// {
-			// 	return -1;
-			// }
-			
-			// else
-			// {
-			// 	prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, edge);
-
-			// }
-		}		
-		
+			return -1;
+		}
+		else
+		{
+			node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, node->links[j]);
+		}
 	}
-	return prev_node->state_id;
+	return j;//node->state_id;
 }
 void TrieTreeInsertString2(TrieTree* my_trie_tree,
 							char element,
@@ -872,6 +875,37 @@ void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_p
 // links
 
 }
+// int TrieTreeSearch(TrieTree* my_trie_tree, Vector* name /* strings*/)
+// {
+// 	if(my_trie_tree == NULL || name == NULL)
+// 	{
+// 		return -1;
+// 	}
+
+// 	// for now name only has 1 item due to changes in the design
+// 	string* input_string = (string*) name->values[0];
+
+// 	TrieNode2* node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, 0);
+
+// 	// search untill no match is possible, or input is empty
+// 	int j = 0;
+// 	for(int i = 0; i < input_string->size(); i++)
+// 	{
+
+// 		// int size = ((string*) name->values[i])->size();
+// 		char letter = input_string[i];
+// 		j = doLinksPointToLeter(my_trie_tree, node, letter);
+// 		if(j == -1)
+// 		{
+// 			return -1;
+// 		}
+// 		else
+// 		{
+// 			node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, node->links[j]);
+// 		}
+// 	}
+// 	return j;//node->state_id;
+// }
 
 Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name /* strings*/)
 {
@@ -879,10 +913,47 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name /* strings*/)
 	{
 		return NULL;
 	}
+
+
+
+	// for now name only has 1 item due to changes in the design
+	string* input_string = (string*) name->values[0];
+
+	TrieNode2* node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, 0);
+
+	// search untill no match is possible, or input is empty
+	int j = 0;
+	int prev = 0;
+	for(int i = 0; i < input_string->size(); i++)
+	{
+
+		// int size = ((string*) name->values[i])->size();
+		char letter = input_string[i];
+		j = doLinksPointToLeter(my_trie_tree, node, letter);
+		if(j == -1)
+		{
+			// add a new node
+			// make a new node with letter
+			// add it into the link at the prev cell
+
+			return -1;
+		}
+		else
+		{
+			prev = j;
+			node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, node->links[j]);
+		}
+	}
+	// j is at the final node
+
+
+
 	// each node is doubly linked
 	// only char nodes
 	int current_node_id = 0;
 	TrieNode2* current_node;
+	// traverse through adding nodes as needed
+	// track the last node so we know where to start generating nodes
 	// VectorPrintStrings(name);
 
 	// TrieNode2* prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, 0);
