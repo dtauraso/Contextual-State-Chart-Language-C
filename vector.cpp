@@ -433,6 +433,19 @@ void VectorTest()
 	// erase a list of numbers
 }
 
+Vector* VectorMakeVectorOfChars(string my_string)
+{
+	Vector* list_of_chars = VectorInitVector();
+
+	for(int i = 0; i < my_string.size(); i++)
+	{
+		char* char_ptr = (char*) malloc(sizeof(char));
+		*char_ptr = my_string[i];
+		VectorAppend(list_of_chars, char_ptr);
+	}
+	return list_of_chars;
+
+}
 
 Vector* VectorAddStringToVector1(string string_1)
 {

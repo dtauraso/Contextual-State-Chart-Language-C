@@ -46,6 +46,7 @@ void VectorPrintVectorOfStrings(Vector* container);
 
 void VectorPrintStrings(Vector* container);
 
+Vector* VectorMakeVectorOfChars(string my_string);
 Vector* VectorAddStringToVector1(string string_1);
 Vector* VectorAddStringToVector2(string string_1, string string_2);
 
