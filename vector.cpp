@@ -74,7 +74,7 @@ void* VectorGetItem(Vector* container, int i)
 	}
 	else if(i < container->population && i >= 0)
 	{
-		//printf("item |%x|\n", container->values[i]);
+		// printf("item |%i|\n", container->values[i]);
 		return container->values[i];
 	}
 	else
@@ -338,7 +338,7 @@ void VectorPrint(Vector* container)
 			//printf("|%x|", container->values[i]);
 			void* a = container->values[i];
 			int* b = (int*) a;
-			printf("|%i|", *b);
+			printf("|%c|", *b);
 			
 			//printf("|item|");
 		}
@@ -439,10 +439,15 @@ Vector* VectorMakeVectorOfChars(string my_string)
 
 	for(int i = 0; i < my_string.size(); i++)
 	{
-		char* char_ptr = (char*) malloc(sizeof(char));
+		int* char_ptr = (int*) malloc(sizeof(int));
 		*char_ptr = my_string[i];
+		// printf("%i\n", my_string[i]);
 		VectorAppend(list_of_chars, char_ptr);
 	}
+
+	// printf("we are here\n%s\n", my_string.c_str());
+	// VectorPrint(list_of_chars);
+	// printf("done\n");
 	return list_of_chars;
 
 }

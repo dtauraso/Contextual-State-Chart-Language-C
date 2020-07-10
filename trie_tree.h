@@ -24,7 +24,7 @@ typedef struct TrieNode2
 
 	// all links are integers
 
-	char my_value;
+	int my_value;
 
 
 	// save memory for the links in the trie by only storing necessary edges
