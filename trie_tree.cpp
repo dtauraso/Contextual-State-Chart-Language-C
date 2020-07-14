@@ -223,20 +223,29 @@ int TrieTreeGetVariable(TrieTree* my_trie_tree, string name)
 
 }
 
-int doLinksPointToLeter(TrieTree* my_trie_tree, TrieNode2* node, int letter)
+int getLinkCount(TrieTree* my_trie_tree, int i)
+{
+	return VectorGetPopulation( ((TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, i)) ->links);
+}
+int getJthLink(TrieTree* my_trie_tree, int i, int j)
+{
+	TrieNode2* current = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, i);
+	return *((int*) VectorGetItem(current->links, j));
+}
+int doLinksPointToLeter(TrieTree* my_trie_tree, int current, int letter)
 {
 	// printf("problem\n");
 	// printf("%x\n", my_trie_tree);
 	// printf("%x\n", node);
 
-	if(my_trie_tree == NULL || node == NULL)
+	if(my_trie_tree == NULL)
 	{
-		printf("either one is null so return -1\n");
+
 		return -1;
 	}
 	// printf("about to search\n");
 
-	int size = VectorGetPopulation(node->links);
+	int size = getLinkCount(my_trie_tree, current);
 	// printf("size %i\n", size);
 	// loop through the links for a match to the letter
 	for(int j = 0; j < size; j++)
@@ -246,16 +255,15 @@ int doLinksPointToLeter(TrieTree* my_trie_tree, TrieNode2* node, int letter)
 		// TrieTreePrintTrie(my_trie_tree);
 		// printf("size of trie %i\n", VectorGetPopulation(my_trie_tree->trie_tree));
 		// have to save this as an integer first or the accessing will not work
-		int x = *((int*) VectorGetItem(node->links, j));
+		int id = getJthLink(my_trie_tree, current, j);
 		// the ndoe at id 1 exists but can't be accessed
-		TrieNode2* node = (TrieNode2*) VectorGetItem(	my_trie_tree->trie_tree,
-														x);
+		TrieNode2* node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, id);
 		// printf("node %i", node);
 		// printf("here\n");
 		if(node == NULL){}
 		else if(node->my_value == letter)
 		{
-			return j;
+			return id;
 		}
 	}
 	return -1;
@@ -281,7 +289,7 @@ int TrieTreeSearch(TrieTree* my_trie_tree, Vector* name /* strings*/)
 
 		// int size = ((string*) name->values[i])->size();
 		int letter =  *((int*) name->values[i]);
-		j = doLinksPointToLeter(my_trie_tree, node, letter);
+		// j = doLinksPointToLeter(my_trie_tree, node, letter);
 		if(j == -1)
 		{
 			return -1;
@@ -926,7 +934,20 @@ void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_p
 // 	return j;//node->state_id;
 // }
 
-void addNewNode(TrieTree* my_trie_tree, int letter, bool at_end_of_word, int prev)
+int getNextNodeId(TrieTree* my_trie_tree, int current, int ith_link)
+{
+	// get the current node
+	TrieNode2* current_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current);
+
+	// void* -> int* -> int
+	return *((int*) VectorGetItem(current_node->links, ith_link));
+}
+int getLastLink(Vector* links)
+{
+	return VectorGetPopulation(links) - 1;
+}
+// int getLastItem()
+void addNewNode(TrieTree* my_trie_tree, int letter, bool at_end_of_word, int current)
 {
 	TrieTreeInsertString2(	my_trie_tree,
 									letter,
@@ -935,13 +956,15 @@ void addNewNode(TrieTree* my_trie_tree, int letter, bool at_end_of_word, int pre
 									at_end_of_word);
 
 	// add it into the link at the prev cell
-	int* new_index = (int*) malloc(sizeof(int));
-	*new_index = VectorGetPopulation(my_trie_tree->trie_tree) - 1;
+	VectorAppendInt(	((TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current))->links,
+						VectorGetPopulation(my_trie_tree->trie_tree) - 1);
+	// int* new_index = (int*) malloc(sizeof(int));
+	// *new_index = VectorGetPopulation(my_trie_tree->trie_tree) - 1;
 	// printf("get a new index\n");
 	// printf("prev %i new index %i\n", prev, *new_index);
 	// add a link to the prev node
-	VectorAppend( 	((TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, prev))->links,
-					new_index);
+	// VectorAppend( 	((TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, prev))->links,
+	// 				new_index);
 }
 Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 {
@@ -956,55 +979,58 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 	// for now name only has 1 item due to changes in the design
 	// string input_string = *((string*) name->values[0]);
 
-	TrieNode2* node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, 0);
+	// TrieNode2* node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, 0);
+	int current = 0;
 	printf("insert \n");
 	VectorPrint(name);
 	// search untill no match is possible, or input is empty
-	int j = 0;
-	int prev = 0;
+	// int j = 0;
+	// TrieTreePrintTrie(my_trie_tree);
+
+	// int prev = 0;
 	int size = VectorGetPopulation(name);
 	int matches = 0;
 	for(int i = 0; i < size; i++)
 	{
+		printf("current %i\n", current);
 		int letter =  *((int*) name->values[i]);
 
-		// printf("here char %c prev %i\n", letter, prev);
-		// j is the index of the link to the next letter
-		j = doLinksPointToLeter(my_trie_tree, node, letter);
-		// printf("just searched j == %i\n", j);
+		printf("here char %c current %i\n", letter, current);
+		// j is the index of the next letter cell in trie tree
+		int j = doLinksPointToLeter(my_trie_tree, current, letter);
+		printf("just searched j == %i\n", j);
 		if(j == -1)
 		{
-			// printf("about to add\n");
+			// printf("about to add ");
+			// printf("current %i\n", current);
+
 
 			// add a new node
-			addNewNode(my_trie_tree, letter, /*at_end_of_word*/ i == size - 1, prev);
+			addNewNode(my_trie_tree, letter, /*at_end_of_word*/ i == size - 1, current);
 			// make a new node with letter
-
-
-
-			prev = VectorGetPopulation(my_trie_tree->trie_tree) - 1;
-			// |a||b||v||f|| ||t||g||r||f||e||d||e|
 			// TrieTreePrintTrie(my_trie_tree);
 
-			// int end = VectorGetPopulation(node->links);
-
-			// void* -> int* -> int
-			node = (TrieNode2*) VectorGetItem(	my_trie_tree->trie_tree, prev);
-
+			current =  getNextNodeId(
+							my_trie_tree,
+							current,
+							getLastLink( ((TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current))->links) );
+			
+			// TrieTreePrintTrie(my_trie_tree);
 		}
 		else
 		{
 
 			matches++;
-			// printf("prev %i node id %i\n", prev, j);
+			printf("node id %i\n", j);
 			// first time prev is root preceding the first searchable characters
 			// in trie
-			prev = *((int*) VectorGetItem(node->links, j));
-			node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, prev);
+			current = j;
 		}
 	}
+	printf("# matches %i total items %i \n", matches, VectorGetPopulation(name));
+	TrieNode2* node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current);
 	// TrieTreePrintTrie(my_trie_tree);
-
+	return name;
 	// printf("done adding last index %i\n", prev);
 
 	if(matches != VectorGetPopulation(name))
@@ -1020,6 +1046,7 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 	// n links
 		// find parent starting at node
 	int parent = 0;
+	int prev = 0; // so the code will not break till I can fix it
 	TrieNode2* parent_node = NULL;
 	if(VectorGetPopulation(node->links) == 0)
 	{
@@ -1031,17 +1058,34 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 		// add new node starting with '!'
 		addNewNode(my_trie_tree, 33, /*at_end_of_word*/ 1, parent);
 		
-
-		int* new_word = (int*) malloc(sizeof(int));
-		*new_word = 33;
-		VectorAppend(name, new_word);
+		VectorAppendInt(name, 33);
 	}
 	else
 	{
 		// find the last possible node untill we are on a node with 0 children
 		TrieNode2* tracker = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, prev);
-		int prev_tracker = prev;
+		// int prev_tracker, last_link, next_link
+		// prev_tracker = last_link = next_link = 0
+		// advanceLinks(prev_tracker, prev, last_link,  VectorGetPopulation(tracker->links) - 1, next_link)
+		// if()
+		// int prev_tracker = prev;
+
 		// put a first round up here
+		parent = prev;
+
+		int next_link = *((int*) VectorGetItem(tracker->links, getLastLink(tracker->links)));
+		printf("%c", tracker->my_value);
+
+		
+		tracker = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, next_link);
+		prev = next_link;
+		// we are on the last final node and 1 past the only parent
+		if(VectorGetPopulation(tracker->links) == 0)
+		{
+			// 
+			printf("screwed %c\n", tracker->my_value);
+			VectorAppendInt(name, tracker->my_value);
+		}
 		// may need 2 cases
 		// on last one and can't go farther
 		// on last one and can go farther
@@ -1050,58 +1094,24 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 		// gets the second round
 		// can't get the third item cause we have already skipped past it and 
 		// VectorGetPopulation(tracker->links) > 0 will now be false so we only get 1 item instead of 2 items
+		// we have more parents to visit
 		while(VectorGetPopulation(tracker->links) > 0)
 		{
-			int last_link = VectorGetPopulation(tracker->links) - 1;
-			parent = prev_tracker;
+			printf("1");
+			printf("%c |", tracker->my_value);
 
-			int next_link = *((int*) VectorGetItem(tracker->links, last_link));
+			VectorAppendInt(name, tracker->my_value);
+
+			parent = prev;
+
+			next_link = *((int*) VectorGetItem(tracker->links, getLastLink(tracker->links)));
 			printf("%c", tracker->my_value);
 
 			
 			tracker = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, next_link);
-			prev_tracker = next_link;
+			prev = next_link;
 
 			printf("%i", VectorGetPopulation(tracker->links));
-			// off kilter with the trackers
-			// can't check ahead via the period to add the current item if the max link hasn't been added yet
-			if(VectorGetPopulation(tracker->links) == 2)
-			{
-				printf("1");
-				printf("%c |", tracker->my_value);
-
-				int* new_word1 = (int*) malloc(sizeof(int));
-				*new_word1 = tracker->my_value;
-				VectorAppend(name, new_word1);
-			}
-			// add tracker's char to name
-			// only add if it's the last final sibling
-			// only want to add the final node from each overflow
-			
-			/*
-			printing array
-			21 |g| end of word 1 state -1
-			links
-			|22||23|
-
-			printing array
-			22 |!| end of word 1 state -1
-			links
-			||
-
-			printing array
-			23 |"| end of word 1 state -1
-			links
-			|24|
-
-			printing array
-			24 |!| end of word 1 state -1
-			links
-			||
-
-			|a||b||v||s||o||m||e||t||h||i||n||g||!|
-			*/
-			
 		}
 		// it's not supposed to collect the sibling preceding the one that will being added this round
 
@@ -1114,11 +1124,11 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 
 		// get the character of the last link
 		int last_location = VectorGetPopulation(parent_node->links) - 1;
-		int last_link = *((int*) VectorGetItem(parent_node->links, last_location));
+		int last_link1 = *((int*) VectorGetItem(parent_node->links, last_location));
 		int period = 2;
 		if(VectorGetPopulation(parent_node->links) == period)
 		{
-			parent = last_link;
+			parent = last_link1;
 			// add tracker's char to name
 			// int* new_word = (int*) malloc(sizeof(int));
 			// *new_word = parent_node->my_value;
@@ -1126,16 +1136,14 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 		}
 		// printf("last link %i\n", last_link);
 		// period is currently 2
-		int next_link = ((last_link + 1) % period) + 33;
+		int next_link1 = ((last_link1 + 1) % period) + 33;
 		// printf("parent %i\n", parent);
 		// + 1 to it
 		// ((last_link + 1) % 2) + 33
-		addNewNode(my_trie_tree, next_link, /*at_end_of_word*/ 1, parent);
+		addNewNode(my_trie_tree, next_link1, /*at_end_of_word*/ 1, parent);
 		// add new node with the new character
-		printf("%c\n", next_link);
-		int* new_word2 = (int*) malloc(sizeof(int));
-		*new_word2 = next_link;
-		VectorAppend(name, new_word2);
+		printf("%c\n", next_link1);
+		VectorAppendInt(name, next_link1);
 	}
 	// printf("parent is %i\n", parent);
 	// the extra words are not getting added to name right
@@ -2250,15 +2258,16 @@ void TrieTreeTest()
 {
 	TrieTree* my_trie_tree = TrieTreeInitTrieTree();
 	printf("inserting\n");
-	Vector* name2 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvf tgrfede"));
-	Vector* name34 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsomething"));
+	Vector* name2 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvf t"));
+	Vector* name31 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvso"));
+	Vector* name32 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsx"));
 
-	Vector* name35 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsomething"));
-	Vector* name36 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsomething"));
-	Vector* name37 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsomething"));
-	Vector* name38 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsomething"));
-	Vector* name39 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsomething"));
-	Vector* name40 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsomething"));
+	// Vector* name35 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsomething"));
+	// Vector* name36 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsomething"));
+	// Vector* name37 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsomething"));
+	// Vector* name38 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsomething"));
+	// Vector* name39 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsomething"));
+	// Vector* name40 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsomething"));
 
 	// TrieTreePrintTrie(my_trie_tree);
 	exit(1);
