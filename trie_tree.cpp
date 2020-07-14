@@ -957,7 +957,7 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 	// string input_string = *((string*) name->values[0]);
 
 	TrieNode2* node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, 0);
-	// printf("here1 \n");
+	printf("insert \n");
 	VectorPrint(name);
 	// search untill no match is possible, or input is empty
 	int j = 0;
@@ -1038,26 +1038,78 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 	}
 	else
 	{
-		// find the last possible node 
+		// find the last possible node untill we are on a node with 0 children
 		TrieNode2* tracker = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, prev);
 		int prev_tracker = prev;
-		while(	VectorGetPopulation(tracker->links) > 0)
+		// put a first round up here
+		// may need 2 cases
+		// on last one and can't go farther
+		// on last one and can go farther
+		// should be able to collect the parent
+		// can't collect first round cause we are still on last searchable char
+		// gets the second round
+		// can't get the third item cause we have already skipped past it and 
+		// VectorGetPopulation(tracker->links) > 0 will now be false so we only get 1 item instead of 2 items
+		while(VectorGetPopulation(tracker->links) > 0)
 		{
 			int last_link = VectorGetPopulation(tracker->links) - 1;
 			parent = prev_tracker;
 
 			int next_link = *((int*) VectorGetItem(tracker->links, last_link));
+			printf("%c", tracker->my_value);
 
+			
 			tracker = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, next_link);
 			prev_tracker = next_link;
-			
-			// add tracker's char to name
-			int* new_word = (int*) malloc(sizeof(int));
-			*new_word = tracker->my_value;
-			VectorAppend(name, new_word);
-		}
-		parent_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, parent);
 
+			printf("%i", VectorGetPopulation(tracker->links));
+			// off kilter with the trackers
+			// can't check ahead via the period to add the current item if the max link hasn't been added yet
+			if(VectorGetPopulation(tracker->links) == 2)
+			{
+				printf("1");
+				printf("%c |", tracker->my_value);
+
+				int* new_word1 = (int*) malloc(sizeof(int));
+				*new_word1 = tracker->my_value;
+				VectorAppend(name, new_word1);
+			}
+			// add tracker's char to name
+			// only add if it's the last final sibling
+			// only want to add the final node from each overflow
+			
+			/*
+			printing array
+			21 |g| end of word 1 state -1
+			links
+			|22||23|
+
+			printing array
+			22 |!| end of word 1 state -1
+			links
+			||
+
+			printing array
+			23 |"| end of word 1 state -1
+			links
+			|24|
+
+			printing array
+			24 |!| end of word 1 state -1
+			links
+			||
+
+			|a||b||v||s||o||m||e||t||h||i||n||g||!|
+			*/
+			
+		}
+		// it's not supposed to collect the sibling preceding the one that will being added this round
+
+		printf(" -> ");
+		parent_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, parent);
+		// int* new_word5 = (int*) malloc(sizeof(int));
+		// *new_word5 = parent_node->my_value;
+		// VectorAppend(name, new_word5);
 		// parent is now the last node we can make children from
 
 		// get the character of the last link
@@ -1080,10 +1132,10 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 		// ((last_link + 1) % 2) + 33
 		addNewNode(my_trie_tree, next_link, /*at_end_of_word*/ 1, parent);
 		// add new node with the new character
-
-		int* new_word = (int*) malloc(sizeof(int));
-		*new_word = next_link;
-		VectorAppend(name, new_word);
+		printf("%c\n", next_link);
+		int* new_word2 = (int*) malloc(sizeof(int));
+		*new_word2 = next_link;
+		VectorAppend(name, new_word2);
 	}
 	// printf("parent is %i\n", parent);
 	// the extra words are not getting added to name right
