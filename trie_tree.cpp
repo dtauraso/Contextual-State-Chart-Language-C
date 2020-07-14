@@ -1025,6 +1025,16 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 	{
 		parent = prev;
 		parent_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, prev);
+
+		// parent is now the last node we can make children from
+
+		// add new node starting with '!'
+		addNewNode(my_trie_tree, 33, /*at_end_of_word*/ 1, parent);
+		
+
+		int* new_word = (int*) malloc(sizeof(int));
+		*new_word = 33;
+		VectorAppend(name, new_word);
 	}
 	else
 	{
@@ -1042,24 +1052,13 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 			prev_tracker = next_link;
 			
 			// add tracker's char to name
+			int* new_word = (int*) malloc(sizeof(int));
+			*new_word = tracker->my_value;
+			VectorAppend(name, new_word);
 		}
 		parent_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, parent);
-	}
-	// printf("parent is %i\n", parent);
 
-	// // parent is now the last node we can make children from
-	if(VectorGetPopulation(parent_node->links) == 0)
-	{
-		// add new node starting with '!'
-		addNewNode(my_trie_tree, 33, /*at_end_of_word*/ 1, parent);
-		
-
-		int* new_word = (int*) malloc(sizeof(int));
-		*new_word = 33;
-		VectorAppend(name, new_word);
-	}
-	else
-	{
+		// parent is now the last node we can make children from
 
 		// get the character of the last link
 		int last_location = VectorGetPopulation(parent_node->links) - 1;
@@ -1068,6 +1067,10 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 		if(VectorGetPopulation(parent_node->links) == period)
 		{
 			parent = last_link;
+			// add tracker's char to name
+			// int* new_word = (int*) malloc(sizeof(int));
+			// *new_word = parent_node->my_value;
+			// VectorAppend(name, new_word);
 		}
 		// printf("last link %i\n", last_link);
 		// period is currently 2
@@ -1081,11 +1084,22 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 		int* new_word = (int*) malloc(sizeof(int));
 		*new_word = next_link;
 		VectorAppend(name, new_word);
-
 	}
+	// printf("parent is %i\n", parent);
+	// the extra words are not getting added to name right
 	TrieTreePrintTrie(my_trie_tree);
+	VectorPrint(name);
+	/*
 
-	
+	generating the next item works but collecting the chars for forming the updated name doesn't work
+	! actuall !
+	" actuall !"
+	"! actual "!
+	"" actual "!"
+	""! actual ""!
+	""" actual ""!"
+
+	 */ 
 	return name;
 
 
