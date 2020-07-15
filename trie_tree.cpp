@@ -1052,7 +1052,7 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 		int letter =  *((int*) name->values[i]);
 
 		// printf("here char %c current %i\n", letter, current);
-		// j is the index of the next letter cell in trie tree
+		// next_node_id is the index of the next letter cell in trie tree
 		int next_node_id = doLinksPointToLeter(my_trie_tree, current, letter);
 		// printf("just searched j == %i\n", j);
 		if(next_node_id == -1)
