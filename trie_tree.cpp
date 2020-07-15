@@ -1032,16 +1032,11 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 		return NULL;
 	}
 
-	// for now name only has 1 item due to changes in the design
-	// string input_string = *((string*) name->values[0]);
 
-	// TrieNode2* node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, 0);
 	int current = 0;
-	// printf("insert \n");
-	// VectorPrint(name);
+
 	// search untill no match is possible, or input is empty
-	// int j = 0;
-	// TrieTreePrintTrie(my_trie_tree);
+
 
 	int size = VectorGetPopulation(name);
 	int matches = 0;
@@ -2192,6 +2187,11 @@ void TrieTreeTest()
 	VectorPrint(name39);
 	Vector* name40 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsx"));
 	VectorPrint(name40);
+
+	printf("insert tests pass\n");
+	// store state integers in various places
+
+	// erase each item
 
 	// TrieTreePrintTrie(my_trie_tree);
 	exit(1);
