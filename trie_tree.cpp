@@ -975,11 +975,11 @@ Vector* generateExtraSymbols(TrieTree* my_trie_tree, int current, Vector* name)
 
 	// we can allow 93 children to be an extra symbol(93 different viewable integers)
 	// We start at 33 and count 93 letters
-	int period = 126; 
+	int max_visible_character = 126; 
 
 	int count = getLinkCount2(my_trie_tree, current);
 	// we have 0 extra symbols to traverse
-	if(count >= 0 && count < period)
+	if(count >= 0 && count < max_visible_character)
 	{
 		int last_link, next_link;
 		last_link = 0;
@@ -987,7 +987,7 @@ Vector* generateExtraSymbols(TrieTree* my_trie_tree, int current, Vector* name)
 		if(count > 0)
 		{
 			last_link = getLastLink(my_trie_tree, current);
-			next_link = ((last_link + 1) % period) + 33;
+			next_link = ((last_link + 1) % max_visible_character) + 33;
 		}
 		
 		addNewNode(my_trie_tree, next_link, /*at_end_of_word*/ 1, current);
@@ -997,7 +997,7 @@ Vector* generateExtraSymbols(TrieTree* my_trie_tree, int current, Vector* name)
 		return name;
 	}
 	// we have n extra symbols to traverse
-	while(getLinkCount2(my_trie_tree, current) == period)
+	while(getLinkCount2(my_trie_tree, current) == max_visible_character)
 	{
 		// get to the next node
 		current = getNextNodeId( 	my_trie_tree,
@@ -1008,7 +1008,7 @@ Vector* generateExtraSymbols(TrieTree* my_trie_tree, int current, Vector* name)
 	}
 	int last_link = getLastLink(my_trie_tree, current);
 
-	int next_link = ((last_link + 1) % period) + 33;
+	int next_link = ((last_link + 1) % max_visible_character) + 33;
 
 	addNewNode(my_trie_tree, next_link, /*at_end_of_word*/ 1, current);
 
