@@ -969,6 +969,10 @@ void addNewNode(TrieTree* my_trie_tree, int letter, bool at_end_of_word, int cur
 	VectorAppendInt(	((TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current))->links,
 						VectorGetPopulation(my_trie_tree->trie_tree) - 1);
 }
+int computeNextVisibleCharacter(int last_link, int max_visible_character)
+{
+	return ((last_link + 1) % max_visible_character) + 33;
+}
 Vector* generateExtraSymbols(TrieTree* my_trie_tree, int current, Vector* name)
 {
 	// we either have 0 extra symbols to traverse or n
@@ -987,7 +991,7 @@ Vector* generateExtraSymbols(TrieTree* my_trie_tree, int current, Vector* name)
 		if(count > 0)
 		{
 			last_link = getLastLink(my_trie_tree, current);
-			next_link = ((last_link + 1) % max_visible_character) + 33;
+			next_link = computeNextVisibleCharacter(last_link, max_visible_character);
 		}
 		
 		addNewNode(my_trie_tree, next_link, /*at_end_of_word*/ 1, current);
@@ -1008,7 +1012,7 @@ Vector* generateExtraSymbols(TrieTree* my_trie_tree, int current, Vector* name)
 	}
 	int last_link = getLastLink(my_trie_tree, current);
 
-	int next_link = ((last_link + 1) % max_visible_character) + 33;
+	int next_link = computeNextVisibleCharacter(last_link, max_visible_character);
 
 	addNewNode(my_trie_tree, next_link, /*at_end_of_word*/ 1, current);
 
