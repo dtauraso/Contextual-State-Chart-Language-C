@@ -937,6 +937,7 @@ void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_p
 int getNextNodeId(TrieTree* my_trie_tree, int current, int ith_link)
 {
 	// get the current node
+	// void* -> TrieNode2*
 	TrieNode2* current_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current);
 
 	// void* -> int* -> int
@@ -1043,6 +1044,7 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 	for(int i = 0; i < size; i++)
 	{
 		// printf("current %i\n", current);
+		// void* -> int* -> int
 		int letter =  *((int*) name->values[i]);
 
 		// printf("here char %c current %i\n", letter, current);
