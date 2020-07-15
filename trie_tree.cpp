@@ -960,10 +960,10 @@ int getMyValue(TrieTree* my_trie_tree, int current)
 void addNewNode(TrieTree* my_trie_tree, int letter, bool at_end_of_word, int current)
 {
 	TrieTreeInsertString2(	my_trie_tree,
-									letter,
-									-1,
-									// are we at end of word?
-									at_end_of_word);
+							letter,
+							-1,
+							// are we at end of word?
+							at_end_of_word);
 
 	// add it into the link at the prev cell
 	VectorAppendInt(	((TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current))->links,
