@@ -2168,6 +2168,7 @@ void TrieTreeTest()
 {
 	TrieTree* my_trie_tree = TrieTreeInitTrieTree();
 	printf("inserting\n");
+	// each name in the tree is made to be unique so duplicates get extra symbols
 	Vector* name2 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvf t"));
 	VectorPrint(name2);
 	Vector* name31 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvso"));
