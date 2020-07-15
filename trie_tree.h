@@ -67,7 +67,7 @@ typedef struct TrieTree
 
 		This is a trie tree to enable n dimensions when describing a state.
 
-		["I am a state", "I am a little bit more detailed", "I am describing 3 dimentions of complexity"]
+		"I am a state. I am a little bit more detailed. I am describing many dimentions of complexity"
 
 		We want any complexity level to approximate the complex states of mind present in a humand mind
 		That requires represening complex states in a general way(General AI).  Numenta has done a great job
@@ -83,7 +83,7 @@ typedef struct TrieTree
 		and still maintain high efficiency.  This happens to be exactly what the programming languages and frameworks
 		represent.
 
-		I see this as a very high level inefficiency that may be addressed more in the comming decades.
+		I see this as a high level inefficiency that may be addressed more in the comming decades.
 		The languages do their job very well and I'm not interested in replacing them.  My interest
 		is to give them flexible features to provide more clarity and expressability to the programmer.
 
