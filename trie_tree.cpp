@@ -968,13 +968,6 @@ void addNewNode(TrieTree* my_trie_tree, int letter, bool at_end_of_word, int cur
 	// add it into the link at the prev cell
 	VectorAppendInt(	((TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current))->links,
 						VectorGetPopulation(my_trie_tree->trie_tree) - 1);
-	// int* new_index = (int*) malloc(sizeof(int));
-	// *new_index = VectorGetPopulation(my_trie_tree->trie_tree) - 1;
-	// printf("get a new index\n");
-	// printf("prev %i new index %i\n", prev, *new_index);
-	// add a link to the prev node
-	// VectorAppend( 	((TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, prev))->links,
-	// 				new_index);
 }
 Vector* generateExtraSymbols(TrieTree* my_trie_tree, int current, Vector* name)
 {
