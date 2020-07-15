@@ -980,7 +980,7 @@ Vector* generateExtraSymbols(TrieTree* my_trie_tree, int current, Vector* name)
 {
 	// we either have 0 extra symbols to traverse or n
 
-	int period = 93; // we can allow 93 children to be an extra symbol
+	int period = 93; // we can allow 93 children to be an extra symbol(93 different viewable integers)
 
 	int count = getLinkCount2(my_trie_tree, current);
 	// we have 0 extra symbols to traverse
@@ -998,7 +998,7 @@ Vector* generateExtraSymbols(TrieTree* my_trie_tree, int current, Vector* name)
 		addNewNode(my_trie_tree, next_link, /*at_end_of_word*/ 1, current);
 		VectorAppendInt(name, next_link);
 		// TrieTreePrintTrie(my_trie_tree);
-		VectorPrint(name);
+		// VectorPrint(name);
 		return name;
 	}
 	// we have n extra symbols to traverse
@@ -1019,7 +1019,7 @@ Vector* generateExtraSymbols(TrieTree* my_trie_tree, int current, Vector* name)
 
 	VectorAppendInt(name, next_link);
 	// TrieTreePrintTrie(my_trie_tree);
-	VectorPrint(name);
+	// VectorPrint(name);
 	return name;
 }
 Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
@@ -1038,8 +1038,8 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 
 	// TrieNode2* node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, 0);
 	int current = 0;
-	printf("insert \n");
-	VectorPrint(name);
+	// printf("insert \n");
+	// VectorPrint(name);
 	// search untill no match is possible, or input is empty
 	// int j = 0;
 	// TrieTreePrintTrie(my_trie_tree);
@@ -1054,7 +1054,7 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 		// printf("here char %c current %i\n", letter, current);
 		// next_node_id is the index of the next letter cell in trie tree
 		int next_node_id = doLinksPointToLeter(my_trie_tree, current, letter);
-		// printf("just searched j == %i\n", j);
+
 		if(next_node_id == -1)
 		{
 			// add a new node with letter
@@ -1070,7 +1070,7 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 			current = next_node_id;
 		}
 	}
-	// printf("# matches %i total items %i \n", matches, VectorGetPopulation(name));
+
 
 	if(matches < VectorGetPopulation(name))
 	{
@@ -2175,15 +2175,24 @@ void TrieTreeTest()
 	TrieTree* my_trie_tree = TrieTreeInitTrieTree();
 	printf("inserting\n");
 	Vector* name2 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvf t"));
+	VectorPrint(name2);
 	Vector* name31 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvso"));
+	VectorPrint(name31);
 	Vector* name32 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsx"));
+	VectorPrint(name32);
 
 	Vector* name35 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsx"));
+	VectorPrint(name35);
 	Vector* name36 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsx"));
+	VectorPrint(name36);
 	Vector* name37 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsx"));
+	VectorPrint(name37);
 	Vector* name38 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsx"));
+	VectorPrint(name38);
 	Vector* name39 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsx"));
+	VectorPrint(name39);
 	Vector* name40 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvsx"));
+	VectorPrint(name40);
 
 	// TrieTreePrintTrie(my_trie_tree);
 	exit(1);
