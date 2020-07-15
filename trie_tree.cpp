@@ -973,7 +973,9 @@ Vector* generateExtraSymbols(TrieTree* my_trie_tree, int current, Vector* name)
 {
 	// we either have 0 extra symbols to traverse or n
 
-	int period = 93; // we can allow 93 children to be an extra symbol(93 different viewable integers)
+	// we can allow 93 children to be an extra symbol(93 different viewable integers)
+	// We start at 33 and count 93 letters
+	int period = 126; 
 
 	int count = getLinkCount2(my_trie_tree, current);
 	// we have 0 extra symbols to traverse
