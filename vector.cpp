@@ -49,6 +49,16 @@ bool VectorDeleteVector(Vector* container)
 	container->values = NULL;
 	return true;
 }
+Vector* VectorCopyVector(Vector* my_vector)
+{
+	Vector* new_vector = VectorInitVector();
+	for(int i = 0; i < VectorGetPopulation(my_vector); i++)
+	{
+		int integer_to_append = *((int*) VectorGetItem(my_vector, i));
+		VectorAppendInt(new_vector, integer_to_append);
+	}
+	return new_vector;
+}
 
 int VectorGetLastIndex(Vector* container)
 {
@@ -115,6 +125,8 @@ int VectorGetPopulation(Vector* container)
 }
 void VectorAppendInt(Vector* container, int element)
 {
+	// printf("adding an integer\n");
+
 	if(container == NULL)
 	{
 		return;
@@ -275,6 +287,27 @@ bool VectorDeleteAllItems(Vector* container)
 	container = NULL;
 	return true;
 }
+bool VectorDeleteAllItems2(Vector* container)
+{
+	// assuems all elements are primitives
+	if(container == NULL)
+	{
+		return false;
+	}
+	for(int i = 0; i < container->population; i++)
+	{
+		free(container->values[i]);
+		container->values[i] = NULL;
+	}
+	free(container->values);
+	container->values = NULL;
+	container->population = 0;
+	container->size = 0;
+	// free(container);
+	// container = NULL;
+	return true;
+}
+
 void VectorShiftItems(Vector* container, int index)
 {
 	if(container == NULL || index >= container->population)
@@ -325,7 +358,7 @@ void VectorPrint(Vector* container)
 		printf("empty container\n");
 		return;
 	}
-	//printf("printing container pop %i, size %i\n", container->population, container->size);
+	// printf("printing container pop %i, size %i\n", container->population, container->size);
 	for(int i = 0; i < container->population; i++)
 	{
 		//printf("i %i\n", i);

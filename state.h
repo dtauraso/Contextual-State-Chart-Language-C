@@ -13,7 +13,14 @@
 //#include "state_machine.h"
 struct StateMachine;
 
+/*
+copying variables up or down the machine
+trie tree for destination state name
+state machine array for the children variable names(that are stored in the trie tree)
+the avariable names then have a number mapping to the official state machine array
 
+
+*/
 typedef struct Search
 {
 	int start;

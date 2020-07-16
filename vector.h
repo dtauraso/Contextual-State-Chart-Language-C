@@ -15,6 +15,8 @@ Vector* VectorInitVector();
 Vector* VectorInitVectorSize(int size);
 
 bool VectorDeleteVector(Vector* container);
+Vector* VectorCopyVector(Vector* my_vector);
+
 int VectorGetLastIndex(Vector* container);
 void* VectorGetItem(Vector* container, int i);
 void VectorSetItemToNull(Vector* container, int i);
@@ -31,6 +33,7 @@ void VectorIncrementTopInt(Vector* container);
 
 bool VectorDeleteItem(Vector* container, int index);
 bool VectorDeleteAllItems(Vector* container);
+bool VectorDeleteAllItems2(Vector* container);
 void VectorShiftItems(Vector* container, int index);
 
 

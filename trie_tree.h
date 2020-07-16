@@ -103,6 +103,8 @@ typedef struct TrieTree
 	// I have not figured out how to make a decent hash table.
 	// will be unsorted
 	// trie tree of characters
+	// a trie tree is also easier for me to think about and it lets me put in any features that takes advantage of a trie wheras a hash table
+	// may not be able to do those things(partial match)
 	Vector* trie_tree;
 
 	// trie tree of words(just a tree refering to the character trie)

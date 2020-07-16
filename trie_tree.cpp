@@ -466,6 +466,11 @@ int getMyValue(TrieTree* my_trie_tree, int current)
 	TrieNode2* current_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current);
 	return current_node->my_value;
 }
+bool getEndOfWord(TrieTree* my_trie_tree, int current)
+{
+	TrieNode2* current_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current);
+	return current_node->end_of_word;
+}
 void addNewNode(TrieTree* my_trie_tree, int letter, bool at_end_of_word, int current)
 {
 	TrieTreeInsertString2(	my_trie_tree,
@@ -488,7 +493,7 @@ Vector* generateExtraSymbols(TrieTree* my_trie_tree, int current, Vector* name)
 
 	// we can allow 93 children to be an extra symbol(93 different viewable integers)
 	// We start at 33 and count 93 letters to get to the ascii value of 126
-	int max_visible_character = 2; 
+	int max_visible_character = 126; 
 
 	int count = getLinkCount2(my_trie_tree, current);
 	// we have 0 extra symbols to traverse
@@ -1380,7 +1385,15 @@ void TrieTreePrintTrieRecursive(TrieTree* my_trie_tree, int root, string indents
 	}
 
 }
-void TrieTreePrintTrieRecursive2(TrieTree* my_trie_tree, int current, int number_of_indents, Void* word_found)
+char* makeIndents(int number_of_indents)
+{
+	// printf("indents to make %i\n", number_of_indents);
+	char* indents = (char*) malloc(sizeof(char) * (number_of_indents + 1));
+	memset(indents, ' ', number_of_indents);
+	indents[number_of_indents] = '\0';
+	return indents;
+}
+void TrieTreePrintTrieRecursive2(TrieTree* my_trie_tree, int current, int number_of_indents, Vector* word_found)
 {
 	/*
 	if current doesn't exist
@@ -1394,6 +1407,67 @@ void TrieTreePrintTrieRecursive2(TrieTree* my_trie_tree, int current, int number
 			make n copies of word_found
 			pass each one to the recursive call
 	*/
+
+	if(current < 0)
+	{
+		return;
+	}
+	// printf("current %i\n", current);
+	// VectorPrint(word_found);
+	int current_letter = getMyValue(my_trie_tree, current);
+	// printf("letter |%c|\n", current_letter);
+	VectorAppendInt(word_found, current_letter);
+	// printf("added letter\n");
+	if(getEndOfWord(my_trie_tree, current))
+	{
+		// printf("end of word\n");
+		printf("%s|", makeIndents(number_of_indents));
+		int size = VectorGetPopulation(word_found);
+		for(int i = 0; i < size; i++)
+		{
+			int letter = *((int*) VectorGetItem(word_found, i));
+			printf("%c", letter);
+		}
+		printf("|\n");
+		// VectorPrint(word_found);
+		// empty container
+		VectorDeleteAllItems2(word_found);
+		// printf("here after vector was emptied\n");
+		// can't print out an empty vector
+		// VectorPrint(word_found);
+		number_of_indents += (size) + 2;
+		// printf("indents %i\n", size);
+
+	}
+	// printf("getting the link count\n");
+	// printf("link count %i\n", getLinkCount2(my_trie_tree, current));
+	if(getLinkCount2(my_trie_tree, current) == 1)
+	{
+		// printf("1 link\n");
+		int x = getNextNodeId(my_trie_tree, current, 0);
+		// printf("%i\n", x);
+		TrieTreePrintTrieRecursive2(	my_trie_tree,
+										x,
+										number_of_indents,
+										word_found);
+	}
+	else
+	{
+
+		int link_count = getLinkCount2(my_trie_tree, current);
+		// printf("%i links\n", link_count);
+		for(int i = 0; i < link_count; i++)
+		{
+			Vector* branch_vector = VectorCopyVector(word_found);
+			
+			TrieTreePrintTrieRecursive2(my_trie_tree,
+										getNextNodeId(my_trie_tree, current, i),
+										number_of_indents,
+										branch_vector);
+		}
+		
+	}
+	
 }
 
 
@@ -1440,6 +1514,8 @@ void TrieTreeTest()
 	printf("result 40 %i\n\n", TrieTreeSearch(my_trie_tree, name40));
 	TrieTreePrintTrie(my_trie_tree);
 	printf("insert tests pass\n");
+	TrieTreePrintTrieRecursive2(my_trie_tree, 0, 1, VectorInitVector());
+
 	exit(1);
 	// erase each item
 	// name40 is the longest branch so if it's deleted all subranches will follow
@@ -1473,7 +1549,8 @@ void TrieTreeTest()
 
 	// delete seems to work
 
-	// TrieTreePrintTrie(my_trie_tree);
+	TrieTreePrintTrie(my_trie_tree);
+	TrieTreePrintTrieRecursive2(my_trie_tree, 0, 1, VectorInitVector());
 	exit(1);
 
 	VectorPrintStrings(VectorAddStringToVector2("abvf", "tgrfede"));
