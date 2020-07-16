@@ -245,7 +245,7 @@ int TrieTreeSearch(TrieTree* my_trie_tree, Vector* name)
 		// printf("here char %c current %i\n", letter, current);
 		// next_node_id is the index of the next letter cell in trie tree
 		int j = doLinksPointToLeter2(my_trie_tree, current, letter);
-		printf("j %i\n", j);
+		// printf("j %i\n", j);
 
 		// no more edges to visit
 		if(j == -1)
@@ -255,7 +255,7 @@ int TrieTreeSearch(TrieTree* my_trie_tree, Vector* name)
 		else
 		{
 			int next_node_id = getJthLink(my_trie_tree, current, j);
-			printf("next_node_id %i\n", next_node_id);
+			// printf("next_node_id %i\n", next_node_id);
 			current = next_node_id;
 		}
 	}
