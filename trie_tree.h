@@ -37,7 +37,6 @@ typedef struct TrieNode2
 
 }TrieNode2;
 TrieNode2* TrieNode2initTrieNode2();
-bool TrieNode2DeleteTrieNode2(TrieNode2* node);
 
 char TrieNode2GetValue(TrieNode2* node);
 
@@ -96,6 +95,12 @@ typedef struct TrieTree
 
 
 	int root;
+	// the different instance of the same base word are connected and you can use a formula to 
+	// generate the next one. Hash tables don't let you connect common words together the same way
+	// autogeneration would be possible with a hash table but the extra symbols would grow really fast(linear with the 
+	// total number of common words already stored)
+	// using a trie tree this space complexity goes from linear to log_{#of children}^{#common words}
+	// I have not figured out how to make a decent hash table.
 	// will be unsorted
 	// trie tree of characters
 	Vector* trie_tree;
@@ -106,6 +111,8 @@ typedef struct TrieTree
 
 }TrieTree;
 TrieTree* TrieTreeInitTrieTree();
+bool TrieNode2DeleteTrieNode2(TrieTree* my_trie_tree, int current);
+
 void TrieTreePush(Vector* container, int new_item);
 int TrieTreeGetNextNode(TrieTree* my_trie_tree, Vector* node_id_stack, Vector* ith_edge_stack);
 int TrieTreeGetVariable(TrieTree* my_trie_tree, string name);
