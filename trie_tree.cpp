@@ -164,80 +164,8 @@ when done, return a pointer to the stack
 
 int TrieTreeGetVariable(TrieTree* my_trie_tree, string name)
 {
-	/*
-	if the 1 word matches traverse the rest of the trie to get the integer
-	assume there is only 1 unique path
-	return -1 if there is no unique path to the item that exists(multiple paths and a path that has a dead end are both fails)
-	*/
-	if(my_trie_tree == NULL || name.length() == 0)
-	{
-		return -1;
-	}
-	int prev_node_id = 0;
-	TrieNode2* prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, 0);
-	//Vector* stack = VectorInitVector();
-	int* prev_node_id_ptr = (int*) malloc(sizeof(int));
-	*prev_node_id_ptr = 0;
-	//VectorAppend(stack, prev_node_id_ptr);
-	// search untill no match is possible, or input is empty
-	// insert untill input runs out
-	for(int i = 0; i < name.size(); i++)
-	{
 
-
-		char letter = name[i];
-		// make sure this is valid
-		// are there chars_from_edges?
-	
-		// int edge = prev_node->char_links[letter];
-
-
-		// if(edge == -1)
-		// {
-		// 	return -1;
-		// }
-		
-		// else
-		// {
-		// 	prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, edge);
-
-		// }
-		
-	}
-	// the name is matched
-	// while the current node has no state data
-	/*
-			if # of edges > 1
-				return -1
-			else if # of edges == 1 and there is state data
-				return -1
-			else if # of edges == 1 and no state data
-				get the next node
-		
-		should run untill we hit the last node that also has state data
-	*/
-	while(prev_node->state_id == -1)
-	{
-		// int edge_count = VectorGetPopulation(prev_node->chars_from_edges);
-		// if(edge_count > 1)
-		// {
-		// 	return -1;
-		// }
-		// else if(edge_count == 1 && prev_node->state_id > -1)
-		// {
-		// 	return -1;
-		// }
-		// else if(edge_count == 1 && prev_node->state_id == -1)
-		// {
-		// 	// int letter = *((int*) VectorGetItem(prev_node->chars_from_edges, 0));
-		// 	// int edge = prev_node->char_links[letter];
-		// 	prev_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, edge);
-
-		// }
-	}
-
-	return prev_node->state_id;
-
+	return 0;
 }
 
 int getLinkCount(TrieTree* my_trie_tree, int i)
@@ -251,38 +179,7 @@ int getJthLink(TrieTree* my_trie_tree, int i, int j)
 }
 int doLinksPointToLeter(TrieTree* my_trie_tree, int current, int letter)
 {
-	// printf("problem\n");
-	// printf("%x\n", my_trie_tree);
-	// printf("%x\n", node);
 
-	if(my_trie_tree == NULL)
-	{
-
-		return -1;
-	}
-	// printf("about to search\n");
-
-	int size = getLinkCount(my_trie_tree, current);
-	// printf("size %i\n", size);
-	// loop through the links for a match to the letter
-	for(int j = 0; j < size; j++)
-	{
-		// printf("%i\n", j);
-		// printf("node id %i\n", *((int*) VectorGetItem(node->links, j)));
-		// TrieTreePrintTrie(my_trie_tree);
-		// printf("size of trie %i\n", VectorGetPopulation(my_trie_tree->trie_tree));
-		// have to save this as an integer first or the accessing will not work
-		int id = getJthLink(my_trie_tree, current, j);
-		// the ndoe at id 1 exists but can't be accessed
-		TrieNode2* node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, id);
-		// printf("node %i", node);
-		// printf("here\n");
-		if(node == NULL){}
-		else if(node->my_value == letter)
-		{
-			return id;
-		}
-	}
 	return -1;
 }
 
@@ -317,7 +214,6 @@ int doLinksPointToLeter2(TrieTree* my_trie_tree, int current, int letter)
 		if(node == NULL){}
 		else if(node->my_value == letter)
 		{
-			// difference between this one and doLinksPointToLeter
 			return j;
 		}
 	}
@@ -348,15 +244,18 @@ int TrieTreeSearch(TrieTree* my_trie_tree, Vector* name)
 
 		// printf("here char %c current %i\n", letter, current);
 		// next_node_id is the index of the next letter cell in trie tree
-		int next_node_id = doLinksPointToLeter(my_trie_tree, current, letter);
+		int j = doLinksPointToLeter2(my_trie_tree, current, letter);
+		printf("j %i\n", j);
 
-		if(next_node_id == -1)
+		// no more edges to visit
+		if(j == -1)
 		{
 			return -1;			
 		}
 		else
 		{
-
+			int next_node_id = getJthLink(my_trie_tree, current, j);
+			printf("next_node_id %i\n", next_node_id);
 			current = next_node_id;
 		}
 	}
@@ -562,9 +461,12 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 
 		// printf("here char %c current %i\n", letter, current);
 		// next_node_id is the index of the next letter cell in trie tree
-		int next_node_id = doLinksPointToLeter(my_trie_tree, current, letter);
+		int j = doLinksPointToLeter2(my_trie_tree, current, letter);
+		printf("j %i\n", j);
 
-		if(next_node_id == -1)
+		
+		// there are no edges to search to
+		if(j == -1)
 		{
 			// add a new node with letter
 			addNewNode(my_trie_tree, letter, /*at_end_of_word*/ i == size - 1, current);
@@ -576,6 +478,7 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 		else
 		{
 			matches++;
+			int next_node_id = getJthLink(my_trie_tree, current, j);//doLinksPointToLeter(my_trie_tree, current, letter);
 			current = next_node_id;
 		}
 	}
