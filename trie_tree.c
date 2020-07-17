@@ -5,7 +5,6 @@ void* VectorGetItem(Vector* container, int i);
 void VectorAppend(Vector* container, void* element);
 int VectorGetPopulation(Vector* container);
 void VectorPrint(Vector* container);
-string makeSpaces(int indent_level);
 
 /*
 typedef struct TrieNode2
@@ -162,11 +161,6 @@ TrieTreePush items to a stack
 when done, return a pointer to the stack
 */
 
-int TrieTreeGetVariable(TrieTree* my_trie_tree, string name)
-{
-
-	return 0;
-}
 
 int getLinkCount(TrieTree* my_trie_tree, int i)
 {
@@ -434,6 +428,11 @@ Vector* generateExtraSymbols(TrieTree* my_trie_tree, int current, Vector* name)
 	// VectorPrint(name);
 	return name;
 }
+Vector* TrieTreeInsertUniqueWord(TrieTree* my_trie_tree, Vector* name)
+{
+	
+	return NULL;
+}
 Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 {
 	// insert characters of name into the trie tree
@@ -462,7 +461,7 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 		// printf("here char %c current %i\n", letter, current);
 		// next_node_id is the index of the next letter cell in trie tree
 		int j = doLinksPointToLeter2(my_trie_tree, current, letter);
-		printf("j %i\n", j);
+		// printf("j %i\n", j);
 
 		
 		// there are no edges to search to
@@ -492,6 +491,8 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 	name = generateExtraSymbols(my_trie_tree, current, name);
 	return name;
 }
+// outer insert function that the regular insert uses
+// inner insert function that only inserts unique items for the hash table
 int TrieTreeDelete(TrieTree* my_trie_tree, Vector* name)
 {
 	// name vector uses integers
@@ -628,7 +629,6 @@ void TrieTreePrintTrie(TrieTree* my_trie_tree)
 
 void TrieTreePrintWordTrie(TrieTree* my_trie_tree){}
 void TrieTreePrintTrieWords(TrieTree* my_trie_tree){}
-void TrieTreePrintTrieRecursive(TrieTree* my_trie_tree, int root, string indents){}
 char* makeIndents(int number_of_indents)
 {
 	// printf("indents to make %i\n", number_of_indents);
@@ -782,155 +782,6 @@ void TrieTreeTest()
 	TrieTreePrintTrieRecursive2(my_trie_tree, 0, 1, VectorInitVector());
 	exit(1);
 
-	VectorPrintStrings(VectorAddStringToVector2("abvf", "tgrfede"));
-	int a = TrieTreeSearch(my_trie_tree, VectorAddStringToVector2("abvf", "tgrfede"));
-	printf("found state id %i\n", a);
-
-
-	Vector* name1 = TrieTreeInsertWords2(my_trie_tree, VectorAddStringToVector1("abvf"));
-
-
-	TrieTreeDeleteWords(my_trie_tree, VectorAddStringToVector2("abvf", "tgrfede"));
-
-	Vector* name3 = TrieTreeInsertWords2(
-						my_trie_tree,
-						VectorAddStringToVectorGeneral(
-							(string [])
-							{
-								"abvf", "tgrfede", "f"
-							}, 3
-						));
-
-
-
-	Vector* name4 = TrieTreeInsertWords2(
-						my_trie_tree,
-						VectorAddStringToVectorGeneral(
-							(string [])
-							{
-								"abvf", "tgrfede", "hijk"
-							}, 3
-						));
-	
-	Vector* name5 = TrieTreeInsertWords2(
-						my_trie_tree,
-						VectorAddStringToVectorGeneral(
-							(string [])
-							{
-								"abvf", "tgrfede", "hijk", "i"
-							}, 4
-						));
-	TrieTreeDeleteWords(
-		my_trie_tree,
-		VectorAddStringToVectorGeneral(
-			(string [])
-			{
-				"abvf", "tgrfede", "hijk"
-			}, 3
-		)
-
-	);
-
-	TrieTreeDeleteWords(
-		my_trie_tree,
-		VectorAddStringToVectorGeneral(
-			(string [])
-			{
-				"abvf", "tgrfede", "hijk", "i"
-			}, 4
-		)
-						
-	);
-
-	Vector* name6 = TrieTreeInsertWords2(my_trie_tree, VectorAddStringToVector1("input_string"));
-	Vector* name7 = TrieTreeInsertWords2(my_trie_tree, VectorAddStringToVector1("i"));
-
-	TrieTreePrintTrie(my_trie_tree);
-	// TrieTreePrintWordTrie(my_trie_tree);
-	TrieTreePrintTrieWords(my_trie_tree);
-	printf("passes this far\n");
-	// exit(1);
-	// //TrieTreeSearch
-	
-	// Vector* name6 = TrieTreeInsertWords(my_trie_tree, VectorAddStringToVector3("a", "e", "g"));
-	
-	// Vector* name7 = TrieTreeInsertWords(my_trie_tree, VectorAddStringToVector1("b"));
-	
-	// Vector* name8 = TrieTreeInsertWords(my_trie_tree, VectorAddStringToVector1("c"));
-	
-	// Vector* name9 = TrieTreeInsertWords(my_trie_tree, VectorAddStringToVector2("c", "d"));
-	// TrieTreeDeleteWords(my_trie_tree, VectorAddStringToVector1("c"));
-
-
-
-	// TrieTreePrintTrie(my_trie_tree);
-	// TrieTreePrintTrieWords(my_trie_tree);
-	
-	printf("testing the generator case and the user interfeering with the generator case\n");
-	Vector* x =  TrieTreeInsertWords2(my_trie_tree, VectorAddStringToVector1("i"));
-	// printf("got here\n");
-	Vector* i = TrieTreeInsertWords2(my_trie_tree, VectorAddStringToVector1("iii"));
-	// TrieTreePrintTrie(my_trie_tree);
-	// TrieTreePrintWordTrie(my_trie_tree);
-	// exit(1);
-
-	// TrieTreePrintTrieWords(my_trie_tree);
-
-	Vector* i1 = TrieTreeInsertWords2(my_trie_tree, VectorAddStringToVector1("iii"));
-	// TrieTreePrintTrie(my_trie_tree);
-	VectorPrintStrings(i1);
-	printf("\n");
-	TrieTreePrintTrieWords(my_trie_tree);
-
-	// exit(1);
-	// printf("\n");
-
-	// TrieTreePrintTrieWords(my_trie_tree);
-	Vector* i2 = TrieTreeInsertWords2(my_trie_tree, VectorAddStringToVector1("iii"));
-	// // TrieTreePrintTrie(my_trie_tree);
-	VectorPrintStrings(i2);
-	// printf("\n");
-
-	Vector* i3 = TrieTreeInsertWords2(my_trie_tree, VectorAddStringToVector1("iii"));
-	// // TrieTreePrintTrie(my_trie_tree);
-	VectorPrintStrings(i3);
-	// printf("\n");
-	// TrieTreePrintTrieWords(my_trie_tree);
-
-	// according to the logs, it probably went out of bounds
-	// fix bounds problem
-	// the max number of visible chars is 96
-	Vector* i4 = TrieTreeInsertWords2(my_trie_tree, VectorAddStringToVector1("j"));
-	VectorPrintStrings(i4);
-	// wondering why this would work as it could throw off the letter counter
-	i4 = TrieTreeInsertWords2(my_trie_tree, VectorAddStringToVector2("iii", "![[)"));
-	VectorPrintStrings(i4);
-	i4 = TrieTreeInsertWords2(my_trie_tree, VectorAddStringToVector2("iii", "![[)8[)"));
-	VectorPrintStrings(i4);
-	TrieTreePrintTrieWords(my_trie_tree);
-
-	// the ! char node is also connected to the other word starting with !
-	// so the last official edge from i is # not !
-	// sort of wierd from the word perspective(It's displayed as a separate path), but prevents the letter incrementer from accidentally
-	// going to an edge already used
-	// works up to 10
-	Vector* collections_of_words = VectorInitVector();
-	for(int i = 0; i < 100; i++)
-	{
-
-		i4 = TrieTreeInsertWords2(my_trie_tree, VectorAddStringToVector1("iii"));
-		VectorAppend(collections_of_words, i4);
-		// TrieTreePrintTrie(my_trie_tree);
-		// TrieTreePrintWordTrie(my_trie_tree);
-		// TrieTreePrintTrieWords(my_trie_tree);
-		// printf("\n");
-
-		// VectorPrintStrings(i4);
-
-		
-		// VectorPrintStrings(i4);
-		int a1 = TrieTreeSearch(my_trie_tree, i4);
-		printf("found %i\n", a1);
 // |a| -> 1
 //       |tgrfede|
 //          |f| -> 2
@@ -967,33 +818,33 @@ void TrieTreeTest()
 		// |j| -> 9
 		// TrieTreePrintTrieWords(my_trie_tree);
 
-	}
-	TrieTreePrintTrieWords(my_trie_tree);
+	//}
+	// TrieTreePrintTrieWords(my_trie_tree);
 
-	printf("erase every other\n");
-	for(int i = 0; i < 100; i++)
-	{
-		 if(i % 3 == 0)
-		 {
-			printf("erase\n");
-			Vector* my_word = (Vector*) VectorGetItem(collections_of_words, i);
-					// VectorAppend(collections_of_words, i4);
+	// printf("erase every other\n");
+	// for(int i = 0; i < 100; i++)
+	// {
+	// 	 if(i % 3 == 0)
+	// 	 {
+	// 		printf("erase\n");
+	// 		Vector* my_word = (Vector*) VectorGetItem(collections_of_words, i);
+	// 				// VectorAppend(collections_of_words, i4);
 
-			VectorPrintStrings(my_word);
-
-
-			TrieTreeDeleteWords(my_trie_tree, my_word);
-			printf("after delete\n");
-			// TrieTreePrintWordTrie(my_trie_tree);
-			int a1 = TrieTreeSearch(my_trie_tree, my_word);
-			printf("found %i\n", a1);
+	// 		VectorPrintStrings(my_word);
 
 
-		 }
-	}
-	TrieTreePrintTrieWords(my_trie_tree);
+	// 		TrieTreeDeleteWords(my_trie_tree, my_word);
+	// 		printf("after delete\n");
+	// 		// TrieTreePrintWordTrie(my_trie_tree);
+	// 		int a1 = TrieTreeSearch(my_trie_tree, my_word);
+	// 		printf("found %i\n", a1);
 
-	printf("testing user interfeering with the generator\n");
+
+	// 	 }
+	// }
+	// TrieTreePrintTrieWords(my_trie_tree);
+
+	// printf("testing user interfeering with the generator\n");
 
 	
 }

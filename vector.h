@@ -23,7 +23,7 @@ void VectorSetItemToNull(Vector* container, int i);
 
 int VectorGetPopulation(Vector* container);
 void VectorAppendInt(Vector* container, int element);
-void VectorAppendString(Vector* container, string element);
+// void VectorAppendString(Vector* container, string element);
 
 void VectorAppend(Vector* container, void* element);
 bool VectorPopItem(Vector* container);
@@ -47,13 +47,13 @@ void VectorTest();
 void VectorPrint(Vector* container);
 void VectorPrintVectorOfStrings(Vector* container);
 
-void VectorPrintStrings(Vector* container);
+// void VectorPrintStrings(Vector* container);
 
-Vector* VectorMakeVectorOfChars(string my_string);
-Vector* VectorAddStringToVector1(string string_1);
-Vector* VectorAddStringToVector2(string string_1, string string_2);
+Vector* VectorMakeVectorOfChars(char* my_string);
+// Vector* VectorAddStringToVector1(string string_1);
+// Vector* VectorAddStringToVector2(string string_1, string string_2);
 
-Vector* VectorAddStringToVectorGeneral(string strings[], int size);
+// Vector* VectorAddStringToVectorGeneral(string strings[], int size);
 
 
 Vector* VectorCombineVectors1(Vector* source_1);

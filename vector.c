@@ -8,10 +8,7 @@ typedef struct Vector
 
 
 }Vector;
-*/enum types{integer, _string, trie_node_2};
-
-struct TrieNode2;
-void* TrieNode2GetValue(TrieNode2* node);
+// */enum types{integer, _string, trie_node_2};
 
 Vector* VectorInitVector()
 {
@@ -132,17 +129,6 @@ void VectorAppendInt(Vector* container, int element)
 		return;
 	}
 	int* element_ptr = (int*) malloc(sizeof(int));
-	*element_ptr = element;
-	VectorAppend(container, element_ptr);
-}
-void VectorAppendString(Vector* container, string element)
-{
-	if(container == NULL)
-	{
-		return;
-	}
-
-	string* element_ptr = (string*) malloc(sizeof(string));
 	*element_ptr = element;
 	VectorAppend(container, element_ptr);
 }
@@ -384,46 +370,19 @@ void VectorPrint(Vector* container)
 	
 
 }
-void VectorPrintVectorOfStrings(Vector* container)
-{
-	if(container == NULL)
-	{
-		return;
-	}
-	// assume we are passing in a vector of vectors of strings
-	for(int i = 0; i < VectorGetPopulation(container); i++)
-	{
-		Vector* inner_container = (Vector*) VectorGetItem(container, i);
-		VectorPrintStrings(inner_container);
-	}
-}
-void VectorPrintStrings(Vector* container)
-{
-	if(container == NULL)
-	{
-		return;
-	}
-	//printf("printing container pop %i, size %i\n", container->population, container->size);
-	for(int i = 0; i < container->population; i++)
-	{
-		//printf("i %i\n", i);
-		if(container->values[i] == NULL)
-		{
-			printf("|NULL|\n");
-		}
-		else
-		{
-			//printf("|%x|", container->values[i]);
-			void* a = container->values[i];
-			string* b = (string*) a;
-			printf("|%s|", (*b).c_str() );
-			
-			//printf("|item|");
-		}
-	}
-	printf("\n");
-
-}
+// void VectorPrintVectorOfStrings(Vector* container)
+// {
+// 	if(container == NULL)
+// 	{
+// 		return;
+// 	}
+// 	// assume we are passing in a vector of vectors of strings
+// 	for(int i = 0; i < VectorGetPopulation(container); i++)
+// 	{
+// 		Vector* inner_container = (Vector*) VectorGetItem(container, i);
+// 		VectorPrintStrings(inner_container);
+// 	}
+// }
 
 void VectorTest()
 {
@@ -466,11 +425,11 @@ void VectorTest()
 	// erase a list of numbers
 }
 
-Vector* VectorMakeVectorOfChars(string my_string)
+Vector* VectorMakeVectorOfChars(char* my_string)
 {
 	Vector* list_of_chars = VectorInitVector();
 
-	for(int i = 0; i < my_string.size(); i++)
+	for(int i = 0; i < strlen(my_string); i++)
 	{
 		int* char_ptr = (int*) malloc(sizeof(int));
 		*char_ptr = my_string[i];
@@ -482,98 +441,5 @@ Vector* VectorMakeVectorOfChars(string my_string)
 	// VectorPrint(list_of_chars);
 	// printf("done\n");
 	return list_of_chars;
-
-}
-
-Vector* VectorAddStringToVector1(string string_1)
-{
-	Vector* list_of_strings_1 = VectorInitVector();
-
-
-	string* string_1_ptr = (string*) malloc(sizeof(string));
-
-	*string_1_ptr = string_1;
-
-	VectorAppend(list_of_strings_1, string_1_ptr);
-
-	return list_of_strings_1;
-}
-
-Vector* VectorAddStringToVector2(string string_1, string string_2)
-{
-	Vector* list_of_strings_1 = VectorInitVector();
-
-	string* string_1_ptr = (string*) malloc(sizeof(string));
-	*string_1_ptr = string_1;
-	VectorAppend(list_of_strings_1, string_1_ptr);
-
-	string* string_2_ptr = (string*) malloc(sizeof(string));
-	*string_2_ptr = string_2;
-
-	VectorAppend(list_of_strings_1, string_2_ptr);
-	return list_of_strings_1;
-}
-
-Vector* VectorAddStringToVectorGeneral(string strings[], int size)
-{
-
-	// assume size is correct as we can't check it.
-	Vector* list_of_strings = VectorInitVector();
-	int i = 0;
-	while(i < size) {
-
-		VectorAppendString(list_of_strings, strings[i]);
-		i++;
-	}
-	if(VectorGetPopulation(list_of_strings) == 0)
-	{
-		return VectorInitVector();
-	}
-
-	return list_of_strings;
-
-}
-
-Vector* VectorCombineVectors1(Vector* source_1)
-{
-	Vector* list_of_lists_of_strings = VectorInitVector();
-
-	VectorAppend(list_of_lists_of_strings, source_1);
-
-
-	return list_of_lists_of_strings;
-
-}
-Vector* VectorCombineVectors2(Vector* source_1, Vector* source_2)
-{
-	Vector* list_of_lists_of_strings = VectorInitVector();
-
-	VectorAppend(list_of_lists_of_strings, source_1);
-
-	VectorAppend(list_of_lists_of_strings, source_2);
-
-	return list_of_lists_of_strings;
-
-}
-
-
-Vector* VectorCombineVectorsGeneral(Vector* vectors[], int size)
-{
-
-	// assume size is correct as we can't check it.
-	Vector* list_of_lists_of_strings = VectorInitVector();
-	int i = 0;
-	while(i < size) {
-
-		
-		VectorAppend(list_of_lists_of_strings, vectors[i]);
-		i++;
-	}
-	if(VectorGetPopulation(list_of_lists_of_strings) == 0)
-	{
-		return VectorInitVector();
-	}
-	
-	return list_of_lists_of_strings;
 
 }

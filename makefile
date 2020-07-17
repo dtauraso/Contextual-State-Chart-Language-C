@@ -1,18 +1,18 @@
 
 
-include_and_c_files =  main.cpp vector.cpp vector.h trie_tree.h trie_tree.cpp state_machine.cpp state_machine.h multiway_lines_node.cpp multiway_lines_node.h scanner.cpp scanner.h state.cpp state.h standard_includes.h
+include_and_c_files =  main.cpp vector.c vector.h trie_tree.h trie_tree.c standard_includes.h
 
-object_files =  main.o vector.o trie_tree.o state_machine.o multiway_lines_node.o scanner.o state.o
+object_files =  main.o vector.o trie_tree.o
 
 
 
 %.o:%.c $(include_and_c_files)
-	g++ $< -c
+	gcc $< -c
 
 
 state_machine.x: $(object_files)
 
-	g++ $(object_files) -o state_machine.x
+	gcc $(object_files) -o state_machine.x
 
 test:
 	-make clean

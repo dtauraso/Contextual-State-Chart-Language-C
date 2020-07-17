@@ -1,24 +1,24 @@
 #include "standard_headers.h"
-#include "state.h"
+// #include "state.h"
 //#include "vector.h"
 #include "trie_tree.h"
 //#include "trie_node.h"
 
-#include "scanner.h"
+// #include "scanner.h"
 //https://zserge.com/jsmn.html
 //#include "jsmn/jsmn.h"
 //#include <string>
 //using namespace std;
-struct Vector;
-Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name /* strings*/);
+// struct Vector;
+// Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name /* strings*/);
 
-//void printState(ContextState* node);
-enum token_types {_primitive, _object, _array, _string};
-enum data_types{is_list, is_string, is_empty_case};
+// //void printState(ContextState* node);
+// enum token_types {_primitive, _object, _array, _string};
+// enum data_types{is_list, is_string, is_empty_case};
 
-//bool returnTrue(ContextState* a);
-//bool returnFalse(ContextState* a);
-void test();
+// //bool returnTrue(ContextState* a);
+// //bool returnFalse(ContextState* a);
+// void test();
 /*
 ContextState* makeFullContextState(
 	TrieNode* name,
@@ -47,41 +47,41 @@ char* copyString(char* b)
 }
 */
 
-string getNextWord(string input, int i)
-{
- 	// this function gets the next word
-	int j = 0;
-	int count = 0;
-	if(i >= input.size())
-	{
-		return NULL;
-	}
-	while(input[i + j] != '\n')
-	{
-		//printf("%c ", input[i + j]);
-		// can't trust the input
-		/*if((i + j) >= strlen(input))
-		{
-			j--;
-			break;
-		}*/
-		j++;
-		count++;
-	}
-	//printf("character count %i\n", count);
-	string word = input.substr(i, j);
-	//char* word = malloc(sizeof(char) * j );
-	//printf("%i\n", j);
-	//memcpy(word, input + i, j);
-	//word[j] = '\0';
-	//printf("|%s|\n", word);
-	//printf("chars in word %lu\n", strlen(word));
-	/*
-	collect the word
-	return word
-	*/
-	return word;
-}
+// string getNextWord(string input, int i)
+// {
+//  	// this function gets the next word
+// 	int j = 0;
+// 	int count = 0;
+// 	if(i >= input.size())
+// 	{
+// 		return NULL;
+// 	}
+// 	while(input[i + j] != '\n')
+// 	{
+// 		//printf("%c ", input[i + j]);
+// 		// can't trust the input
+// 		/*if((i + j) >= strlen(input))
+// 		{
+// 			j--;
+// 			break;
+// 		}*/
+// 		j++;
+// 		count++;
+// 	}
+// 	//printf("character count %i\n", count);
+// 	string word = input.substr(i, j);
+// 	//char* word = malloc(sizeof(char) * j );
+// 	//printf("%i\n", j);
+// 	//memcpy(word, input + i, j);
+// 	//word[j] = '\0';
+// 	//printf("|%s|\n", word);
+// 	//printf("chars in word %lu\n", strlen(word));
+// 	/*
+// 	collect the word
+// 	return word
+// 	*/
+// 	return word;
+// }
 /*
 char* surroundByQuotes(char* word_from_input)
 {
@@ -98,69 +98,69 @@ char* surroundByQuotes(char* word_from_input)
 	return word_surrounded_by_quotes;
 }
 */
-bool whiteSpace(char character)
-{
+// bool whiteSpace(char character)
+// {
 
-	return character < '!';
-}
-int countTabs(string input, int i)
-{
-	int k = 0;
-	//printf("input\n|%s|, %i\n", input, i);
-	// this 't' is actually invisable from Atom when used as a tab character
-	// input[i + k] must be in non-whitespace ascii range
-	//printf("whitespace %i\n", whiteSpace(input[i + k]));
-	while(whiteSpace(input[i + k]))
-	{
-		//char x = '!';
-		//printf("counting tab validation |%c|, |%c|, %i\n", input[i + k], x, input[i + k] < x);
+// 	return character < '!';
+// }
+// int countTabs(string input, int i)
+// {
+// 	int k = 0;
+// 	//printf("input\n|%s|, %i\n", input, i);
+// 	// this 't' is actually invisable from Atom when used as a tab character
+// 	// input[i + k] must be in non-whitespace ascii range
+// 	//printf("whitespace %i\n", whiteSpace(input[i + k]));
+// 	while(whiteSpace(input[i + k]))
+// 	{
+// 		//char x = '!';
+// 		//printf("counting tab validation |%c|, |%c|, %i\n", input[i + k], x, input[i + k] < x);
 
-		//printf("at least 1 white space\n");
-		k++;
-		if(input[i + k + 1] == '\0')
-		{
-			break;
-		}
-	}
-	//printf("tab count %i\n", k);
-	return k;
-}
+// 		//printf("at least 1 white space\n");
+// 		k++;
+// 		if(input[i + k + 1] == '\0')
+// 		{
+// 			break;
+// 		}
+// 	}
+// 	//printf("tab count %i\n", k);
+// 	return k;
+// }
 
-string makeSpaces(int indent_level)
-{
-	/*if(indent_level == 0)
-	{
-		return ' ';
-	}*/
-	//printf("making indents\n");
-	// this might mess up the reading in graph algorithm
-	//indent_level++;
-	//printf("here\n");
+// string makeSpaces(int indent_level)
+// {
+// 	/*if(indent_level == 0)
+// 	{
+// 		return ' ';
+// 	}*/
+// 	//printf("making indents\n");
+// 	// this might mess up the reading in graph algorithm
+// 	//indent_level++;
+// 	//printf("here\n");
 
-	//string indents2;
-	string x = "";
-	//printf("here 2\n");
+// 	//string indents2;
+// 	string x = "";
+// 	//printf("here 2\n");
 
-	for(int i = 0; i < indent_level; i++)
-	{
-		//printf("%i|%s|\n", i, x.c_str());
+// 	for(int i = 0; i < indent_level; i++)
+// 	{
+// 		//printf("%i|%s|\n", i, x.c_str());
 
-		x += ' ';
-	}
-	/*
-	char* indents;
-	indents = malloc(indent_level + 1);
-	memset(indents, ' ', sizeof(char) * indent_level);
-	indents[indent_level] = '\0';
-	*/
-	//printf("|%s|\n", indents2.c_str());
+// 		x += ' ';
+// 	}
+// 	/*
+// 	char* indents;
+// 	indents = malloc(indent_level + 1);
+// 	memset(indents, ' ', sizeof(char) * indent_level);
+// 	indents[indent_level] = '\0';
+// 	*/
+// 	//printf("|%s|\n", indents2.c_str());
 
 
 	
-	return x;
+// 	return x;
 
 
-}
+// }
 
 void swap(int* a, int* b)
 {
@@ -184,53 +184,53 @@ void doubleLinkHash(ht_hash_table* input_states, const char* parent, const char*
 	//printf("here 2\n");
 
 }*/
-string trimEndOfInput(string input)
-{
-	//if(input != NULL)
-	//{
-		int last_letter_location = input.size() - 1;
+// string trimEndOfInput(string input)
+// {
+// 	//if(input != NULL)
+// 	//{
+// 		int last_letter_location = input.size() - 1;
 
-		while(last_letter_location >= 0 && whiteSpace(input[last_letter_location]))
-		{
-			last_letter_location--;
-		}
-		if(last_letter_location < 0)
-		{
-			return NULL;
-		}
+// 		while(last_letter_location >= 0 && whiteSpace(input[last_letter_location]))
+// 		{
+// 			last_letter_location--;
+// 		}
+// 		if(last_letter_location < 0)
+// 		{
+// 			return NULL;
+// 		}
 
-		//int new_size = sizeof(char) * (last_letter_location + 1);
-		string trimmed_input2 = input.substr(0, last_letter_location + 1);
-		/* 
-		char* trimmed_input = malloc(new_size);
-		memcpy(trimmed_input, input, new_size);
-		*/
-		trimmed_input2 += '\n';
-		return trimmed_input2;
-	//}
-	return /*NULL*/"";
-}
-int countLines(string input)
-{
-	int num_lines = 0;
-	unsigned input_size = input.size();
-	//printf("%s\n", input);
-	int i = 0;
-	for(; i < input_size; i++)
-	{
-		//printf("|%c|\n", input[i]);
-		if(input[i] == '\n')
-		{
-			num_lines++;
-			//printf("%i\n", num_lines);
-		}
-	}
-	if(input[i - 1] != '\n')
-	{
-		num_lines++;
-	}
-	return num_lines;
-}
+// 		//int new_size = sizeof(char) * (last_letter_location + 1);
+// 		string trimmed_input2 = input.substr(0, last_letter_location + 1);
+// 		/* 
+// 		char* trimmed_input = malloc(new_size);
+// 		memcpy(trimmed_input, input, new_size);
+// 		*/
+// 		trimmed_input2 += '\n';
+// 		return trimmed_input2;
+// 	//}
+// 	return /*NULL*/"";
+// }
+// int countLines(string input)
+// {
+// 	int num_lines = 0;
+// 	unsigned input_size = input.size();
+// 	//printf("%s\n", input);
+// 	int i = 0;
+// 	for(; i < input_size; i++)
+// 	{
+// 		//printf("|%c|\n", input[i]);
+// 		if(input[i] == '\n')
+// 		{
+// 			num_lines++;
+// 			//printf("%i\n", num_lines);
+// 		}
+// 	}
+// 	if(input[i - 1] != '\n')
+// 	{
+// 		num_lines++;
+// 	}
+// 	return num_lines;
+// }
 
 
 
@@ -244,29 +244,29 @@ int countLines(string input)
 
 
 
-string readFile(char* file_name)
-{
-	FILE* file = fopen(file_name, "r");
-	string my_string;
-	size_t n = 0;
-	int c;
+// string readFile(char* file_name)
+// {
+// 	FILE* file = fopen(file_name, "r");
+// 	string my_string;
+// 	size_t n = 0;
+// 	int c;
 
-	if(file == NULL)
-	   return NULL; // file can't be opened
-   fseek(file, 0, SEEK_END);
-   long f_size = ftell(file);
-   fseek(file, 0, SEEK_SET);
+// 	if(file == NULL)
+// 	   return NULL; // file can't be opened
+//    fseek(file, 0, SEEK_END);
+//    long f_size = ftell(file);
+//    fseek(file, 0, SEEK_SET);
 
-   my_string.resize(f_size);
-   //string = malloc(f_size);
+//    my_string.resize(f_size);
+//    //string = malloc(f_size);
 
-   while((c = fgetc(file)) != EOF)
-   {
-	   my_string[n++] = (char) c;
-   }
-   //string[n] = '\0';
-   return my_string;
-  }
+//    while((c = fgetc(file)) != EOF)
+//    {
+// 	   my_string[n++] = (char) c;
+//    }
+//    //string[n] = '\0';
+//    return my_string;
+//   }
 /*
 string collectChars(jsmntok_t token, const char* string input)
 {
@@ -436,14 +436,14 @@ bool tokenIsKeyWord(string token_string)
 
 int main(int argc, char** argv)
 {
-	string input = readFile(argv[2]);
+	// string input = readFile(argv[2]);
 	//printf("%s\n", input.c_str());
-	if(input.size() == 0)
-	{
-		printf("can't find %s\n", argv[2]);
-		exit(1);
-	}
-	printf("parsing %s\n", argv[2]);
+	// if(input.size() == 0)
+	// {
+	// 	printf("can't find %s\n", argv[2]);
+	// 	exit(1);
+	// }
+	// printf("parsing %s\n", argv[2]);
 	// todo
 	//printf("make tree\n");
 	// get rid of all blank lines
