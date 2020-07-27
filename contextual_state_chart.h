@@ -128,26 +128,29 @@ enum container_types {array, trie_tree};
 typedef struct State
 {
 	Vector* name;
-	bool is_start_child;
-	bool has_down_links;
+	// bool is_start_child;
+	// bool has_down_links;
 	
-	Vector* parents;
+	// Vector* parents;
 	// TrieTree* _parents;
 	
-	Vector* start_children;
+	// Vector* start_children;
 
 	// OrderedDict* _start_children;
 
 	Vector* children;
-	TrieTree* _children;
+
+	// for when this state represents a dictionary
+	TrieTree* keys;
 
 	Vector* next_states;
 
 
 	// OrderedDict* _next_states;
 
-	bool is_variable;
-
+	bool is_dictionary;
+	bool is_primitive;
+	// for when the state is storing a primitive value
 	Data* value;
 
 	// modification flags for the recording user changes system
