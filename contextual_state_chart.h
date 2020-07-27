@@ -124,7 +124,6 @@ typedef struct ContextualStateChart
 
 
 }ContextualStateChart;
-enum container_types {array, trie_tree};
 typedef struct State
 {
 	// This state can be multiple things:
@@ -133,15 +132,6 @@ typedef struct State
 	// dictionary
 	// root for any other data structure
 	Vector* name;
-	// bool is_start_child;
-	// bool has_down_links;
-	
-	// Vector* parents;
-	// TrieTree* _parents;
-	
-	// Vector* start_children;
-
-	// OrderedDict* _start_children;
 
 	Vector* children;
 
@@ -151,7 +141,6 @@ typedef struct State
 	Vector* next_states;
 
 
-	// OrderedDict* _next_states;
 
 	bool is_dictionary;
 	bool is_primitive;
@@ -164,21 +153,12 @@ typedef struct State
 	bool is_added;
 	bool is_deleted;
 	bool is_modified;
-	// -1 == NULL
-	// 0 == array
-	// 1 == trie tree
-	// int container_type;
-	// int level_number;
-	// string function_name;
-	bool (*function) (ContextualStateChart* my_machine, int parent_state, int current_state);
-	// bool parent_status;
-	// int max_id_for_siblings; // so the max id of machine doesn't grow too fast
-	// int id;
-	// this part is not the trie tree part
-	// ith value in |name|th level, so all states are enumerated with respect to the deepest context dimention they are in(not numbered, but when they are numbered and how many siblings they have)
-	//remaining items for the asyncronous nfa evaluator state machine
 
-}ContextualStateChart;
+
+	Vector* function_name;
+	bool (*function) (ContextualStateChart* my_machine, int parent_state, int current_state);
+
+}State;
 
 
 // dynamic state funcitons
@@ -212,15 +192,15 @@ typedef struct State
 
 
 ContextualStateChart* DynamicMachineInitDynamicMachine();
-Vector* DynamicMachineAppendState(ContextualStateChart* my_machine, DynamicState* state);
+Vector* DynamicMachineAppendState(ContextualStateChart* my_machine, State* state);
 
-bool recordA(ContextualStateChart* my_machine, DynamicState* parent_state, DynamicState* current_state);
-bool returnTrue(ContextualStateChart* my_machine, DynamicState* parent_state, DynamicState* current_state);
-bool returnATrueValue(ContextualStateChart* my_machine, DynamicState* parent_state, DynamicState* current_state);
+bool recordA(ContextualStateChart* my_machine, State* parent_state, State* current_state);
+bool returnTrue(ContextualStateChart* my_machine, State* parent_state, State* current_state);
+bool returnATrueValue(ContextualStateChart* my_machine, State* parent_state, State* current_state);
 
 // DynamicState* DynamicMachineRunStates(DynamicMachine* my_machine, Vector* state_names);
 
-DynamicState* DynamicStateMakeVariable(
+State* DynamicStateMakeVariable(
 	// string variable_name,
 										Vector* parents,  // array of strings
 										Data* value);
@@ -235,7 +215,7 @@ void DynamicMachineTest();
 
 void printArraysOfStrings(Vector* arrays_of_strings, int indent_level);
 void printArrayOfStrings(Vector* array_of_strings, int indent_level);
-void printState(DynamicState* my_state, int indent_level);
+void printState(State* my_state, int indent_level);
 int computeIndex(int offset, int state_name);
 
 TrieTree* searchState1(
