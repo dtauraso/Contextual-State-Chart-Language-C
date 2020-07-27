@@ -127,6 +127,11 @@ typedef struct ContextualStateChart
 enum container_types {array, trie_tree};
 typedef struct State
 {
+	// This state can be multiple things:
+	// control flow node
+	// primitive value
+	// dictionary
+	// root for any other data structure
 	Vector* name;
 	// bool is_start_child;
 	// bool has_down_links;
@@ -150,6 +155,8 @@ typedef struct State
 
 	bool is_dictionary;
 	bool is_primitive;
+	bool is_other_data_structure;
+	bool is_control_flow_node;
 	// for when the state is storing a primitive value
 	Data* value;
 
@@ -171,7 +178,7 @@ typedef struct State
 	// ith value in |name|th level, so all states are enumerated with respect to the deepest context dimention they are in(not numbered, but when they are numbered and how many siblings they have)
 	//remaining items for the asyncronous nfa evaluator state machine
 
-}DynamicState;
+}ContextualStateChart;
 
 
 // dynamic state funcitons
