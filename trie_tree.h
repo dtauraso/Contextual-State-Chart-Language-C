@@ -99,7 +99,7 @@ TrieTree* TrieTreeInitTrieTree();
 
 int TrieTreeGetJthLink(TrieTree* my_trie_tree, int i, int j);
 
-int TrieTreeDoLinksPointToLeter2(TrieTree* my_trie_tree, int current, int letter);
+int TrieTreeDoLinksPointToLeter(TrieTree* my_trie_tree, int current, int letter);
 
 int TrieTreeSearch(TrieTree* my_trie_tree, Vector* name);
 
@@ -108,7 +108,6 @@ void TrieTreeInsertString(TrieTree* my_trie_tree,
 							int state_id,
 							bool is_end_of_string);
 
-TrieTree *TrieTreeInsertEdges(TrieTree *my_general_tree, TrieTree *my_trie_tree, Vector *names);
 
 TrieNode* TrieTreeGetNode(TrieTree* my_trie_tree, int current);
 
@@ -131,6 +130,8 @@ void TrieTreeAddNewNode(TrieTree* my_trie_tree, int letter, bool at_end_of_word,
 int TrieTreeComputeNextVisibleCharacter(int last_link, int max_visible_character);
 
 Vector* TrieTreeGenerateExtraSymbols(TrieTree* my_trie_tree, int current, Vector* name);
+
+int TrieTreeInsertWordsDictionary(TrieTree* my_trie_tree, Vector* name);
 
 Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name);
 

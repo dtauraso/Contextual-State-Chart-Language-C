@@ -6,21 +6,23 @@ void VectorAppend(Vector* container, void* element);
 int VectorGetPopulation(Vector* container);
 void VectorPrint(Vector* container);
 
-/*
-typedef struct TrieNode
-{
-	// the links are integers
-	void* value;
-	// will be unsorted
-	Vector* links;  // ints
-	int value_type;
-	// 0 -> int
-	// 1 -> string
+// typedef struct TrieNode
+// {
 
-	int state_id; // location of state in state vector
+// 	// all links are integers
 
-}TrieNode;
-*/
+// 	int my_value;
+
+
+// 	// save memory for the links in the trie by only storing necessary edges
+// 	Vector* links;  // ints
+
+// 	int state_id; // location of state in state vector
+
+// 	bool end_of_word;
+
+
+// }TrieNode;
 
 TrieNode* TrieNodeinitTrieNode()
 {
@@ -130,7 +132,7 @@ int TrieTreeGetJthLink(TrieTree* my_trie_tree, int i, int j)
 
 
 
-int TrieTreeDoLinksPointToLeter2(TrieTree* my_trie_tree, int current, int letter)
+int TrieTreeDoLinksPointToLeter(TrieTree* my_trie_tree, int current, int letter)
 {
 	// printf("problem\n");
 	// printf("%x\n", my_trie_tree);
@@ -191,7 +193,7 @@ int TrieTreeSearch(TrieTree* my_trie_tree, Vector* name)
 
 		// printf("here char %c current %i\n", letter, current);
 		// next_node_id is the index of the next letter cell in trie tree
-		int j = TrieTreeDoLinksPointToLeter2(my_trie_tree, current, letter);
+		int j = TrieTreeDoLinksPointToLeter(my_trie_tree, current, letter);
 		// printf("j %i\n", j);
 
 		// no more edges to visit
@@ -243,10 +245,6 @@ void TrieTreeInsertString(TrieTree* my_trie_tree,
 
 
 
-TrieTree *TrieTreeInsertEdges(TrieTree *my_general_tree, TrieTree *my_trie_tree, Vector *names)
-{
-	return NULL;
-}
 TrieNode* TrieTreeGetNode(TrieTree* my_trie_tree, int current)
 {
 	return (TrieNode*) VectorGetItem(my_trie_tree->trie_tree, current);
@@ -359,25 +357,14 @@ Vector* TrieTreeGenerateExtraSymbols(TrieTree* my_trie_tree, int current, Vector
 	// VectorPrint(name);
 	return name;
 }
-
-Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name)
+int TrieTreeInsertWordsDictionary(TrieTree* my_trie_tree, Vector* name)
 {
-	// insert characters of name into the trie tree
-	// if the name is already in there, generate a new name so the user can add the same name
-	// uniquely. It's different from how you usually use a trie tree by design.
-	// integers are used as the trackers because it's easier to work with an integer than a void pointer
-	if(my_trie_tree == NULL || name == NULL)
-	{
-		return NULL;
-	}
-
-
 	int current = 0;
 
 	// search untill no match is possible, or input is empty
 
-
 	int size = VectorGetPopulation(name);
+
 	int matches = 0;
 	for(int i = 0; i < size; i++)
 	{
@@ -387,7 +374,7 @@ Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name)
 
 		// printf("here char %c current %i\n", letter, current);
 		// next_node_id is the index of the next letter cell in trie tree
-		int j = TrieTreeDoLinksPointToLeter2(my_trie_tree, current, letter);
+		int j = TrieTreeDoLinksPointToLeter(my_trie_tree, current, letter);
 		// printf("j %i\n", j);
 
 		
@@ -404,13 +391,34 @@ Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name)
 		else
 		{
 			matches++;
-			int next_node_id = TrieTreeGetJthLink(my_trie_tree, current, j);//doLinksPointToLeter(my_trie_tree, current, letter);
+			int next_node_id = TrieTreeGetJthLink(my_trie_tree, current, j);
 			current = next_node_id;
 		}
 	}
 
 
 	if(matches < VectorGetPopulation(name))
+	{
+		// curent should be at 0 as we will not be generating any new symbols
+		return 0;
+	}
+	return current;
+}
+
+Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name)
+{
+	// insert characters of name into the trie tree
+	// if the name is already in there, generate a new name so the user can add the same name
+	// uniquely. It's different from how you usually use a trie tree by design.
+	// integers are used as the trackers because it's easier to work with an integer than a void pointer
+	if(my_trie_tree == NULL || name == NULL)
+	{
+		return NULL;
+	}
+
+
+	int current = TrieTreeInsertWordsDictionary(my_trie_tree, name);
+	if(current == 0)
 	{
 		return name;
 	}
@@ -446,7 +454,7 @@ int TrieTreeDelete(TrieTree* my_trie_tree, Vector* name)
 		
 		// printf("here char %c current %i last fork %i\n", letter, current, last_fork);
 		// next_node_id is the index of the next letter cell in trie tree
-		int j = TrieTreeDoLinksPointToLeter2(my_trie_tree, current, letter);
+		int j = TrieTreeDoLinksPointToLeter(my_trie_tree, current, letter);
 		// printf("j %i\n", j);
 		if(j == -1)
 		{
