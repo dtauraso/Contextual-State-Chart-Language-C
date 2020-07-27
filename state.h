@@ -1,17 +1,18 @@
 #ifndef STATE3
 #define STATE3
-#include <stdbool.h>
-#include "stdlib.h"
-#include <stdio.h>
-#include <string.h>
-#include "trie_node.h"
+#include "standard_headers.h"
+// #include <stdbool.h>
+// #include "stdlib.h"
+// #include <stdio.h>
+// #include <string.h>
+// #include "trie_node.h"
 // #include "multiway_lines_node.h"
 #include "vector.h"
 #include "trie_tree.h"
-#include <map>
-#include <set>
+// #include <map>
+// #include <set>
 //#include "state_machine.h"
-struct StateMachine;
+// struct StateMachine;
 
 /*
 copying variables up or down the machine
@@ -56,7 +57,7 @@ typedef struct Data
 	*/
 	int _int;
 
-	string _string;
+	// string _string;
 	
 	int string_size;
 
@@ -157,8 +158,8 @@ typedef struct DynamicState
 	// 1 == trie tree
 	int container_type;
 	// int level_number;
-	string function_name;
-	bool (*function) (DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state);
+	// string function_name;
+	bool (*function) (DynamicMachine* my_machine, int parent_state, int current_state);
 	// bool parent_status;
 	// int max_id_for_siblings; // so the max id of machine doesn't grow too fast
 	// int id;
@@ -170,29 +171,31 @@ typedef struct DynamicState
 
 
 // dynamic state funcitons
-DynamicState* DynamicStateInitDynamicState(	Vector* name, // strings
-								Vector* parents,  // array of strings
-								Vector* start_children,  // array of strings
-								Vector* children, // array of strings
-								Vector* next_states, // array of strings
-								bool (*function) (	DynamicMachine* my_machine,
-													DynamicState* parent_state,
-													DynamicState* current_state));
+// DynamicState* DynamicStateInitDynamicState(	Vector* name, // strings
+// 								Vector* parents,  // array of strings
+// 								Vector* start_children,  // array of strings
+// 								Vector* children, // array of strings
+// 								Vector* next_states, // array of strings
+// 								bool (*function) (	DynamicMachine* my_machine,
+// 													DynamicState* parent_state,
+// 													DynamicState* current_state));
 
-DynamicState* DynamicStateInitDynamicState2(	Vector* name, // strings
-								bool is_start_child,
-								bool has_down_links,
-								Vector* parents,  // array of strings
-								Vector* start_children,  // array of strings
-								Vector* children, // array of strings
-								Vector* next_states, // array of strings
-								bool (*function) (	DynamicMachine* my_machine,
-													DynamicState* parent_state,
-													DynamicState* current_state));
+// DynamicState* DynamicStateInitDynamicState2(	Vector* name, // strings
+// 								bool is_start_child,
+// 								bool has_down_links,
+// 								Vector* parents,  // array of strings
+// 								Vector* start_children,  // array of strings
+// 								Vector* children, // array of strings
+// 								Vector* next_states, // array of strings
+// 								bool (*function) (	DynamicMachine* my_machine,
+// 													DynamicState* parent_state,
+// 													DynamicState* current_state));
 
 // dynamic machine functions
 // final 2 structs for trie ordered dict
-void TrieTreeInsertString(TrieTree* my_trie_tree, string element);
+// void TrieTreeInsertString(TrieTree* my_trie_tree
+// // , string element
+// );
 
 
 
@@ -204,15 +207,16 @@ bool recordA(DynamicMachine* my_machine, DynamicState* parent_state, DynamicStat
 bool returnTrue(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state);
 bool returnATrueValue(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state);
 
-DynamicState* DynamicMachineRunStates(DynamicMachine* my_machine, Vector* state_names);
+// DynamicState* DynamicMachineRunStates(DynamicMachine* my_machine, Vector* state_names);
 
-DynamicState* DynamicStateMakeVariable(	string variable_name,
+DynamicState* DynamicStateMakeVariable(
+	// string variable_name,
 										Vector* parents,  // array of strings
 										Data* value);
 
-DynamicState* DynamicStateMakeVariable2(string variable_name,
-										Vector* parents,  // array of strings
-										Data* value);
+// DynamicState* DynamicStateMakeVariable2(string variable_name,
+// 										Vector* parents,  // array of strings
+// 										Data* value);
 
 void DynamicMachineTest2();
 
@@ -239,7 +243,9 @@ TrieTree* insertState1(
 					Vector* next_states, // array of strings
 					Data* value); // primitive
 
-void printStateTrie(DynamicMachine* my_dynamic_machine, string root, int indent_level);
+void printStateTrie(DynamicMachine* my_dynamic_machine
+// , string root
+, int indent_level);
 
 int computeIndex(int offset, int state_name);
 void setupNeighbors( int* next_states, int state,
@@ -248,16 +254,29 @@ void setupNeighbors( int* next_states, int state,
 
 bool Empty(void* pointer);
 
-DynamicMachine* makeDynamicMachine(StateMachine* my_machine);
+// DynamicMachine* makeDynamicMachine(StateMachine* my_machine);
 
-StateMachine* setupMachine(int start_state, int end_state);
-
-
+// StateMachine* setupMachine(int start_state, int end_state);
 
 
-int runState(StateMachine* machine, int start_of_next_states, void* object/*Scanner* my_scanner*/, int level);
 
 
+// int runState(StateMachine* machine, int start_of_next_states, void* object/*Scanner* my_scanner*/, int level);
+
+	// we are going to recognize a context-sensitive grammer
+	// a^nb^nc^n with 4 states without using text rewriting rules
+	// each state is very clear on the expected sequence following it
+	// there is no need for a hierarchy in the state structure
+			// all we know is the variables are addressed by unique names
+
+// (word##)
+		// (#word#)
+		// ()
+
+		// (Im_a_word5)
+		// (Im_a_word56)
+		// (4Im_a_word5)
+		// ()
 struct Tokens;
 
 struct TrieNode;
@@ -344,7 +363,7 @@ Data* DataInitDataInt(int a);
 
 Data* DataInitDataFloat(float a);
 
-Data* DataInitDataString(string a);
+// Data* DataInitDataString(string a);
 void DataDeleteData(Data* variable);
 
 Data* DataInitDataVector(Vector* container);
@@ -379,7 +398,7 @@ int countLines(char* input);
 
 //////
 char* getNextWord(char* input, int i);
-char* collectChars(jsmntok_t token, const char* input);
+// char* collectChars(jsmntok_t token, const char* input);
 
 
 ContextState* makeFullContextState2(

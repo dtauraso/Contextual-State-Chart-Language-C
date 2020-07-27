@@ -12,6 +12,10 @@
         "system_error": "cpp",
         "functional": "cpp",
         "tuple": "cpp",
-        "type_traits": "cpp"
+        "type_traits": "cpp",
+        "string": "c",
+        "*.tcc": "c",
+        "deque": "c",
+        "vector": "c"
     }
 }

@@ -36,47 +36,6 @@ typedef struct TrieTree
 	// global scope is the entire state machine
 	// each state(class) will have local scope for the submachine
 	// 
-	/*
-		i, 0
-		i, 1
-		i, 2
-		That way the user can make as many "i"'s as they want as long as each
-		"i" will be stored in a different submachine
-		this is like having many instances of a class each having their own "i"
-
-		This is needed because the state machine represents all control flow elements(if, while)
-		and all data elements(class, int, string, container) so we must have the ability for the user
-		to treat making variables in the state machine to be as close as possible to how variables
-		are made in programming languages.
-
-		This is a trie tree to enable n dimensions when describing a state.
-
-		"I am a state. I am a little bit more detailed. I am describing many dimentions of complexity"
-
-		We want any complexity level to approximate the complex states of mind present in a humand mind
-		That requires represening complex states in a general way(General AI).  Numenta has done a great job
-		with this, and while AGI isn't here, parts of it are here and can be used as a programming tool
-		to aid the programmer.
-
-		Why would we want this?  We already have many programming languages that can do any computable task.
-		There are many different kinds of languages for different tasks.
-
-		That is true, but computers hardly have a way of relating to how we think.  Based on the current
-		general ai thought, we have a single way of representing all kinds of information.  It's much harder
-		for the brain to have hundreds of different kinds of representations in the same organ
-		and still maintain high efficiency.  This happens to be exactly what the programming languages and frameworks
-		represent.
-
-		I see this as a high level inefficiency that may be addressed more in the comming decades.
-		The languages do their job very well and I'm not interested in replacing them.  My interest
-		is to give them flexible features to provide more clarity and expressability to the programmer.
-
-		I could be misguided about how much the field can be improved, but adding meaningful and valuable features
-		to programming languages seems like a good idea if it can be done.
-
-
-
-	*/
 
 
 	// the different instance of the same base word are connected and you can use a formula to 
