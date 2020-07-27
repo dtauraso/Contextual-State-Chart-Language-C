@@ -1,8 +1,8 @@
 
 
-include_and_c_files =  main.c vector.c vector.h trie_tree.h trie_tree.c standard_includes.h state.c state.h 
+include_and_c_files =  main.c vector.c vector.h trie_tree.h trie_tree.c standard_includes.h contextual_state_chart.c contextual_state_chart.h 
 
-object_files =  main.o vector.o trie_tree.o state.o
+object_files =  main.o vector.o trie_tree.o contextual_state_chart.o
 
 
 

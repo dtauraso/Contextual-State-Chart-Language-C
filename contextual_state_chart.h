@@ -50,23 +50,15 @@ typedef struct Data
 {
 	int type_id; // enum
 	/*
-	0 => int
-	1 => string
+	1 => int
 	2 => float
-	3 => Vector
+	3 => char
+	4 => bool
 	*/
 	int _int;
-
-	// string _string;
-	
-	int string_size;
-
+	char _char;
 	float _float;
-
-	Vector* container;
-	int vector_type_id;
-	int container_nesting_level;
-
+	bool _bool;
 
 }Data;
 
@@ -120,18 +112,20 @@ bool type of container
 
 
 
-typedef struct DynamicMachine
+typedef struct ContextualStateChart
 {
 
+	// variations of the same state in different situations represent
+	// the idea of context and are identified by slightly different state names
 	Vector* states;
 	TrieTree* state_names;
 	// root is position 0
 
 
 
-}DynamicMachine;
+}ContextualStateChart;
 enum container_types {array, trie_tree};
-typedef struct DynamicState
+typedef struct State
 {
 	Vector* name;
 	bool is_start_child;
@@ -152,14 +146,21 @@ typedef struct DynamicState
 
 	// OrderedDict* _next_states;
 
+	bool is_variable;
+
 	Data* value;
+
+	// modification flags for the recording user changes system
+	bool is_added;
+	bool is_deleted;
+	bool is_modified;
 	// -1 == NULL
 	// 0 == array
 	// 1 == trie tree
-	int container_type;
+	// int container_type;
 	// int level_number;
 	// string function_name;
-	bool (*function) (DynamicMachine* my_machine, int parent_state, int current_state);
+	bool (*function) (ContextualStateChart* my_machine, int parent_state, int current_state);
 	// bool parent_status;
 	// int max_id_for_siblings; // so the max id of machine doesn't grow too fast
 	// int id;
@@ -200,12 +201,12 @@ typedef struct DynamicState
 
 
 
-DynamicMachine* DynamicMachineInitDynamicMachine();
-Vector* DynamicMachineAppendState(DynamicMachine* my_machine, DynamicState* state);
+ContextualStateChart* DynamicMachineInitDynamicMachine();
+Vector* DynamicMachineAppendState(ContextualStateChart* my_machine, DynamicState* state);
 
-bool recordA(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state);
-bool returnTrue(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state);
-bool returnATrueValue(DynamicMachine* my_machine, DynamicState* parent_state, DynamicState* current_state);
+bool recordA(ContextualStateChart* my_machine, DynamicState* parent_state, DynamicState* current_state);
+bool returnTrue(ContextualStateChart* my_machine, DynamicState* parent_state, DynamicState* current_state);
+bool returnATrueValue(ContextualStateChart* my_machine, DynamicState* parent_state, DynamicState* current_state);
 
 // DynamicState* DynamicMachineRunStates(DynamicMachine* my_machine, Vector* state_names);
 
@@ -243,7 +244,7 @@ TrieTree* insertState1(
 					Vector* next_states, // array of strings
 					Data* value); // primitive
 
-void printStateTrie(DynamicMachine* my_dynamic_machine
+void printStateTrie(ContextualStateChart* my_dynamic_machine
 // , string root
 , int indent_level);
 
