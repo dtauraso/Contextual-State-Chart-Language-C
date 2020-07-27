@@ -3,24 +3,9 @@
 #include "standard_headers.h"
 #include "vector.h"
 
-// int char_limit = 93 possible visible characters as edges
-
 struct Vector;
-
-typedef struct TrieNode2
+typedef struct TrieNode
 {
-	// assumptions for this struct
-	// Each word the chars spell out will end with a unique node(holding a letter), hence the branching in the trie tree
-	// Each unique node will link to the corresponding word node
-	// Each word node will have a list of children, where each child corresponds to the char from the 
-	// char trie tree.
-	
-	// This enables a few things:
-
-	// printing out the char trie letters as words,
-	// adding new char nodes and tracking them in the char trie and the word trie
-	// deleting char nodes and tracking them in the char trie and the word trie
-
 
 	// all links are integers
 
@@ -35,10 +20,10 @@ typedef struct TrieNode2
 	bool end_of_word;
 
 
-}TrieNode2;
-TrieNode2* TrieNode2initTrieNode2();
+}TrieNode;
+TrieNode* TrieNodeinitTrieNode();
 
-char TrieNode2GetValue(TrieNode2* node);
+char TrieNodeGetValue(TrieNode* node);
 
 typedef struct TrieTree
 {
@@ -94,7 +79,6 @@ typedef struct TrieTree
 	*/
 
 
-	int root;
 	// the different instance of the same base word are connected and you can use a formula to 
 	// generate the next one. Hash tables don't let you connect common words together the same way
 	// autogeneration would be possible with a hash table but the extra symbols would grow really fast(linear with the 
@@ -105,67 +89,60 @@ typedef struct TrieTree
 	// trie tree of characters
 	// a trie tree is also easier for me to think about and it lets me put in any features that takes advantage of a trie wheras a hash table
 	// may not be able to do those things(partial match)
+
+
 	Vector* trie_tree;
-
-	// trie tree of words(just a tree refering to the character trie)
-	Vector* word_tree;
-	int max_state_id;
-
 }TrieTree;
+bool TrieTreeDeleteTrieNode(TrieTree* my_trie_tree, int current);
+
 TrieTree* TrieTreeInitTrieTree();
-bool TrieNode2DeleteTrieNode2(TrieTree* my_trie_tree, int current);
 
-void TrieTreePush(Vector* container, int new_item);
-int TrieTreeGetNextNode(TrieTree* my_trie_tree, Vector* node_id_stack, Vector* ith_edge_stack);
-// int TrieTreeGetVariable(TrieTree* my_trie_tree, string name);
+int TrieTreeGetJthLink(TrieTree* my_trie_tree, int i, int j);
 
-int TrieTreeSearch(TrieTree* my_trie_tree, Vector* name /* strings*/);
+int TrieTreeDoLinksPointToLeter2(TrieTree* my_trie_tree, int current, int letter);
 
+int TrieTreeSearch(TrieTree* my_trie_tree, Vector* name);
 
-// prepend trieTree to all functions
-void TrieTreeInsertString(TrieTree* my_trie_tree, char element, int state_id);
-int TrieNode2GetLastNode(TrieTree* my_trie_tree, int prev_node_id);
-int TrieNode2GetLastEdge(TrieTree* my_trie_tree, int prev_node_id);
-int TrieNode2GetWordCounterpart(TrieTree* my_trie_tree, int prev_node_id);
-TrieNode2* TrieNode2GetWord(TrieTree* my_trie_tree, int prev_node_id);
-// string* TrieNode2MakeStringFromWord(TrieTree* my_trie_tree, int prev_node_id);
+void TrieTreeInsertString(TrieTree* my_trie_tree,
+							int element,
+							int state_id,
+							bool is_end_of_string);
 
-bool TrieTreeEdgeIndicatesToMakeChild(int letter_edge);
+TrieTree *TrieTreeInsertEdges(TrieTree *my_general_tree, TrieTree *my_trie_tree, Vector *names);
 
+TrieNode* TrieTreeGetNode(TrieTree* my_trie_tree, int current);
 
-int TrieTreeFindLastPrevNode(TrieTree* my_trie_tree, Vector* path);
+Vector* TrieTreeGetEdges(TrieTree* my_trie_tree, int current);
 
-int TrieTreeFindLastWordNode(TrieTree* my_trie_tree, Vector* path);
+int TrieTreeGetFirstNodeId(TrieTree* my_trie_tree, int current);
 
-void TrieTreeAddSoubtleCase(TrieTree* my_trie_tree, int prev_node_id, int prev_proxy_id, Vector* name /* strings*/);
+int TrieTreeGetNextNodeId(TrieTree* my_trie_tree, int current, int ith_link);
 
+int TrieTreeGetLastLink(TrieTree* my_trie_tree, int current);
 
-// void TrieTreeInsertWord(TrieTree* my_trie_tree, string* new_number_ptr, TrieNode2* node_found2, int state_id);
-// testing this version
-Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name /* strings*/);
+int TrieTreeGetLinkCount(TrieTree* my_trie_tree, int current);
 
-// Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name /* strings*/, int expected_id);
-TrieTree* TrieTreeInsertEdges(TrieTree* my_general_tree, TrieTree* my_trie_tree, Vector* names /* vectors of strings*/);
+int TrieTreeGetMyValue(TrieTree* my_trie_tree, int current);
 
-int TrieTreeUpdateId(TrieTree* my_trie_tree, int old_id);
+bool TrieTreeGetEndOfWord(TrieTree* my_trie_tree, int current);
 
-void TrieTreeCutLinkToFirstNodeInPath(	TrieTree* my_trie_tree,
-								Vector* name,
-								int* lower_bound_ptr,
-								int start_node,
-								int ith_string_in_input);
-void TrieTreeEraseEdgeToTopCharNode(Vector* char_nodes_matching,
-							int j,
-							TrieTree* my_trie_tree,
-							char top_node_value);
-int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/);
+void TrieTreeAddNewNode(TrieTree* my_trie_tree, int letter, bool at_end_of_word, int current);
+
+int TrieTreeComputeNextVisibleCharacter(int last_link, int max_visible_character);
+
+Vector* TrieTreeGenerateExtraSymbols(TrieTree* my_trie_tree, int current, Vector* name);
+
+Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name);
+
+int TrieTreeDelete(TrieTree* my_trie_tree, Vector* name);
 
 void TrieTreePrintTrie(TrieTree* my_trie_tree);
-void TrieTreePrintWordTrie(TrieTree* my_trie_tree);
 
-void TrieTreePrintTrieWords(TrieTree* my_trie_tree);
 
-// void TrieTreePrintTrieRecursive(TrieTree* my_trie_tree, int root, string indents);
+char* makeIndents(int number_of_indents);
+
+void TrieTreePrintTrieRecursive(TrieTree* my_trie_tree, int current, int number_of_indents, Vector* word_found);
+
 void TrieTreeTest();
 
 #endif

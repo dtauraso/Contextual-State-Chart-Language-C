@@ -501,7 +501,7 @@ Vector* DynamicMachineAppendState(DynamicMachine* my_machine, DynamicState* stat
 	VectorAppend(my_machine->states, state);
 	// insert word into trie
 
-	Vector* new_state_name = TrieTreeInsertWords2(my_machine->state_names, state->name);
+	Vector* new_state_name = TrieTreeInsertWords(my_machine->state_names, state->name);
 
 	// update the state's name
 	// copy the extra parts over
@@ -1510,9 +1510,9 @@ void appendChildren(DynamicMachine* machine,
 	DynamicMachineAppendState(machine, ith_child_data_state);
 
 
-	TrieTreeInsertWords2(last_state_added_state->_children, parent_data_state->name);
-	TrieTreeInsertWords2(last_state_added_state->_children, child_data_state->name);
-	TrieTreeInsertWords2(last_state_added_state->_children, ith_child_data_state->name);
+	TrieTreeInsertWords(last_state_added_state->_children, parent_data_state->name);
+	TrieTreeInsertWords(last_state_added_state->_children, child_data_state->name);
+	TrieTreeInsertWords(last_state_added_state->_children, ith_child_data_state->name);
 	last_state_added_state->container_type = 1;  // trie tree
 	// get the state variable
 	// add in the integers as state children variable

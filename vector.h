@@ -8,6 +8,14 @@ typedef struct Vector
 	int size;
 	int population;
 
+	// special window variables for the recording user changes system
+	int first;
+	int last;
+
+	// use start and end to indicate the range of data focused on in a slice as nothing is deleted
+	// untill after the state function finishes collecting the user changes 
+	// any deleted items can just use the deleted flag in the state attribute
+
 
 }Vector;
 

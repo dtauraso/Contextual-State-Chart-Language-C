@@ -7,7 +7,7 @@ int VectorGetPopulation(Vector* container);
 void VectorPrint(Vector* container);
 
 /*
-typedef struct TrieNode2
+typedef struct TrieNode
 {
 	// the links are integers
 	void* value;
@@ -19,13 +19,13 @@ typedef struct TrieNode2
 
 	int state_id; // location of state in state vector
 
-}TrieNode2;
+}TrieNode;
 */
 
-TrieNode2* TrieNode2initTrieNode2()
+TrieNode* TrieNodeinitTrieNode()
 {
 	// assume the dafault type to be stored is an integer
-	TrieNode2* my_node = (TrieNode2*) malloc(sizeof(TrieNode2));
+	TrieNode* my_node = (TrieNode*) malloc(sizeof(TrieNode));
 
 	my_node->links = VectorInitVector();
 	my_node->my_value = 0;
@@ -34,11 +34,11 @@ TrieNode2* TrieNode2initTrieNode2()
 	return my_node;
 
 }
-bool TrieNode2DeleteTrieNode2(TrieTree* my_trie_tree, int current)
+bool TrieTreeDeleteTrieNode(TrieTree* my_trie_tree, int current)
 {
-	TrieNode2* temp_node = ((TrieNode2*) my_trie_tree->trie_tree->values[current]);
-	// VectorDeleteAllItems( ((TrieNode2*) my_trie_tree->trie_tree->values[current])->links);
-	// ((TrieNode2*) my_trie_tree->trie_tree->values[current])->links = NULL;
+	TrieNode* temp_node = ((TrieNode*) my_trie_tree->trie_tree->values[current]);
+	// VectorDeleteAllItems( ((TrieNode*) my_trie_tree->trie_tree->values[current])->links);
+	// ((TrieNode*) my_trie_tree->trie_tree->values[current])->links = NULL;
 	// free(my_trie_tree->trie_tree->values[current]);
 	// my_trie_tree->trie_tree->values[current] = NULL;
 	if(temp_node == NULL)
@@ -57,7 +57,7 @@ bool TrieNode2DeleteTrieNode2(TrieTree* my_trie_tree, int current)
 	// free(node);
 	// node = NULL;
 	VectorDeleteAllItems(temp_node->links);
-	((TrieNode2*) my_trie_tree->trie_tree->values[current])->links = NULL;
+	((TrieNode*) my_trie_tree->trie_tree->values[current])->links = NULL;
 
 	free(my_trie_tree->trie_tree->values[current]);
 	my_trie_tree->trie_tree->values[current] = NULL;
@@ -67,7 +67,7 @@ bool TrieNode2DeleteTrieNode2(TrieTree* my_trie_tree, int current)
 	return true;
 
 }
-char TrieNode2GetValue(TrieNode2* node)
+char TrieNodeGetValue(TrieNode* node)
 {
 	if(node == NULL)
 	{
@@ -93,91 +93,44 @@ TrieTree* TrieTreeInitTrieTree()
 	TrieTree* my_trie_tree = (TrieTree*) malloc(sizeof(TrieTree));
 
 	my_trie_tree->trie_tree = VectorInitVector();
-	my_trie_tree->word_tree = VectorInitVector();
+	// my_trie_tree->word_tree = VectorInitVector();
 
 	// add a node called "root"
-	char root = 'r';
-	TrieTreeInsertString(my_trie_tree, root, -1);
+	TrieTreeInsertString(my_trie_tree,
+							114, // 'r'
+							-1, // state id is -1
+							0); // the root is not end of string
 
-	TrieNode2* node = TrieNode2initTrieNode2();
+	// char root = 'r';
+	// TrieTreeInsertString(my_trie_tree, root, -1);
+
+	TrieNode* node = TrieNodeinitTrieNode();
 
 
 	node->links = VectorInitVector();
 
-	VectorAppend(my_trie_tree->word_tree, node);
+	// VectorAppend(my_trie_tree->word_tree, node);
 
 
-	my_trie_tree->root = 0;
-	my_trie_tree->max_state_id = -1;
+	// my_trie_tree->root = 0;
+	// my_trie_tree->max_state_id = -1;
 
 	// quickly print the root
-	//printf("%s\n", ((string*) ((TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, my_trie_tree->root))->value)->c_str());
+	//printf("%s\n", ((string*) ((TrieNode*) VectorGetItem(my_trie_tree->trie_tree, my_trie_tree->root))->value)->c_str());
 	return my_trie_tree;
 
 }
-// (id of parent node, ith string, did we find a match for the ith string, location to insert the link for the child node)
-// trieTreeInsertStrings
-/*
 
-	id of node to start inserting as a child
-	ith string to start inserting
-	wether we need to insert? is this a valid question, considering everything is inserted?
-	the id of the child link where we start inserting
-*/
 
-// deleteStrings
-/*
-	id of node where we start deleting the child(requires another search because search doesn't look for this node)
-
-	
-*/
-void TrieTreePush(Vector* container, int new_item)
+int TrieTreeGetJthLink(TrieTree* my_trie_tree, int i, int j)
 {
-	if(container == NULL)
-	{
-		return;
-	}
-	int* new_item_ptr = (int*) malloc(sizeof(int));
-	*new_item_ptr = new_item;
-	VectorAppend(container, new_item_ptr);
-}
-int TrieTreeGetNextNode(TrieTree* my_trie_tree, Vector* node_id_stack, Vector* ith_edge_stack)
-{
-	if(my_trie_tree == NULL || node_id_stack == NULL || ith_edge_stack == NULL)
-	{
-		return -1;
-	}
-	int top_node_id = *((int*) VectorGetItem(node_id_stack, VectorGetPopulation(node_id_stack) - 1));
-	TrieNode2* top_node = (TrieNode2*) VectorGetItem(my_trie_tree->word_tree, top_node_id);
-
-	int top_ith_edge = *((int*) VectorGetItem(ith_edge_stack, VectorGetPopulation(ith_edge_stack) - 1));
-	return *((int*) VectorGetItem(top_node->links, top_ith_edge) );
-
-}
-
-// int search
-/*
-TrieTreePush items to a stack
-when done, return a pointer to the stack
-*/
-
-
-int getLinkCount(TrieTree* my_trie_tree, int i)
-{
-	return VectorGetPopulation( ((TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, i)) ->links);
-}
-int getJthLink(TrieTree* my_trie_tree, int i, int j)
-{
-	TrieNode2* current = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, i);
+	TrieNode* current = (TrieNode*) VectorGetItem(my_trie_tree->trie_tree, i);
 	return *((int*) VectorGetItem(current->links, j));
 }
-int doLinksPointToLeter(TrieTree* my_trie_tree, int current, int letter)
-{
 
-	return -1;
-}
 
-int doLinksPointToLeter2(TrieTree* my_trie_tree, int current, int letter)
+
+int TrieTreeDoLinksPointToLeter2(TrieTree* my_trie_tree, int current, int letter)
 {
 	// printf("problem\n");
 	// printf("%x\n", my_trie_tree);
@@ -190,7 +143,7 @@ int doLinksPointToLeter2(TrieTree* my_trie_tree, int current, int letter)
 	}
 	// printf("about to search\n");
 
-	int size = getLinkCount(my_trie_tree, current);
+	int size = TrieTreeGetLinkCount(my_trie_tree, current);
 	// printf("size %i\n", size);
 	// loop through the links for a match to the letter
 	for(int j = 0; j < size; j++)
@@ -200,9 +153,9 @@ int doLinksPointToLeter2(TrieTree* my_trie_tree, int current, int letter)
 		// TrieTreePrintTrie(my_trie_tree);
 		// printf("size of trie %i\n", VectorGetPopulation(my_trie_tree->trie_tree));
 		// have to save this as an integer first or the accessing will not work
-		int id = getJthLink(my_trie_tree, current, j);
+		int id = TrieTreeGetJthLink(my_trie_tree, current, j);
 		// the ndoe at id 1 exists but can't be accessed
-		TrieNode2* node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, id);
+		TrieNode* node = (TrieNode*) VectorGetItem(my_trie_tree->trie_tree, id);
 		// printf("node %i", node);
 		// printf("here\n");
 		if(node == NULL){}
@@ -238,7 +191,7 @@ int TrieTreeSearch(TrieTree* my_trie_tree, Vector* name)
 
 		// printf("here char %c current %i\n", letter, current);
 		// next_node_id is the index of the next letter cell in trie tree
-		int j = doLinksPointToLeter2(my_trie_tree, current, letter);
+		int j = TrieTreeDoLinksPointToLeter2(my_trie_tree, current, letter);
 		// printf("j %i\n", j);
 
 		// no more edges to visit
@@ -248,14 +201,14 @@ int TrieTreeSearch(TrieTree* my_trie_tree, Vector* name)
 		}
 		else
 		{
-			int next_node_id = getJthLink(my_trie_tree, current, j);
+			int next_node_id = TrieTreeGetJthLink(my_trie_tree, current, j);
 			// printf("next_node_id %i\n", next_node_id);
 			current = next_node_id;
 		}
 	}
 	return current;
 }
-void TrieTreeInsertString2(TrieTree* my_trie_tree,
+void TrieTreeInsertString(TrieTree* my_trie_tree,
 							int element,
 							int state_id,
 							bool is_end_of_string)
@@ -265,7 +218,7 @@ void TrieTreeInsertString2(TrieTree* my_trie_tree,
 		return;
 	}
 	// printf("inserting string\n");
-	TrieNode2* node = TrieNode2initTrieNode2();
+	TrieNode* node = TrieNodeinitTrieNode();
 
 	//string* node_string = (string*) malloc(sizeof(string));
 	//node_string = element;
@@ -288,99 +241,77 @@ void TrieTreeInsertString2(TrieTree* my_trie_tree,
 }
 
 
-void TrieTreeInsertString(TrieTree* my_trie_tree, char element, int state_id)
-{
-	if(my_trie_tree == NULL)
-	{
-		return;
-	}
-	TrieNode2* node = TrieNode2initTrieNode2();
 
-	//string* node_string = (string*) malloc(sizeof(string));
-	//node_string = element;
-	//node->value = element;
-	node->my_value = element;
-	// node->value_type = 1;
-	// node->parent = -1;
-	node->state_id = state_id;
-	VectorAppend(my_trie_tree->trie_tree, node);
-
-}
-
-
-
-
-// TrieNode2* TrieNodeGetTrieNode()
 
 TrieTree *TrieTreeInsertEdges(TrieTree *my_general_tree, TrieTree *my_trie_tree, Vector *names)
 {
 	return NULL;
 }
-TrieNode2* getNode(TrieTree* my_trie_tree, int current)
+TrieNode* TrieTreeGetNode(TrieTree* my_trie_tree, int current)
 {
-	return (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current);
+	return (TrieNode*) VectorGetItem(my_trie_tree->trie_tree, current);
 }
-Vector* getEdges(TrieTree* my_trie_tree, int current)
+Vector* TrieTreeGetEdges(TrieTree* my_trie_tree, int current)
 {
-	TrieNode2* current_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current);
+	TrieNode* current_node = (TrieNode*) VectorGetItem(my_trie_tree->trie_tree, current);
 	return current_node->links;
 }
-int getFirstNodeId(TrieTree* my_trie_tree, int current)
+int TrieTreeGetFirstNodeId(TrieTree* my_trie_tree, int current)
 {
 	// get the current node
-	// void* -> TrieNode2*
-	TrieNode2* current_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current);
+	// void* -> TrieNode*
+	TrieNode* current_node = (TrieNode*) VectorGetItem(my_trie_tree->trie_tree, current);
 
 	// void* -> int* -> int
 	return *((int*) VectorGetItem(current_node->links, 0));
 }
 
-int getNextNodeId(TrieTree* my_trie_tree, int current, int ith_link)
+int TrieTreeGetNextNodeId(TrieTree* my_trie_tree, int current, int ith_link)
 {
 	// get the current node
-	// void* -> TrieNode2*
-	TrieNode2* current_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current);
+	// void* -> TrieNode*
+	TrieNode* current_node = (TrieNode*) VectorGetItem(my_trie_tree->trie_tree, current);
 
 	// void* -> int* -> int
 	return *((int*) VectorGetItem(current_node->links, ith_link));
 }
-int getLastLink(TrieTree* my_trie_tree, int current)
+int TrieTreeGetLastLink(TrieTree* my_trie_tree, int current)
 {
-	TrieNode2* current_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current);
+	TrieNode* current_node = (TrieNode*) VectorGetItem(my_trie_tree->trie_tree, current);
 	return VectorGetPopulation(current_node->links) - 1;
 }
-int getLinkCount2(TrieTree* my_trie_tree, int current)
+int TrieTreeGetLinkCount(TrieTree* my_trie_tree, int current)
 {
-	TrieNode2* current_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current);
+	TrieNode* current_node = (TrieNode*) VectorGetItem(my_trie_tree->trie_tree, current);
 	return VectorGetPopulation(current_node->links);
 }
-int getMyValue(TrieTree* my_trie_tree, int current)
+int TrieTreeGetMyValue(TrieTree* my_trie_tree, int current)
 {
-	TrieNode2* current_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current);
+	TrieNode* current_node = (TrieNode*) VectorGetItem(my_trie_tree->trie_tree, current);
 	return current_node->my_value;
 }
-bool getEndOfWord(TrieTree* my_trie_tree, int current)
+bool TrieTreeGetEndOfWord(TrieTree* my_trie_tree, int current)
 {
-	TrieNode2* current_node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current);
+	TrieNode* current_node = (TrieNode*) VectorGetItem(my_trie_tree->trie_tree, current);
 	return current_node->end_of_word;
 }
-void addNewNode(TrieTree* my_trie_tree, int letter, bool at_end_of_word, int current)
+void TrieTreeAddNewNode(TrieTree* my_trie_tree, int letter, bool at_end_of_word, int current)
 {
-	TrieTreeInsertString2(	my_trie_tree,
+	TrieTreeInsertString(	my_trie_tree,
 							letter,
 							-1,
 							// are we at end of word?
 							at_end_of_word);
 
 	// add it into the link at the prev cell
-	VectorAppendInt(	((TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, current))->links,
+	VectorAppendInt(	((TrieNode*) VectorGetItem(my_trie_tree->trie_tree, current))->links,
 						VectorGetPopulation(my_trie_tree->trie_tree) - 1);
 }
-int computeNextVisibleCharacter(int last_link, int max_visible_character)
+int TrieTreeComputeNextVisibleCharacter(int last_link, int max_visible_character)
 {
 	return ((last_link + 1) % max_visible_character) + 33;
 }
-Vector* generateExtraSymbols(TrieTree* my_trie_tree, int current, Vector* name)
+Vector* TrieTreeGenerateExtraSymbols(TrieTree* my_trie_tree, int current, Vector* name)
 {
 	// we either have 0 extra symbols to traverse or n
 
@@ -388,7 +319,7 @@ Vector* generateExtraSymbols(TrieTree* my_trie_tree, int current, Vector* name)
 	// We start at 33 and count 93 letters to get to the ascii value of 126
 	int max_visible_character = 126; 
 
-	int count = getLinkCount2(my_trie_tree, current);
+	int count = TrieTreeGetLinkCount(my_trie_tree, current);
 	// we have 0 extra symbols to traverse
 	if(count >= 0 && count < max_visible_character)
 	{
@@ -397,43 +328,39 @@ Vector* generateExtraSymbols(TrieTree* my_trie_tree, int current, Vector* name)
 		next_link = 33;
 		if(count > 0)
 		{
-			last_link = getLastLink(my_trie_tree, current);
-			next_link = computeNextVisibleCharacter(last_link, max_visible_character);
+			last_link = TrieTreeGetLastLink(my_trie_tree, current);
+			next_link = TrieTreeComputeNextVisibleCharacter(last_link, max_visible_character);
 		}
 		
-		addNewNode(my_trie_tree, next_link, /*at_end_of_word*/ 1, current);
+		TrieTreeAddNewNode(my_trie_tree, next_link, /*at_end_of_word*/ 1, current);
 		VectorAppendInt(name, next_link);
 		// TrieTreePrintTrie(my_trie_tree);
 		// VectorPrint(name);
 		return name;
 	}
 	// we have n extra symbols to traverse
-	while(getLinkCount2(my_trie_tree, current) == max_visible_character)
+	while(TrieTreeGetLinkCount(my_trie_tree, current) == max_visible_character)
 	{
 		// get to the next node
-		current = getNextNodeId( 	my_trie_tree,
+		current = TrieTreeGetNextNodeId( 	my_trie_tree,
 										current,
-										getLastLink(my_trie_tree, current));
+										TrieTreeGetLastLink(my_trie_tree, current));
 		// add the next node's value to name
-		VectorAppendInt(name, getMyValue(my_trie_tree, current));
+		VectorAppendInt(name, TrieTreeGetMyValue(my_trie_tree, current));
 	}
-	int last_link = getLastLink(my_trie_tree, current);
+	int last_link = TrieTreeGetLastLink(my_trie_tree, current);
 
-	int next_link = computeNextVisibleCharacter(last_link, max_visible_character);
+	int next_link = TrieTreeComputeNextVisibleCharacter(last_link, max_visible_character);
 
-	addNewNode(my_trie_tree, next_link, /*at_end_of_word*/ 1, current);
+	TrieTreeAddNewNode(my_trie_tree, next_link, /*at_end_of_word*/ 1, current);
 
 	VectorAppendInt(name, next_link);
 	// TrieTreePrintTrie(my_trie_tree);
 	// VectorPrint(name);
 	return name;
 }
-Vector* TrieTreeInsertUniqueWord(TrieTree* my_trie_tree, Vector* name)
-{
-	
-	return NULL;
-}
-Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
+
+Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name)
 {
 	// insert characters of name into the trie tree
 	// if the name is already in there, generate a new name so the user can add the same name
@@ -460,7 +387,7 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 
 		// printf("here char %c current %i\n", letter, current);
 		// next_node_id is the index of the next letter cell in trie tree
-		int j = doLinksPointToLeter2(my_trie_tree, current, letter);
+		int j = TrieTreeDoLinksPointToLeter2(my_trie_tree, current, letter);
 		// printf("j %i\n", j);
 
 		
@@ -468,16 +395,16 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 		if(j == -1)
 		{
 			// add a new node with letter
-			addNewNode(my_trie_tree, letter, /*at_end_of_word*/ i == size - 1, current);
+			TrieTreeAddNewNode(my_trie_tree, letter, /*at_end_of_word*/ i == size - 1, current);
 
-			current = getNextNodeId( 	my_trie_tree,
+			current = TrieTreeGetNextNodeId( 	my_trie_tree,
 										current,
-										getLastLink(my_trie_tree, current));
+										TrieTreeGetLastLink(my_trie_tree, current));
 		}
 		else
 		{
 			matches++;
-			int next_node_id = getJthLink(my_trie_tree, current, j);//doLinksPointToLeter(my_trie_tree, current, letter);
+			int next_node_id = TrieTreeGetJthLink(my_trie_tree, current, j);//doLinksPointToLeter(my_trie_tree, current, letter);
 			current = next_node_id;
 		}
 	}
@@ -488,7 +415,7 @@ Vector* TrieTreeInsertWords2(TrieTree* my_trie_tree, Vector* name)
 		return name;
 	}
 
-	name = generateExtraSymbols(my_trie_tree, current, name);
+	name = TrieTreeGenerateExtraSymbols(my_trie_tree, current, name);
 	return name;
 }
 // outer insert function that the regular insert uses
@@ -519,7 +446,7 @@ int TrieTreeDelete(TrieTree* my_trie_tree, Vector* name)
 		
 		// printf("here char %c current %i last fork %i\n", letter, current, last_fork);
 		// next_node_id is the index of the next letter cell in trie tree
-		int j = doLinksPointToLeter2(my_trie_tree, current, letter);
+		int j = TrieTreeDoLinksPointToLeter2(my_trie_tree, current, letter);
 		// printf("j %i\n", j);
 		if(j == -1)
 		{
@@ -528,17 +455,17 @@ int TrieTreeDelete(TrieTree* my_trie_tree, Vector* name)
 		else
 		{
 			// branch of at least 2 is a fork
-			if(getLinkCount2(my_trie_tree, current) > 1)
+			if(TrieTreeGetLinkCount(my_trie_tree, current) > 1)
 			{
 				// printf("link count at current %i is %i\n", current, getLinkCount2(my_trie_tree, current) );
 				last_fork = current;
 				edge_id_after_last_fork = j;
 			}
-			current = getNextNodeId(my_trie_tree, current, j);
+			current = TrieTreeGetNextNodeId(my_trie_tree, current, j);
 		}
 	}
 	// if current has edges, don't delete anything
-	if(getLinkCount2(my_trie_tree, current) > 0)
+	if(TrieTreeGetLinkCount(my_trie_tree, current) > 0)
 	{
 		// don't delete anything but the delete function ran successfully
 		return 1;
@@ -546,11 +473,11 @@ int TrieTreeDelete(TrieTree* my_trie_tree, Vector* name)
 	// TrieTreePrintTrie(my_trie_tree);
 	// printf("last fork %i, edge id %i\n", last_fork, edge_id_after_last_fork);
 	// printf("about to delete \n");
-	int first_node_to_delete = getNextNodeId( 	my_trie_tree,
+	int first_node_to_delete = TrieTreeGetNextNodeId( 	my_trie_tree,
 										last_fork,
 										edge_id_after_last_fork);
 	
-	VectorDeleteItem(getEdges(my_trie_tree, last_fork), edge_id_after_last_fork);
+	VectorDeleteItem(TrieTreeGetEdges(my_trie_tree, last_fork), edge_id_after_last_fork);
 	// TrieTreePrintTrie(my_trie_tree);
 	// start from last_fork at edge_id_after_last_fork and erase all the nodes
 	// delete the edge
@@ -564,28 +491,21 @@ int TrieTreeDelete(TrieTree* my_trie_tree, Vector* name)
 		// printf("delete node at %i\n", node_to_delete);
 		// move to the next node
 
-		first_node_to_delete = getFirstNodeId( 	my_trie_tree,
+		first_node_to_delete = TrieTreeGetFirstNodeId( 	my_trie_tree,
 										first_node_to_delete);
 		// delete previous node
-		TrieNode2DeleteTrieNode2(my_trie_tree, node_to_delete);
+		TrieTreeDeleteTrieNode(my_trie_tree, node_to_delete);
 
-		// TrieNode2DeleteTrieNode2(getNode(my_trie_tree, node_to_delete));
+		// TrieTreeDeleteTrieNode(getNode(my_trie_tree, node_to_delete));
 
 		// TrieTreePrintTrie(my_trie_tree);
 	}
 	// printf("first_node_to_delete %i, current %i\n", first_node_to_delete, current);
 
-	TrieNode2DeleteTrieNode2(my_trie_tree, current);
+	TrieTreeDeleteTrieNode(my_trie_tree, current);
 	// TrieTreePrintTrie(my_trie_tree);
 	return 1;
 }
-
-void TrieTreeEraseEdgeToTopCharNode(Vector* char_nodes_matching,
-							int j,
-							TrieTree* my_trie_tree,
-							char top_node_value){}
-
-int TrieTreeDeleteWords(TrieTree* my_trie_tree, Vector* name /* strings*/){return 0;}
 
 void TrieTreePrintTrie(TrieTree* my_trie_tree)
 {
@@ -599,7 +519,7 @@ void TrieTreePrintTrie(TrieTree* my_trie_tree)
 	for(int i = 0; i < VectorGetPopulation(my_trie_tree->trie_tree); i++)
 	{
 	
-		TrieNode2* node = (TrieNode2*) VectorGetItem(my_trie_tree->trie_tree, i);
+		TrieNode* node = (TrieNode*) VectorGetItem(my_trie_tree->trie_tree, i);
 		if(node == NULL)
 		{
 			printf("%i empty\n\n", i);
@@ -627,8 +547,8 @@ void TrieTreePrintTrie(TrieTree* my_trie_tree)
 	}
 }
 
-void TrieTreePrintWordTrie(TrieTree* my_trie_tree){}
-void TrieTreePrintTrieWords(TrieTree* my_trie_tree){}
+// void TrieTreePrintWordTrie(TrieTree* my_trie_tree){}
+// void TrieTreePrintTrieWords(TrieTree* my_trie_tree){}
 char* makeIndents(int number_of_indents)
 {
 	// printf("indents to make %i\n", number_of_indents);
@@ -637,7 +557,7 @@ char* makeIndents(int number_of_indents)
 	indents[number_of_indents] = '\0';
 	return indents;
 }
-void TrieTreePrintTrieRecursive2(TrieTree* my_trie_tree, int current, int number_of_indents, Vector* word_found)
+void TrieTreePrintTrieRecursive(TrieTree* my_trie_tree, int current, int number_of_indents, Vector* word_found)
 {
 
 	if(current < 0)
@@ -646,11 +566,11 @@ void TrieTreePrintTrieRecursive2(TrieTree* my_trie_tree, int current, int number
 	}
 	// printf("current %i\n", current);
 	// VectorPrint(word_found);
-	int current_letter = getMyValue(my_trie_tree, current);
+	int current_letter = TrieTreeGetMyValue(my_trie_tree, current);
 	// printf("letter |%c|\n", current_letter);
 	VectorAppendInt(word_found, current_letter);
 	// printf("added letter\n");
-	if(getEndOfWord(my_trie_tree, current))
+	if(TrieTreeGetEndOfWord(my_trie_tree, current))
 	{
 		// printf("end of word\n");
 		printf("%s|", makeIndents(number_of_indents));
@@ -673,26 +593,26 @@ void TrieTreePrintTrieRecursive2(TrieTree* my_trie_tree, int current, int number
 	}
 	// printf("getting the link count\n");
 	// printf("link count %i\n", getLinkCount2(my_trie_tree, current));
-	if(getLinkCount2(my_trie_tree, current) == 1)
+	if(TrieTreeGetLinkCount(my_trie_tree, current) == 1)
 	{
 		// printf("1 link\n");
-		int x = getNextNodeId(my_trie_tree, current, 0);
+		int x = TrieTreeGetNextNodeId(my_trie_tree, current, 0);
 		// printf("%i\n", x);
-		TrieTreePrintTrieRecursive2(	my_trie_tree,
+		TrieTreePrintTrieRecursive(	my_trie_tree,
 										x,
 										number_of_indents,
 										word_found);
 	}
 	else
 	{
-		int link_count = getLinkCount2(my_trie_tree, current);
+		int link_count = TrieTreeGetLinkCount(my_trie_tree, current);
 		// printf("%i links\n", link_count);
 		for(int i = 0; i < link_count; i++)
 		{
 			Vector* branch_vector = VectorCopyVector(word_found);
 			
-			TrieTreePrintTrieRecursive2(my_trie_tree,
-										getNextNodeId(my_trie_tree, current, i),
+			TrieTreePrintTrieRecursive(my_trie_tree,
+										TrieTreeGetNextNodeId(my_trie_tree, current, i),
 										number_of_indents,
 										branch_vector);
 		}	
@@ -706,44 +626,44 @@ void TrieTreeTest()
 	TrieTree* my_trie_tree = TrieTreeInitTrieTree();
 	printf("inserting\n");
 	// each name in the tree is made to be unique so duplicates get extra symbols
-	Vector* name2 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvf t"));
+	Vector* name2 = TrieTreeInsertWords(my_trie_tree, VectorMakeVectorOfChars("abvf t"));
 	VectorPrint(name2);
 	printf("result 2 %i\n\n", TrieTreeSearch(my_trie_tree, name2));
 
-	Vector* name31 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvs o"));
+	Vector* name31 = TrieTreeInsertWords(my_trie_tree, VectorMakeVectorOfChars("abvs o"));
 	VectorPrint(name31);
 	printf("result 31 %i\n\n", TrieTreeSearch(my_trie_tree, name31));
 
-	Vector* name32 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvs x"));
+	Vector* name32 = TrieTreeInsertWords(my_trie_tree, VectorMakeVectorOfChars("abvs x"));
 	VectorPrint(name32);
 	printf("result 32 %i\n\n", TrieTreeSearch(my_trie_tree, name32));
 
-	Vector* name35 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvs x"));
+	Vector* name35 = TrieTreeInsertWords(my_trie_tree, VectorMakeVectorOfChars("abvs x"));
 	VectorPrint(name35);
 	printf("result 35 %i\n\n", TrieTreeSearch(my_trie_tree, name35));
 
-	Vector* name36 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvs x"));
+	Vector* name36 = TrieTreeInsertWords(my_trie_tree, VectorMakeVectorOfChars("abvs x"));
 	VectorPrint(name36);
 	printf("result 36 %i\n\n", TrieTreeSearch(my_trie_tree, name36));
 
-	Vector* name37 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvs x"));
+	Vector* name37 = TrieTreeInsertWords(my_trie_tree, VectorMakeVectorOfChars("abvs x"));
 	VectorPrint(name37);
 	printf("result 37 %i\n\n", TrieTreeSearch(my_trie_tree, name37));
 
-	Vector* name38 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvs x"));
+	Vector* name38 = TrieTreeInsertWords(my_trie_tree, VectorMakeVectorOfChars("abvs x"));
 	VectorPrint(name38);
 	printf("result 38 %i\n\n", TrieTreeSearch(my_trie_tree, name38));
 
-	Vector* name39 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvs x"));
+	Vector* name39 = TrieTreeInsertWords(my_trie_tree, VectorMakeVectorOfChars("abvs x"));
 	VectorPrint(name39);
 	printf("result 39 %i\n\n", TrieTreeSearch(my_trie_tree, name39));
 
-	Vector* name40 = TrieTreeInsertWords2(my_trie_tree, VectorMakeVectorOfChars("abvs x"));
+	Vector* name40 = TrieTreeInsertWords(my_trie_tree, VectorMakeVectorOfChars("abvs x"));
 	VectorPrint(name40);
 	printf("result 40 %i\n\n", TrieTreeSearch(my_trie_tree, name40));
 	TrieTreePrintTrie(my_trie_tree);
 	printf("insert tests pass\n");
-	TrieTreePrintTrieRecursive2(my_trie_tree, 0, 1, VectorInitVector());
+	TrieTreePrintTrieRecursive(my_trie_tree, 0, 1, VectorInitVector());
 
 	// exit(1);
 	// erase each item
@@ -779,7 +699,7 @@ void TrieTreeTest()
 	// delete seems to work
 
 	TrieTreePrintTrie(my_trie_tree);
-	TrieTreePrintTrieRecursive2(my_trie_tree, 0, 1, VectorInitVector());
+	TrieTreePrintTrieRecursive(my_trie_tree, 0, 1, VectorInitVector());
 	exit(1);
 
 // |a| -> 1

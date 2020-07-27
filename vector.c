@@ -6,9 +6,13 @@ typedef struct Vector
 	int size;
 	int population;
 
+	// special window variables for the recording user changes system
+	int first;
+	int last;
+
 
 }Vector;
-// */enum types{integer, _string, trie_node_2};
+// */
 
 Vector* VectorInitVector()
 {
@@ -17,6 +21,8 @@ Vector* VectorInitVector()
 	new_container->values = NULL;
 	new_container->size = 0;
 	new_container->population = 0;
+	new_container->first = 0;
+	new_container->last = 0;
 	return new_container;
 }
 Vector* VectorInitVectorSize(int size)
@@ -29,6 +35,9 @@ Vector* VectorInitVectorSize(int size)
 	new_container->values = (void**) malloc(sizeof(void*) * size);
 	new_container->size = size;
 	new_container->population = 0;
+	new_container->first = 0;
+	new_container->last = 0;
+
 	return new_container;
 }
 bool VectorDeleteVector(Vector* container)
