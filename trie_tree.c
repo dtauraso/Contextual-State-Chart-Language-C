@@ -426,7 +426,7 @@ Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name)
 	}
 	// if there is 1 edge coming after current then name is a substring and exit
 	int edge_count = TrieTreeGetLinkCount(my_trie_tree, current);
-	if(edge_count == 0)
+	if(edge_count == 1)
 	{
 		return name
 	}
