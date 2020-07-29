@@ -22,28 +22,28 @@ the avariable names then have a number mapping to the official state machine arr
 
 
 */
-typedef struct Search
-{
-	int start;
-	int end;
-	int mid;
-	int comparison_type;
-	Vector* container;
+// typedef struct Search
+// {
+// 	int start;
+// 	int end;
+// 	int mid;
+// 	int comparison_type;
+// 	Vector* container;
 
-}Search;
-Search* initSearch();
+// }Search;
+// Search* initSearch();
 
-typedef struct Insert
-{
-	struct Search* my_search;
-}Insert;
-Insert* initIners();
+// typedef struct Insert
+// {
+// 	struct Search* my_search;
+// }Insert;
+// Insert* initIners();
 
-typedef struct Delete
-{
-	struct Search* my_search;
-}Delete;
-Delete* initDelete();
+// typedef struct Delete
+// {
+// 	struct Search* my_search;
+// }Delete;
+// Delete* initDelete();
 
 //enum stack_types{char_p_p, struct_context_state_p_p};
 typedef struct Data
@@ -61,54 +61,6 @@ typedef struct Data
 	bool _bool;
 
 }Data;
-
-
-/*
-only made the top level points logn searchable
-the lower level points in the state graph are logn searchable
-all nodes must be partial matchable
-*/
-/*
-partial matchable(trie)
-each state name can contain the same string (children names are unique by id)
-all searching must be logn(multimap and map)
-
-*/
-/*
-multimap<string, ExtendedState*>* and map<string, int>* next_next_contexts provide the trie tree, logn,
-int id in each ExtendedState* provides the unique string, ExtendedState* entries in the multimap
-
-int max_id_for_siblings is to prevent the id of each state to be used for the id's of the state's links
-
-also, the chldren must be accessible at random, from an index.  This calls for an ordered dict.
-
-
-id in DynamicState is so each state is enumerated.  this allows for the next contex name to be string(id) when autogenerating unique id's for adding the same state to the graph.  The same state will be used differently, so they all must be enumerated and the user shouldn't have to know the state name at the context dimention of enumeration
-new_state_name1 = add("name") => saves as "name"
-new_state_name2 = add("name") => saves as "name", "0"
-new_state_name2 = some_state.addChild("name") => saves as "name", "1"
-searchChildrenFor(some_state, "name") => "name", "1" as a correct match
-should work because we are looking at the children of some_state so only within that child context is "name", ... being searched for
-
-
-user should only have to use part of the name to search for it, all relevant variations will be returned. there should only be as many varaitions as the user expects from the data structure
-*/
-
-// It's okay if it's O(n^2) where n is the number of parts of the state name and the links
-// search = O(nlog(m))
-// modify = O(1) ; assume item was already found by search
-
-// add = O(n)
-// delete = O(nm) ; where m is the number of items being shifted
-
-// size = O(n)
-
-/*
-Vector strings for array
-Vector trienodes for dict
-bool type of container
-
-*/
 
 
 
@@ -133,19 +85,53 @@ typedef struct State
 	// root for any other data structure
 	Vector* name;
 
+	// operating system stuff
+	// https://www.enterpriseintegrationpatterns.com/docs/IEEE_Software_Design_2PC.pdf
+	// Don't run the state untill this value == 0.
+	// This is for when asynchronous timelines merge into a synchronous timeline
+	// assume 2 different asynchronous states will try this state at the same time
+	int threshold;
+
+	// run state if visit_count == threshhold in 1 pass of trying next states from all timelines
+	int visit_count;
+	
+	// lets us quickly check if the state's parent is actually the same one as the parent of the timeline
+	// prevents us from having a timeline try states(more than 1 in a row at the time of crossover) in a different timeline before the other
+	// timeline tries it
+	// keep all asynchronous timelines separated even if they visit a state from another timeline
+	TrieTree* parents;
+
+
+	// preventing timeline stalls
+	// if we assume this state represents a parent on a timeline
+	// then we can time how long it takes for the submachine to finish
+	// if the duration > 1 second kill the state(curent state) and all parent states in the timeline
+	// exclucding the root state as the root may host more than 1 timeline
+	int duration;
+
+	bool children_are_parallel_states;
 	Vector* children;
 
-	// for when this state represents a dictionary
-	TrieTree* keys;
-
+	bool next_states_are_parallel_states;
 	Vector* next_states;
 
 
+	// for copying up saved items after the current submachine is finished
+	bool is_copied_up_hierarchy;
+	Vector* destination_state_parent_name;
+	// whatever data is in the higher level variable name we will overwrite with the data from the lower level
+
+
+
+	// for when this state represents a dictionary
+	TrieTree* keys;
 
 	bool is_dictionary;
 	bool is_primitive;
 	bool is_other_data_structure;
 	bool is_control_flow_node;
+
+
 	// for when the state is storing a primitive value
 	Data* value;
 
@@ -194,9 +180,13 @@ typedef struct State
 ContextualStateChart* DynamicMachineInitDynamicMachine();
 Vector* DynamicMachineAppendState(ContextualStateChart* my_machine, State* state);
 
-bool recordA(ContextualStateChart* my_machine, State* parent_state, State* current_state);
-bool returnTrue(ContextualStateChart* my_machine, State* parent_state, State* current_state);
-bool returnATrueValue(ContextualStateChart* my_machine, State* parent_state, State* current_state);
+bool returnTrue(ContextualStateChart* my_machine, int parent_state, int current_state);
+
+bool returnFalse(ContextualStateChart* my_machine, int parent_state, int current_state);
+
+bool recordA(ContextualStateChart* my_machine, int parent_state, int current_state);
+bool returnTrue(ContextualStateChart* my_machine, int parent_state, int current_state);
+bool returnATrueValue(ContextualStateChart* my_machine, int parent_state, int current_state);
 
 // DynamicState* DynamicMachineRunStates(DynamicMachine* my_machine, Vector* state_names);
 
@@ -268,88 +258,88 @@ bool Empty(void* pointer);
 		// (Im_a_word56)
 		// (4Im_a_word5)
 		// ()
-struct Tokens;
+// struct Tokens;
 
-struct TrieNode;
+// struct TrieNode;
 
 // can't group it like this
 // need to think by letter than by word
 // typedef only seems to let me use "ContextState" outside the struct definition
 
-typedef struct ContextState
-{
-		char* name;
-		struct TrieNode* state_name;
+// typedef struct ContextState
+// {
+// 		char* name;
+// 		struct TrieNode* state_name;
 
 
-		struct TrieNode* start_children;
+// 		struct TrieNode* start_children;
 
-		// for the language input tree
-		struct ContextState** parents;
-
-
-		//char** parents_names;
-		int parents_size;
-
-		struct TrieNode* parents_;
+// 		// for the language input tree
+// 		struct ContextState** parents;
 
 
-		// no recursion, have an indent on/off var in the stack
-		// when the child state is at a higher level than the current state
-			// deactivate the indent
-		// use last indent on/off value to find out if indents should be on or off
-		// (current state, prev item on stack, is_indent_on)
+// 		//char** parents_names;
+// 		int parents_size;
 
-		// for the language input tree
-		struct ContextState** children;
+// 		struct TrieNode* parents_;
 
 
-		//char** children_names;
-		int children_size;
+// 		// no recursion, have an indent on/off var in the stack
+// 		// when the child state is at a higher level than the current state
+// 			// deactivate the indent
+// 		// use last indent on/off value to find out if indents should be on or off
+// 		// (current state, prev item on stack, is_indent_on)
 
-		struct TrieNode* children_;
+// 		// for the language input tree
+// 		struct ContextState** children;
 
-		// can't delete this yet
-		// for the language input tree
-		struct ContextState** nexts;
 
-		struct TrieNode* nexts_;
+// 		//char** children_names;
+// 		int children_size;
 
-		// tri tree for partial state name matches(can match only 1 name at a time)
-		//struct TrieNode* tri_children;
+// 		struct TrieNode* children_;
 
-		// the next level from name's perspective
+// 		// can't delete this yet
+// 		// for the language input tree
+// 		struct ContextState** nexts;
 
-		// when parts of a full name are linked to a context state object
-		// the context state object may be a dummy node
-		//bool dummy_node;
+// 		struct TrieNode* nexts_;
 
-		// can only be a function state or a data state
-		bool (*function_pointer)(struct ContextState* state);
-		char* function_pointer_name;
+// 		// tri tree for partial state name matches(can match only 1 name at a time)
+// 		//struct TrieNode* tri_children;
 
-		Data* var_data;
-		int context_id;  // each context is enumerated
+// 		// the next level from name's perspective
+
+// 		// when parts of a full name are linked to a context state object
+// 		// the context state object may be a dummy node
+// 		//bool dummy_node;
+
+// 		// can only be a function state or a data state
+// 		bool (*function_pointer)(struct ContextState* state);
+// 		char* function_pointer_name;
+
+// 		Data* var_data;
+// 		int context_id;  // each context is enumerated
 		
-		// used by visitor function
-		// set in parser
-		bool start_children_are_parallel;
-		bool nexts_are_parallel;
-		bool is_start_child;
-		bool is_child;
-		bool is_parent;
-		bool is_start_state;
-		bool is_end_state;
-		bool is_data_state;
+// 		// used by visitor function
+// 		// set in parser
+// 		bool start_children_are_parallel;
+// 		bool nexts_are_parallel;
+// 		bool is_start_child;
+// 		bool is_child;
+// 		bool is_parent;
+// 		bool is_start_state;
+// 		bool is_end_state;
+// 		bool is_data_state;
 
-		// set in visitor
-		bool is_visited;
-		int total_start_children_who_failed;
+// 		// set in visitor
+// 		bool is_visited;
+// 		int total_start_children_who_failed;
 
-		// set by an api the state function uses
-		char* debugging_log;
+// 		// set by an api the state function uses
+// 		char* debugging_log;
 
-}ContextState;
+// }ContextState;
 Data* DataInitDataInt(int a);
 
 Data* DataInitDataFloat(float a);
@@ -363,69 +353,69 @@ void DataDeleteDataVector(Data* variable);
 
 
 
-ContextState* initContextState();
-void printContextState2(ContextState* node);
-int isMatch(char* ith_word, struct TrieNode* node);
+// ContextState* initContextState();
+// void printContextState2(ContextState* node);
+// int isMatch(char* ith_word, struct TrieNode* node);
 
-struct TrieNode* appendNode(struct TrieNode* node, char* ith_name);
-void addToTrie(struct TrieNode* root, ContextState* state);
-char* lispNodeType(int type_value);
+// struct TrieNode* appendNode(struct TrieNode* node, char* ith_name);
+// void addToTrie(struct TrieNode* root, ContextState* state);
+// char* lispNodeType(int type_value);
 
-char* copyString(char* b);
+// char* copyString(char* b);
 
-void printData(Data* var_data, int indent_level);
-void printTrieNodeTree(struct TrieNode* root, int indent);
-void printContextState(ContextState* node);
-void printTrieNodes(struct TrieNode* trie_node_sequence);
-void printTrieNodeTreeFlat(struct TrieNode* root);
-ContextState* duplicate(ContextState* item);
-ContextState* initContextState();
-ContextState* makeContextState(/*int* i, jsmntok_t tokens[], const char* input*/struct Tokens* my_tokens, int token_count);
+// void printData(Data* var_data, int indent_level);
+// void printTrieNodeTree(struct TrieNode* root, int indent);
+// void printContextState(ContextState* node);
+// void printTrieNodes(struct TrieNode* trie_node_sequence);
+// void printTrieNodeTreeFlat(struct TrieNode* root);
+// ContextState* duplicate(ContextState* item);
+// ContextState* initContextState();
+// ContextState* makeContextState(/*int* i, jsmntok_t tokens[], const char* input*/struct Tokens* my_tokens, int token_count);
 
-int countTabs(char* input, int i);
-void swap(int* a, int* b);
-int countLines(char* input);
-
-
-//////
-char* getNextWord(char* input, int i);
-// char* collectChars(jsmntok_t token, const char* input);
+// int countTabs(char* input, int i);
+// void swap(int* a, int* b);
+// int countLines(char* input);
 
 
-ContextState* makeFullContextState2(
-	struct TrieNode* name,
-	struct TrieNode* nexts,
-	struct TrieNode* start_children,
-	struct TrieNode* children,
-	char* function_name,
-	Data* variable_from_json_dict,
-	struct TrieNode* parents,
-	bool (*function_pointer)(struct ContextState* state),
-	bool start_children_are_parallel,
-	bool nexts_are_parallel,
-	bool is_start_child,
-	bool is_child,
-	bool is_parent,
-	bool is_start_state,
-	bool is_end_state,
-	bool is_data_state);
+// //////
+// char* getNextWord(char* input, int i);
+// // char* collectChars(jsmntok_t token, const char* input);
 
-ContextState* makeFullContextState(
-	struct TrieNode* name,
-	struct TrieNode* nexts,
-	struct TrieNode* start_children,
-	struct TrieNode* children,
-	char* function_name,
-	Data* variable_from_json_dict,
-	struct TrieNode* parents,
-	bool start_children_are_parallel,
-	bool nexts_are_parallel,
-	bool is_start_child,
-	bool is_child,
-	bool is_parent,
-	bool is_start_state,
-	bool is_end_state,
-	bool is_data_state);
-void deleteContextState(ContextState* node);
+
+// ContextState* makeFullContextState2(
+// 	struct TrieNode* name,
+// 	struct TrieNode* nexts,
+// 	struct TrieNode* start_children,
+// 	struct TrieNode* children,
+// 	char* function_name,
+// 	Data* variable_from_json_dict,
+// 	struct TrieNode* parents,
+// 	bool (*function_pointer)(struct ContextState* state),
+// 	bool start_children_are_parallel,
+// 	bool nexts_are_parallel,
+// 	bool is_start_child,
+// 	bool is_child,
+// 	bool is_parent,
+// 	bool is_start_state,
+// 	bool is_end_state,
+// 	bool is_data_state);
+
+// ContextState* makeFullContextState(
+// 	struct TrieNode* name,
+// 	struct TrieNode* nexts,
+// 	struct TrieNode* start_children,
+// 	struct TrieNode* children,
+// 	char* function_name,
+// 	Data* variable_from_json_dict,
+// 	struct TrieNode* parents,
+// 	bool start_children_are_parallel,
+// 	bool nexts_are_parallel,
+// 	bool is_start_child,
+// 	bool is_child,
+// 	bool is_parent,
+// 	bool is_start_state,
+// 	bool is_end_state,
+// 	bool is_data_state);
+// void deleteContextState(ContextState* node);
 
 #endif
