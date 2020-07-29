@@ -428,7 +428,7 @@ Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name)
 	int edge_count = TrieTreeGetLinkCount(my_trie_tree, current);
 	if(edge_count == 1)
 	{
-		return name
+		return name;
 	}
 	name = TrieTreeGenerateExtraSymbols(my_trie_tree, current, name);
 	return name;
