@@ -315,6 +315,8 @@ Vector* TrieTreeGenerateExtraSymbols(TrieTree* my_trie_tree, int current, Vector
 
 	// we can allow 93 children to be an extra symbol(93 different viewable integers)
 	// We start at 33 and count 93 letters to get to the ascii value of 126
+
+	// make sure we don't use any alphabetical characters
 	int max_visible_character = 126; 
 
 	int count = TrieTreeGetLinkCount(my_trie_tree, current);
