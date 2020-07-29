@@ -1,6 +1,8 @@
 #include "contextual_state_chart.h"
 /*
 init state
+init state async merge
+init state children and/or next states are async
 init variablePrimitive
 init variableDictionary
 init variableOtherDataStructure
@@ -20,260 +22,198 @@ hierarchy for the log
 // #include "vector.h"
 // #include "trie_tree.h"
 //#include "jsmn/jsmn.h"
-// this file is compiled last?
-//struct Vector;
-// const bool is_start_child = 1;
-// const bool has_down_links = 1;
-// string makeSpaces(int indent_level);
 
-// const char* getInput(Tokens* my_tokens);
-// int getI(Tokens* my_tokens);
-// TrieTree* TrieTreeInitTrieTree();
-// void TrieTreeInsertString(TrieTree* my_trie_tree, string element);
-//int VectorGetPopulation(Vector* container);
-
-// enum data_types{is_list, is_string, is_empty_case};
-// enum token_types {_primitive, _object, _array, _string};
-
-/*
-typedef struct LispNode
-{
-	void* value;
-	struct LispNode* next;
-
-	int count_of_value_items;
-	bool value_type;
-}*/
-
-/*
-typedef struct DynamicState
-{
-	Vector* start_children;
-	Vector* children;
-	Vector* next_states;
-	Data* value;
-	int level_number;
-	bool (*function) (void*);
-	//remaining items for the asyncronous nfa evaluator state machine
-
-}DynamicState;
-
-typedef struct DynamicMachine
-{
-	Vector* states_trie; // numeric
-	Vector* state_name_trie; // character
-	Vector* function_names_trie; // character
-	Vector* parent_status_trie; // boolean
-	int nth_name_part;
-	StateMachine* static_machine;
-
-	// auxiliary data hierarchy for filling up the vectors
-	Vector* trie_being_used_to_match;  // trie_being_used_to_match is set to whatever trie vector is being used
-	int type; // 0 == int 1 == char, 2 == bool
-
-
-	vector<string>* state_name_buffer; // for adding, deleting, modifying
-
-
-
-}DynamicMachine;
-*/
-/*
-state machine for control flow and variable modification
-parser state graph
-nfa asyncronious evaluator state graph
-api functions
-
-*/
-/*
-parsing json
-DynamicMachine* parsing_engine
-int root_of_output_from_parsing_engine
-
-
-parser
-int root_of_parsing_language_engine
-DynamicMachine* parsing_engine but only from the parsing language engine
-
-*/
-/*
-the "Dynamic" part is for manipulating the "state" variables than the state control flow
-DynamicState
-	Vector* start_children
-	Vector* children
-	Vector* next_states
-	data* value (includes pointer to a dynamic state)
-	bool (*function) (void*)
-	remaining items for the asyncronous nfa evaluator state machine
-
-
-DynamicMachine
-1 numeric trie of states (Vector* DynamicState)
-1 character trie of state name part (Vector* DynamicState)
-1 character trie of function names (Vector* DynamicState)
-1 numeric trie of parent statuses (Vector* DynamicState)
-1 int for tallying the strings forming the state names
-1 int* internal_machine_of_operations(child, next states for each state)
-
-DynamicStateGetState(name_1, name_2, name_3)
-setStateTypeName(name_1, name_2, name_3, value)
-link(state_1, state_2)
-
-setChildren(state_1_name, children_state_names)
-setNextStates(state_1_name, next_state_names)
-
-
-
-
-use api for getting states collected from json_parser(static machine) into a state machine object(DynamicMachine)
-make evaluator from api to run the parser and the langauge parsed
-run through the state machine object(DynamicMachine) to parse the language(evaluator)
-run the language(same evaluator)
-
-*/
-// enum internal_states{
-
-// 	empty,
-// 	_search,
-
-// 	root_exists,
-
-// 	get_id_of_expected_location,
-
-// 	setup,
-// 	midpoint,
-// 	type_of_match_int,
-// 	type_of_match_char,
-// 	type_of_match_bool,
-
-// 	no_more_matches_are_possible,
-// 	no_match,
-// 	left,
-// 	right,
-// 	full_match,
-// 	partial_match,
-// 	tree_has_too_little_data_for_a_full_match,
-// 	tree_is_incomplete,
-// 	calculate_expected_location
-// };
-/*
-
-
-input assembly line
-	children
-		-name
-			next
-				start_children
-		start_children
-			next
-				children
-		children
-			next
-				next_states
-		next_states
-			next
-				data
-		data
-
-setupNeighbors(make_tree_next_states, input_assembly_line,
-											name, 					empty, 				empty, 			empty,
-											empty, 					empty, 				empty, 			empty);
-setupNeighbors(make_tree_next_states, name,
-											list_of_strings, 					empty, 				empty, 			empty,
-											start_children, 					empty, 				empty, 			empty);
-
-setupNeighbors(make_tree_next_states, start_children,
-											list_of_lists_of_strings, 					empty, 				empty, 			empty,
-											children, 					empty, 				empty, 			empty);
-
-setupNeighbors(make_tree_next_states, children,
-											list_of_lists_of_strings, 					empty, 				empty, 			empty,
-											next_states, 					empty, 				empty, 			empty);
-
-setupNeighbors(make_tree_next_states, next_states,
-											list_of_lists_of_strings, 					empty, 				empty, 			empty,
-											empty, 					empty, 				empty, 			empty);
-
-setupNeighbors(make_tree_next_states, data,
-											empty, 					empty, 				empty, 			empty,
-											empty, 					empty, 				empty, 			empty);
-
-
-
-
-api
-	children
-		-search
-
-		-insert
-			next
-				search, store
-			children
-				- input_assembly_line
-			
-		store
-		-delete
-			next
-				search, erase
-		erase
-*/
-/*
-typedef struct Search
-{
-	int start;
-	int end;
-	int mid;
-	int comparison_type;
-	Vector* container;
-
-}Search;
-*/
-
-// Search* initSearch(Vector* container, int comparison_type)
+// typedef struct State
 // {
-// 	Search* my_search = (Search*) malloc(sizeof(Search));
-// 	my_search->start = 0;
-// 	my_search->end = 0;
-// 	my_search->comparison_type = comparison_type;
-// 	my_search->container = container;
-// 	return my_search;
-// }
+// 	// This state can be multiple things:
+// 	// control flow node
+// 	// primitive value
+// 	// dictionary
+// 	// root for any other data structure
+// 	Vector* name;
 
-/*
-typedef struct Insert
+// 	// operating system stuff
+// 	// https://www.enterpriseintegrationpatterns.com/docs/IEEE_Software_Design_2PC.pdf
+// 	// Don't run the state untill this value == 0.
+// 	// This is for when asynchronous timelines merge into a synchronous timeline
+// 	// assume 2 different asynchronous states will try this state at the same time
+// 	int threshold;
+
+// 	// run state if visit_count == threshhold in 1 pass of trying next states from all timelines
+// 	int visit_count;
+	
+// 	// lets us quickly check if the state's parent is actually the same one as the parent of the timeline
+// 	// prevents us from having a timeline try states(more than 1 in a row at the time of crossover) in a different timeline before the other
+// 	// timeline tries it
+// 	// keep all asynchronous timelines separated even if they visit a state from another timeline
+// 	TrieTree* parents;
+
+
+// 	// preventing timeline stalls
+// 	// if we assume this state represents a parent on a timeline
+// 	// then we can time how long it takes for the submachine to finish
+// 	// if the duration > 1 second kill the state(curent state) and all parent states in the timeline
+// 	// exclucding the root state as the root may host more than 1 timeline
+// 	int duration;
+
+// 	bool children_are_parallel_states;
+// 	Vector* children;
+
+// 	bool next_states_are_parallel_states;
+// 	Vector* next_states;
+
+
+// 	// for copying up saved items after the current submachine is finished
+// 	bool is_copied_up_hierarchy;
+// 	Vector* destination_state_parent_name;
+// 	// whatever data is in the higher level variable name we will overwrite with the data from the lower level
+
+
+
+// 	// for when this state represents a dictionary
+// 	TrieTree* keys;
+
+// 	bool is_dictionary;
+// 	bool is_primitive;
+// 	bool is_other_data_structure;
+// 	bool is_control_flow_node;
+
+
+// 	// for when the state is storing a primitive value
+// 	Data* value;
+
+// 	// modification flags for the recording user changes system
+// 	bool is_added;
+// 	bool is_deleted;
+// 	bool is_modified;
+
+
+// 	Vector* function_name;
+// 	bool (*function) (ContextualStateChart* my_machine, int parent_state, int current_state);
+
+// }State;
+
+
+// init state
+State* StateInitState(	Vector* name,
+						Vector* parents,
+						Vector* next_states,
+						Vector* children,
+						Vector* function_name,
+						bool (*function_pointer)(ContextualStateChart* my_machine, int parent_state, int current_state)
+				)
 {
-	struct Search* my_search;
-}Insert;
-*/
+	State* my_state = (State*) malloc(sizeof(State));
 
-// Insert* initInsert(Vector* container, int comparison_type)
-// {
-// 	Insert* my_insert = (Insert*) malloc(sizeof(Insert));
-// 	my_insert->my_search = initSearch(container, comparison_type);
-// 	return my_insert;
-// }
+	my_state->name = NULL;
+	if(name != NULL)
+	{
+		my_state->name = (Vector*) malloc(sizeof(Vector));
+		memccpy(my_state->name, name, VectorGetPopulation(name), sizeof(Vector));
+	}
+	my_state->parents = NULL;
+	if(parents != NULL)
+	{
+		my_state->parents = (Vector*) malloc(sizeof(Vector));
+		memccpy(my_state->parents, parents, VectorGetPopulation(parents), sizeof(Vector));
+	}
+	my_state->next_states = NULL;
+	if(next_states != NULL)
+	{
+		my_state->next_states = (Vector*) malloc(sizeof(Vector));
+		memccpy(my_state->next_states, next_states, VectorGetPopulation(next_states), sizeof(Vector));
+	}
+	my_state->children = NULL;
+	if(children != NULL)
+	{
+		my_state->children = (Vector*) malloc(sizeof(Vector));
+		memccpy(my_state->children, children, VectorGetPopulation(children), sizeof(Vector));
+	}
+	my_state->function_name = NULL;
+	if(function_name != NULL)
+	{
+		my_state->function_name = (Vector*) malloc(sizeof(Vector));
+		memccpy(my_state->function_name, function_name, VectorGetPopulation(function_name), sizeof(Vector));
+	}
+	my_state->function = function_pointer;
+	my_state->is_control_flow_node = 1;
+	my_state->is_primitive = 0;
+	my_state->is_dictionary = 0;
+	my_state->is_other_data_structure = 0;
 
-/*
-typedef struct Delete
+
+	return my_state;
+}
+// init state async merge
+State* StateInitStateAsyncMerge(Vector* name,
+								Vector* parents,
+								Vector* next_states,
+								Vector* children,
+								Vector* function_name,
+								bool (*function_pointer)(ContextualStateChart* my_machine, int parent_state, int current_state),
+								int threshold)
 {
-	struct Search* my_search;
-}Delete;
-*/
-// Delete* initDelete(Vector* container, int comparison_type)
-// {
-// 	Delete* my_delete = (Delete*) malloc(sizeof(Delete));
-// 	my_delete->my_search = initSearch(container, comparison_type);
-// 	return my_delete;
-
-// }
-/*
-typedef struct ExtendedState
+	State* my_state = StateInitState(	name,
+										parents,
+										next_states,
+										children,
+										function_name,
+										function_pointer);
+	my_state->threshold = threshold;
+	my_state->visit_count = 0;
+	return my_state;
+}
+// init state children and/or next states are async
+State* StateInitStateChildrenAndOrNextStatesAreAsync(Vector* name,
+								Vector* parents,
+								bool next_states_are_parallel_states,
+								Vector* next_states,
+								bool children_are_parallel_states,
+								Vector* children,
+								Vector* function_name,
+								bool (*function_pointer)(ContextualStateChart* my_machine, int parent_state, int current_state))
 {
-	string next_context;
-	map<string, int>* next_next_contexts;
-	int id;
-}ExtendedState;
-*/
+	State* my_state = StateInitState(	name,
+										parents,
+										next_states,
+										children,
+										function_name,
+										function_pointer);
+	my_state->next_states_are_parallel_states = next_states_are_parallel_states;
+	my_state->children_are_parallel_states = children_are_parallel_states;
+
+	return my_state;
+}
+
+// init variablePrimitive
+State* StateInitVariablePrimitive(	Vector* name,
+									Vector* parents,
+									Vector* next_states,
+									Vector* children,
+									Data* value)
+{
+	State* my_state = StateInitState(	name,
+										parents,
+										next_states,
+										children,
+										NULL,
+										NULL);
+	my_state->value = NULL;
+	if(value != NULL)
+	{
+		my_state->value = (Data*) malloc(sizeof(Data));
+		memccpy(my_state->value, value, 1, sizeof(Data));
+	}
+	my_state->is_primitive = 1;
+	my_state->is_dictionary = 0;
+	my_state->is_other_data_structure = 0;
+	my_state->is_control_flow_node = 0;
+	return my_state;
+}
+// init variableDictionary
+// init variableOtherDataStructure
+
+
 // ExtendedState* initExtendedState()
 // {
 // 	ExtendedState* new_extended_state = (ExtendedState*) malloc(sizeof(ExtendedState));

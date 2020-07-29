@@ -87,12 +87,10 @@ typedef struct State
 
 	// operating system stuff
 	// https://www.enterpriseintegrationpatterns.com/docs/IEEE_Software_Design_2PC.pdf
-	// Don't run the state untill this value == 0.
+	// run state if visit_count == threshhold in 1 pass of trying next states from all timelines
 	// This is for when asynchronous timelines merge into a synchronous timeline
 	// assume 2 different asynchronous states will try this state at the same time
 	int threshold;
-
-	// run state if visit_count == threshhold in 1 pass of trying next states from all timelines
 	int visit_count;
 	
 	// lets us quickly check if the state's parent is actually the same one as the parent of the timeline
@@ -109,17 +107,21 @@ typedef struct State
 	// exclucding the root state as the root may host more than 1 timeline
 	int duration;
 
-	bool children_are_parallel_states;
-	Vector* children;
 
 	bool next_states_are_parallel_states;
 	Vector* next_states;
 
+	bool children_are_parallel_states;
+	Vector* children;
+
+
+
 
 	// for copying up saved items after the current submachine is finished
+	// whatever data is in the higher level variable name we will overwrite with the data from the lower level
+
 	bool is_copied_up_hierarchy;
 	Vector* destination_state_parent_name;
-	// whatever data is in the higher level variable name we will overwrite with the data from the lower level
 
 
 
