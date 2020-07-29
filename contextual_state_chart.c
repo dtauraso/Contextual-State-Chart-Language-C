@@ -214,15 +214,60 @@ State* StateInitVariablePrimitive(	Vector* name,
 // init variableOtherDataStructure
 
 
-// ExtendedState* initExtendedState()
+// typedef struct ContextualStateChart
 // {
-// 	ExtendedState* new_extended_state = (ExtendedState*) malloc(sizeof(ExtendedState));
-// 	new_extended_state->data = VectorInitVector();
-// 	new_extended_state->next_contexts = new map<string, int>();
-// 	new_extended_state->id = 0;
-// 	new_extended_state->type = 0;
-// 	return new_extended_state;
-// }
+
+// 	// variations of the same state in different situations represent
+// 	// the idea of context and are identified by slightly different state names
+// 	Vector* states;
+// 	TrieTree* state_names;
+// 	// root is position 0
+
+
+
+// }ContextualStateChart;
+
+// add state
+void ContextualStateChartAddState(	ContextualStateChart* contextualStateChart,
+									State* state)
+{
+	state->name = TrieTreeInsertWords(contextualStateChart->state_names, state->name);
+	VectorAppend(contextualStateChart->states, state);
+
+	int node_id = TrieTreeSearch(contextualStateChart->state_names, state->name);
+	TrieNode* my_node = (TrieNode*) VectorGetItem(contextualStateChart->state_names->trie_tree, node_id);
+	my_node->state_id = VectorGetPopulation(contextualStateChart->states) - 1;
+
+}
+
+// delete state
+void ContextualStateChartDeleteState(ContextualStateChart* contextualStateChart, Vector* name)
+{
+	int node_id = TrieTreeSearch(contextualStateChart->state_names, name);
+	TrieNode* my_node = (TrieNode*) VectorGetItem(contextualStateChart->state_names->trie_tree, node_id);
+	int state_id = my_node->state_id;
+	int passes = TrieTreeDelete(contextualStateChart->state_names, name);
+	if(!passes)
+	{
+		return;
+		
+	}
+	bool result = VectorDeleteItem(contextualStateChart->states, state_id);
+	if(!result)
+	{
+		return;
+	}
+	return;
+}
+// get state value
+// set state value
+// search for state
+// search for neighbors
+// print machine
+// evaluator(dfa with setup data structues for nfa)
+// tracking system for array manipulations
+// hierarchy for the log
+
 /*
 ExtendedState* TrieTreeInsertString(ExtendedState* node, string value)
 {
