@@ -424,7 +424,12 @@ Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name)
 	{
 		return name;
 	}
-
+	// if there is 1 edge coming after current then name is a substring and exit
+	int edge_count = TrieTreeGetLinkCount(my_trie_tree, current);
+	if(edge_count == 0)
+	{
+		return name
+	}
 	name = TrieTreeGenerateExtraSymbols(my_trie_tree, current, name);
 	return name;
 }

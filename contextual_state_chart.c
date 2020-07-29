@@ -288,6 +288,12 @@ void ContextualStateChartDeleteState(ContextualStateChart* contextualStateChart,
 	}
 	return;
 }
+// add state as a variable to a parent
+	// make the state
+	// insert the state globally
+	// add the new name to the parent's trie with the state's id
+	// the global version of the 
+
 // get state value
 int StateGetInt(ContextualStateChart* contextualStateChart, Vector* parent_name, Vector* variable_name)
 {
@@ -308,6 +314,7 @@ int StateGetInt(ContextualStateChart* contextualStateChart, Vector* parent_name,
 			there is only edge from now on and it's not alphabetical(our string is a unique string from the user entered part
 			but not across the entire machine("i" was used in separate parent submachines)
 			anything else and the user will not find their entry
+			path divergence vs the content of the nodes
 	variable must be inserted into the machine first then added to the variabel state entry
 	all sequence must have the same sequence configuration reguardless of their entry order
 
