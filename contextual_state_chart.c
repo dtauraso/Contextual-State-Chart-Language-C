@@ -299,6 +299,30 @@ int StateGetInt(ContextualStateChart* contextualStateChart, Vector* parent_name,
 	// if a var name is a substring of another then pick the next edge with a non alphabetical character
 	// pick the next edge with a non alphabetical character
 	// to complete the partial matchin with the user typed in name
+
+	/*
+	partial match conditions
+		the last char matched
+			there is at least 1 edge that is alphapetical(our string is a substring of a larger string)
+			there are no more edges(this variable was the only one of it's name in the entire machine)
+			there is only edge from now on and it's not alphabetical(our string is a unique string from the user entered part
+			but not across the entire machine("i" was used in separate parent submachines)
+			anything else and the user will not find their entry
+	variable must be inserted into the machine first then added to the variabel state entry
+	all sequence must have the same sequence configuration reguardless of their entry order
+
+	locally the user made variable name must be unique
+	globally the user made variable name will not be unique
+	user made as in the user uses "i" in multiple places in the state machine but we have
+	i/
+	i&
+	i*
+	i(
+	i)
+	stored in the global machine
+
+	i is stored in each parent submacine
+	*/
 	return 0;
 }
 int DataGetInt(Data* variable)
