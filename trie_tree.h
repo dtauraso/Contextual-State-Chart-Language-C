@@ -99,7 +99,7 @@ int TrieTreeDelete(TrieTree* my_trie_tree, Vector* name);
 void TrieTreePrintTrie(TrieTree* my_trie_tree);
 
 
-char* makeIndents(int number_of_indents);
+char* TrieTreeMakeIndents(int number_of_indents);
 
 void TrieTreePrintTrieRecursive(TrieTree* my_trie_tree, int current, int number_of_indents, Vector* word_found);
 

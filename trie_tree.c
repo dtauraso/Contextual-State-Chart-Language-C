@@ -564,7 +564,7 @@ void TrieTreePrintTrie(TrieTree* my_trie_tree)
 
 // void TrieTreePrintWordTrie(TrieTree* my_trie_tree){}
 // void TrieTreePrintTrieWords(TrieTree* my_trie_tree){}
-char* makeIndents(int number_of_indents)
+char* TrieTreeMakeIndents(int number_of_indents)
 {
 	// printf("indents to make %i\n", number_of_indents);
 	char* indents = (char*) malloc(sizeof(char) * (number_of_indents + 1));
@@ -588,7 +588,7 @@ void TrieTreePrintTrieRecursive(TrieTree* my_trie_tree, int current, int number_
 	if(TrieTreeGetEndOfWord(my_trie_tree, current))
 	{
 		// printf("end of word\n");
-		printf("%s|", makeIndents(number_of_indents));
+		printf("%s|", TrieTreeMakeIndents(number_of_indents));
 		int size = VectorGetPopulation(word_found);
 		for(int i = 0; i < size; i++)
 		{

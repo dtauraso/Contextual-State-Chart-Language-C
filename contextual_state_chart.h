@@ -56,8 +56,8 @@ typedef struct Data
 	4 => bool
 	*/
 	int _int;
-	char _char;
 	float _float;
+	char _char;
 	bool _bool;
 
 }Data;
