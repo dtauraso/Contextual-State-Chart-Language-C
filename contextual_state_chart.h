@@ -178,7 +178,7 @@ typedef struct State
 	CopyVariableDataUpHierarchyState* copyVariableDataUpHierarchyState;
 
 	ModificationFlags* modificationFlags;
-	DictionaryState* dictionaryState;
+	CollectionState* dictionaryState;
 	PrimitiveState* primitiveState;
 
 	bool is_control_flow_node;
