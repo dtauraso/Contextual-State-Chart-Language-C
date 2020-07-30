@@ -609,7 +609,16 @@ char* TrieTreeMakeIndents(int number_of_indents)
 }
 void TrieTreePrintTrieRecursive(TrieTree* my_trie_tree, int current, int number_of_indents, Vector* word_found)
 {
-
+	if(my_trie_tree == NULL)
+	{
+		return;
+	}
+	
+	if(VectorGetPopulation(my_trie_tree->trie_tree) == 0)
+	{
+		return;
+	}
+	// printf("size %i\n", VectorGetPopulation(my_trie_tree->trie_tree));
 	if(current < 0)
 	{
 		return;

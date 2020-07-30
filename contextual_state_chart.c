@@ -139,30 +139,12 @@ State* StateInitState(	Vector* name,
 
 	my_state->name = name;
 
-	my_state->parents = NULL;
-	if(parents != NULL)
-	{
-		my_state->parents = (TrieTree*) malloc(sizeof(TrieTree));
-		memccpy(my_state->parents, parents, 1, sizeof(TrieTree));
-	}
-	my_state->next_states = NULL;
-	if(next_states != NULL)
-	{
-		my_state->next_states = (Vector*) malloc(sizeof(Vector));
-		memccpy(my_state->next_states, next_states, VectorGetPopulation(next_states), sizeof(Vector));
-	}
-	my_state->children = NULL;
-	if(children != NULL)
-	{
-		my_state->children = (Vector*) malloc(sizeof(Vector));
-		memccpy(my_state->children, children, VectorGetPopulation(children), sizeof(Vector));
-	}
-	my_state->function_name = NULL;
-	if(function_name != NULL)
-	{
-		my_state->function_name = (Vector*) malloc(sizeof(Vector));
-		memccpy(my_state->function_name, function_name, VectorGetPopulation(function_name), sizeof(Vector));
-	}
+	// pretend this is NULL for now
+	// parents are used in the multiple timelines case(nfa style)
+	// my_state->parents = parents;
+	my_state->next_states = next_states;
+	my_state->children = children;
+	my_state->function_name = function_name;
 	my_state->function = function_pointer;
 	my_state->is_control_flow_node = 1;
 	my_state->is_primitive = 0;
@@ -238,6 +220,7 @@ State* StateInitVariablePrimitive(	Vector* name,
 										NULL,
 										NULL,
 										NULL);
+	my_state->keys = NULL;
 	my_state->value = value;
 	my_state->is_primitive = 1;
 	my_state->is_dictionary = 0;
@@ -569,6 +552,7 @@ void StatePrintIntsFromVectorAsChars(Vector* my_ints)
 		int letter = *((int*) VectorGetItem(my_ints, i));
 		printf("%c", letter);
 	}
+
 }
 
 void StatePrintAttribute(int indents, Vector* attribute_name, Vector* attribute)
@@ -579,7 +563,10 @@ void StatePrintAttribute(int indents, Vector* attribute_name, Vector* attribute)
 	// printing name of attribute
 	StatePrintIntsFromVectorAsChars(attribute_name);
 	printf(":\n%s", TrieTreeMakeIndents(indents));
+	printf("|");
 	StatePrintIntsFromVectorAsChars(attribute);
+	printf("|");
+
 	printf("\n");
 
 }
@@ -619,7 +606,10 @@ void StatePrintState(State* state, int indents)
 	}
 	if(state->keys != NULL)
 	{
-		printf("show the keys here\n");
+		printf("%s", TrieTreeMakeIndents(indents));
+		StatePrintIntsFromVectorAsChars(VectorMakeVectorOfChars("keys"));
+		printf(":\n%s", TrieTreeMakeIndents(indents));
+
 		TrieTreePrintTrieRecursive(state->keys, 0, 1, VectorInitVector());
 	}
 	printf("\n\n");
@@ -633,9 +623,10 @@ void ContextualStateChartPrintStateTree(ContextualStateChart* my_machine, int st
 	{
 		return;
 	}
-	// StatePrintState(my_machine, state_id, indents);
-
 	State* state = (State*) VectorGetItem(my_machine->states, state_id);
+
+	StatePrintState(state, indents);
+
 
 	for(int i = 0; i < VectorGetPopulation(state->children); i++)
 	{
@@ -664,7 +655,7 @@ void visit(ContextualStateChart* graph, Vector* start_state, int indents)
 
 	State* machine_metrics = StateInitDictionary(
 								VectorMakeVectorOfChars("machine metrics"),
-								VectorMakeVectorOfChars("root"),
+								NULL,
 								VectorMakeVectorOfVectorsOfChars(
 									3,
 									VectorMakeVectorOfChars("next states"),
@@ -676,7 +667,7 @@ void visit(ContextualStateChart* graph, Vector* start_state, int indents)
 
 	State* next_states = StateInitDictionary(
 							VectorMakeVectorOfChars("next states"),
-							VectorMakeVectorOfVectorsOfChars(1, VectorMakeVectorOfChars("root")),
+							NULL,
 							VectorMakeVectorOfVectorsOfChars(0, VectorInitVector()));
 	// next_states->keys = TrieTreeInitTrieTree();
 	// loop through start_state
@@ -694,11 +685,15 @@ void visit(ContextualStateChart* graph, Vector* start_state, int indents)
 		// printf("%i\n", int_value);
 		State* int_state = StateInitVariablePrimitive(
 									new_name,
-									VectorMakeVectorOfVectorsOfChars(1, VectorMakeVectorOfChars("next states")),
+									NULL,
 									DataInitInt(int_value));
 		// printf("from state %i\n", int_state->value->_int);
+		// add to graph
+		// add id from graph to next_states->keys[new_name]
 		StatePrintState(int_state, 0);
 	}
+	StatePrintState(next_states, 0);
+
 	// StateAddChildEdge(next_states, start_state);
 
 	/*
