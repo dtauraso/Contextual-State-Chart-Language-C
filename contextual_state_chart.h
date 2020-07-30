@@ -98,7 +98,7 @@ typedef struct CollectionState
 
 
 
-}DictionaryState;
+}CollectionState;
 
 
 typedef struct PrimitiveState
