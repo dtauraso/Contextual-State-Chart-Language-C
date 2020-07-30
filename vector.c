@@ -452,3 +452,17 @@ Vector* VectorMakeVectorOfChars(char* my_string)
 	return list_of_chars;
 
 }
+Vector* VectorMakeVectorOfVectorsOfChars(int arg_count, ...)
+{
+	Vector* list_of_vectors = VectorInitVector();
+	
+	va_list ap;
+
+	va_start(ap, arg_count);
+	for(int i = 0; i < arg_count; i++)
+	{
+		Vector* current_arg = va_arg(ap, Vector*);
+		VectorAppend(list_of_vectors, current_arg);
+	}
+	return list_of_vectors;
+}

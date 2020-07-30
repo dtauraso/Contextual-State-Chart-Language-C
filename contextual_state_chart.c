@@ -145,8 +145,8 @@ State* StateInitState(	Vector* name,
 	my_state->parents = NULL;
 	if(parents != NULL)
 	{
-		my_state->parents = (Vector*) malloc(sizeof(Vector));
-		memccpy(my_state->parents, parents, VectorGetPopulation(parents), sizeof(Vector));
+		my_state->parents = (TrieTree*) malloc(sizeof(TrieTree));
+		memccpy(my_state->parents, parents, 1, sizeof(TrieTree));
 	}
 	my_state->next_states = NULL;
 	if(next_states != NULL)
@@ -240,10 +240,9 @@ State* StateInitVariablePrimitive(	Vector* name,
 	return my_state;
 }
 // init variableDictionary
-// init variableOtherDataStructure
-State* StateInitVariableOtherDataStructure(	Vector* name,
-											Vector* parents,
-											Vector* variable_names)
+State* StateInitDictionary(	Vector* name,
+							Vector* parents,
+							Vector* variable_names)
 {
 	State* my_state = StateInitState(	name,
 										parents,
@@ -266,11 +265,12 @@ State* StateInitVariableOtherDataStructure(	Vector* name,
 	}
 
 	my_state->is_primitive = 0;
-	my_state->is_dictionary = 0;
-	my_state->is_other_data_structure = 1;
+	my_state->is_dictionary = 1;
+	my_state->is_other_data_structure = 0;
 	my_state->is_control_flow_node = 0;
 	return my_state;
 }
+// init variableOtherDataStructure
 
 
 
@@ -595,9 +595,22 @@ void ContextualStateChartPrintStateTree(ContextualStateChart* my_machine, int st
 }
 
 // evaluator(dfa with setup data structues for nfa)
-void visit(ContextualStateChart* graph, Vector* start_state, indents)
+void visit(ContextualStateChart* graph, Vector* start_state, int indents)
 {
-	
+
+	int i = 0;
+
+	// add a state called "machine_metrics"
+	State* machine_metrics = StateInitDictionary(
+								VectorMakeVectorOfChars("machine metrics"),
+								VectorMakeVectorOfChars("root"),
+								VectorMakeVectorOfVectorsOfChars(
+									3, 
+									VectorMakeVectorOfChars("next states"),
+									VectorMakeVectorOfChars("parent"),
+									VectorMakeVectorOfChars("indents")
+									)
+							);
 }
 // tracking system for array manipulations
 // hierarchy for the log
@@ -2589,23 +2602,23 @@ void printArrayOfStrings(Vector* array_of_strings, int indent_level)
 	}
 	
 }
-void printState(State* my_state, int indent_level)
-{
-	// printf("%sname\n", makeSpaces(indent_level).c_str());
-	printArrayOfStrings(my_state->name, indent_level + 1);
-	// printf("%sstart children\n", makeSpaces(indent_level).c_str());
+// void printState(State* my_state, int indent_level)
+// {
+// 	// printf("%sname\n", makeSpaces(indent_level).c_str());
+// 	printArrayOfStrings(my_state->name, indent_level + 1);
+// 	// printf("%sstart children\n", makeSpaces(indent_level).c_str());
 
-	// printArraysOfStrings(my_state->start_children, indent_level + 1);
-	// printf("%schildren\n", makeSpaces(indent_level).c_str());
+// 	// printArraysOfStrings(my_state->start_children, indent_level + 1);
+// 	// printf("%schildren\n", makeSpaces(indent_level).c_str());
 
-	printArraysOfStrings(my_state->children, indent_level + 1);
-	// printf("%snext states\n", makeSpaces(indent_level).c_str());
+// 	printArraysOfStrings(my_state->children, indent_level + 1);
+// 	// printf("%snext states\n", makeSpaces(indent_level).c_str());
 
-	printArraysOfStrings(my_state->next_states, indent_level + 1);
-	// printf("%sdata\n", makeSpaces(indent_level).c_str());
+// 	printArraysOfStrings(my_state->next_states, indent_level + 1);
+// 	// printf("%sdata\n", makeSpaces(indent_level).c_str());
 
-	printData(my_state->value, indent_level + 1);
-}
+// 	printData(my_state->value, indent_level + 1);
+// }
 // functions for makeTreeStateMachine
 int computeIndex(int offset, int state_name)
 {
@@ -3420,17 +3433,17 @@ void DataDeleteDataVector(Data* variable)
 	// VectorDeleteVector(variable->container);
 
 }
-ContextState* initContextState()
-{
-	ContextState* test = (ContextState*) malloc(sizeof(ContextState));
-	test->parents_size = 0;
-	test->children_size = 0;
+// ContextState* initContextState()
+// {
+// 	ContextState* test = (ContextState*) malloc(sizeof(ContextState));
+// 	test->parents_size = 0;
+// 	test->children_size = 0;
 
 	//test->name = malloc(sizeof(char) * 50);
 	//memcpy(test->name, input, sizeof(char) * strlen(input));
 
-	return test;
-}
+// 	return test;
+// }
 // ContextState* makeFullContextState2(
 // 	TrieNode* name,
 // 	TrieNode* nexts,

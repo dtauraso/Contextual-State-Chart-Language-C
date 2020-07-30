@@ -18,6 +18,7 @@ typedef struct TrieNode
 	int state_id; // location of state in state vector
 
 	bool end_of_word;
+	bool is_auto_generated;
 
 
 }TrieNode;
