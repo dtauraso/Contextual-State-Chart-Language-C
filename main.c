@@ -2,7 +2,8 @@
 
 // #include "state.h"
 //#include "vector.h"
-#include "trie_tree.h"
+// #include "trie_tree.h"
+#include "contextual_state_chart.h"
 //#include "trie_node.h"
 
 // #include "scanner.h"
@@ -464,7 +465,8 @@ int main(int argc, char** argv)
 	// 	// printTree2(my_scanner->_lines_graph, 2, 0);
 
 	// }
-	TrieTreeTest();
+	// TrieTreeTest();
+	ContextualStateChartTest();
 	// DynamicMachineTest();
 	// tests pass so far
 	// DynamicMachineTest2();

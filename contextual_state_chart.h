@@ -419,5 +419,6 @@ void DataDeleteDataVector(Data* variable);
 // 	bool is_end_state,
 // 	bool is_data_state);
 // void deleteContextState(ContextState* node);
+void ContextualStateChartTest();
 
 #endif

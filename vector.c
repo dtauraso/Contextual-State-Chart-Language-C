@@ -16,13 +16,15 @@ typedef struct Vector
 
 Vector* VectorInitVector()
 {
-
 	Vector* new_container = (Vector*) malloc(sizeof(Vector));
 	new_container->values = NULL;
 	new_container->size = 0;
 	new_container->population = 0;
 	new_container->first = 0;
 	new_container->last = 0;
+	// new_container->is_empty = true;
+	// from C's point of view new_container == NULL
+
 	return new_container;
 }
 Vector* VectorInitVectorSize(int size)
@@ -37,7 +39,7 @@ Vector* VectorInitVectorSize(int size)
 	new_container->population = 0;
 	new_container->first = 0;
 	new_container->last = 0;
-
+	// new_container->is_empty = true;
 	return new_container;
 }
 bool VectorDeleteVector(Vector* container)
@@ -53,6 +55,7 @@ bool VectorDeleteVector(Vector* container)
 	}
 	free(container->values);
 	container->values = NULL;
+	// container->is_empty = true;
 	return true;
 }
 Vector* VectorCopyVector(Vector* my_vector)
@@ -181,6 +184,7 @@ void VectorAppend(Vector* container, void* element)
 		container->population += 1;
 
 	}
+	// container->is_empty = false;
 		//printf("result\n");
 		//VectorPrint(container);
 

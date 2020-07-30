@@ -8,6 +8,9 @@ typedef struct Vector
 	int size;
 	int population;
 
+	// so I can instantiate vectors and C will not treat them as NULL
+	// bool is_empty;
+
 	// special window variables for the recording user changes system
 	int first;
 	int last;

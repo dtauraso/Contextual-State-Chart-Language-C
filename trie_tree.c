@@ -324,7 +324,7 @@ Vector* TrieTreeGenerateExtraSymbols(TrieTree* my_trie_tree, int current, Vector
 
 	// make sure we don't use any alphabetical characters
 	int max_visible_character = 126; 
-
+	// printf("here we are\n");
 	int count = TrieTreeGetLinkCount(my_trie_tree, current);
 	// we have 0 extra symbols to traverse
 	if(count >= 0 && count < max_visible_character)
@@ -426,14 +426,21 @@ Vector* TrieTreeInsertWords(TrieTree* my_trie_tree, Vector* name)
 	// integers are used as the trackers because it's easier to work with an integer than a void pointer
 	if(my_trie_tree == NULL || name == NULL)
 	{
+		// printf("problem\n");
 		return NULL;
 	}
 
-
 	int current = TrieTreeInsertWordsDictionary(my_trie_tree, name);
+	// printf("size %i\n", VectorGetPopulation(name));
+	if(VectorGetPopulation(name) == 0)
+	{
+		name = TrieTreeGenerateExtraSymbols(my_trie_tree, current, name);
+		return name;
+	}
 	if(current == 0)
 	{
 		return name;
+		// return TrieTreeGenerateExtraSymbols(my_trie_tree, current, name);
 	}
 	// if there is 1 edge coming after current then name is a substring and exit
 	int edge_count = TrieTreeGetLinkCount(my_trie_tree, current);
@@ -705,11 +712,11 @@ void TrieTreeTest()
 	VectorPrint(name40);
 	printf("result 40 %i\n\n", TrieTreeSearch(my_trie_tree, name40));
 
-	Vector* name41 = TrieTreeInsertWords(my_trie_tree, VectorMakeVectorOfChars("i"));
+	Vector* name41 = TrieTreeInsertWords(my_trie_tree, VectorMakeVectorOfChars("input"));
 	VectorPrint(name41);
 	printf("result 41 %i\n\n", TrieTreeSearch(my_trie_tree, name41));
 
-	Vector* name42 = TrieTreeInsertWords(my_trie_tree, VectorMakeVectorOfChars("input"));
+	Vector* name42 = TrieTreeInsertWords(my_trie_tree, VectorMakeVectorOfChars("i"));
 	VectorPrint(name42);
 	printf("result 42 %i\n\n", TrieTreeSearch(my_trie_tree, name42));
 
