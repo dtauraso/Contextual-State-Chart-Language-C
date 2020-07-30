@@ -128,7 +128,6 @@ Data* DataInitBool(bool a)
 
 // init state
 State* StateInitState(	Vector* name,
-						Vector* parents,
 						Vector* next_states,
 						Vector* children,
 						Vector* function_name,
@@ -139,17 +138,17 @@ State* StateInitState(	Vector* name,
 
 	my_state->name = name;
 
-	// pretend this is NULL for now
-	// parents are used in the multiple timelines case(nfa style)
-	// my_state->parents = parents;
 	my_state->next_states = next_states;
 	my_state->children = children;
 	my_state->function_name = function_name;
 	my_state->function = function_pointer;
 	my_state->is_control_flow_node = 1;
-	my_state->is_primitive = 0;
-	my_state->is_dictionary = 0;
-	my_state->is_other_data_structure = 0;
+	my_state->asynchronousTimelineMergeState = NULL;
+	my_state->childrenOrNextStatesAreParallelState = NULL;
+	my_state->copyVariableDataUpHierarchyState = NULL;
+	my_state->modificationFlags = NULL;
+	my_state->collectionState = NULL;
+	my_state->primitiveState = NULL;
 
 
 	return my_state;
@@ -169,6 +168,86 @@ void StateAddChildEdge(State* my_state, Vector* child)
 	return;
 }
 // init state async merge
+// typedef struct ModificationFlags
+// {
+// 	// modification flags for the recording user changes system
+// 	bool is_added;
+// 	bool is_deleted;
+// 	bool is_modified;
+// constructor for modification flags
+// }ModificationFlags;
+// typedef struct CollectionState
+// {
+// 	// for when this state represents a collection
+// 	// a value state can link to a collection state
+// 	TrieTree* keys;
+
+// 	bool is_dictionary;
+
+// 	bool is_array;
+
+
+
+// }CollectionState;
+
+
+// typedef struct PrimitiveState
+// {
+// 	bool is_primitive;
+
+// 	// for when the state is storing a primitive value
+// 	Data* value;
+
+// }PrimitiveState;
+
+// typedef struct CopyVariableDataUpHierarchyState
+// {
+// 	// for copying up saved items after the current submachine is finished
+// 	// whatever data is in the higher level variable name we will overwrite with the data from the lower level
+
+// 	bool is_copied_up_hierarchy;
+// 	Vector* destination_state_parent_name;
+
+// }CopyVariableDataUpHierarchyState;
+// typedef struct ChildrenOrNextStatesAreParallelState
+// {
+// 	bool next_states_are_parallel_states;
+
+// 	bool children_are_parallel_states;
+
+
+// }ChildrenOrNextStatesAreParallelState;
+// typedef struct AsynchronousTimelineMergeState
+// {
+// 		// operating system stuff
+// 	// https://www.enterpriseintegrationpatterns.com/docs/IEEE_Software_Design_2PC.pdf
+// 	// run state if visit_count == threshhold in 1 pass of trying next states from all timelines
+// 	// This is for when asynchronous timelines merge into a synchronous timeline
+// 	// assume 2 different asynchronous states will try this state at the same time
+// 	// int threshold;
+// 	// int visit_count;
+	
+// 	// lets us quickly check if the state's parent is actually the same one as the parent of the timeline
+// 	// prevents us from having a timeline try states(more than 1 in a row at the time of crossover) in a different timeline before the other
+// 	// timeline tries it
+// 	// keep all asynchronous timelines separated even if they visit a state from another timeline
+// 	// TrieTree* parents;
+
+
+// 	// preventing timeline stalls
+// 	// if we assume this state represents a parent on a timeline
+// 	// then we can time how long it takes for the submachine to finish
+// 	// if the duration > 1 second kill the state(curent state) and all parent states in the timeline
+// 	// exclucding the root state as the root may host more than 1 timeline
+// 	// int duration;
+
+// 	int threshold;
+// 	int visit_count;
+// 	TrieTree* parents;
+// 	int duration;
+
+// }AsynchronousTimelineMergeState;
+
 State* StateInitStateAsyncMerge(Vector* name,
 								Vector* parents,
 								Vector* next_states,
