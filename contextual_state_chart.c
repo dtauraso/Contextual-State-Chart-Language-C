@@ -606,15 +606,29 @@ void StatePrintAttribute(int indents, Vector* attribute_name, Vector* attribute,
 
 	if(state_attribute == _name || state_attribute == _function_name)
 	{
-			// printing name of attribute
-			printf("|");
-			// what if attibute is 
-			StatePrintIntsFromVectorAsChars(attribute);
-			printf("|");
+		// printing name of attribute
+		printf("|");
+		// what if attibute is 
+		StatePrintIntsFromVectorAsChars(attribute);
+		printf("|");
 	}
 	else if(state_attribute == _next_states || state_attribute == _children)
 	{
-		printf("|print 2 level vector|\n");
+		// printf("|print 2 level vector|\n");
+		printf("[");
+		for(int i = 0; i < VectorGetPopulation(attribute); i++)
+		{
+			printf("\'");
+			// what if attibute is 
+			StatePrintIntsFromVectorAsChars((Vector*) VectorGetItem(attribute, i));
+			printf("\'");
+			if(i < VectorGetPopulation(attribute) - 1)
+			{
+				printf(", ");
+			}
+			
+		}
+		printf("]");
 	}
 
 	printf("\n");
@@ -660,8 +674,15 @@ void StatePrintCollection(ContextualStateChart* contextual_state_chart, State* s
 		for(int i = 0; i < VectorGetPopulation(state->children); i++)
 		{
 			Vector* state_name = (Vector*) VectorGetItem(state->children, i);
-			int state_id = TrieTreeSearch(state->collectionState->keys, state_name);
-			State* my_state = (State*) VectorGetItem(contextual_state_chart->states, state_id);
+			// trienode id
+			int node_id = TrieTreeSearch(state->collectionState->keys, state_name);
+			// missing something
+			// segfaults
+			// TrieNode* node = (TrieNode*) VectorGetItem(structure_state->collectionState->keys->trie_tree, node_id);
+
+			// claims container is empty but they should have been added
+			TrieNode* node = (TrieNode*) VectorGetItem(state->collectionState->keys->trie_tree, node_id);
+			State* my_state = (State*) VectorGetItem(contextual_state_chart->states, node->state_id);
 			// VectorPrint(state_name);
 			StatePrintCollection(contextual_state_chart, my_state, indents + 3);
 		}
