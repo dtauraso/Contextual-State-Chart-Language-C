@@ -165,11 +165,13 @@ typedef struct State
 	// primitive value
 	// dictionary
 	// root for any other data structure
+	// 1 level
 	Vector* name;
 
-
+	// 2 levels
 	Vector* next_states;
 
+	// 2 levels
 	Vector* children;
 
 	AsynchronousTimelineMergeState* asynchronousTimelineMergeState;
@@ -183,6 +185,7 @@ typedef struct State
 
 	bool is_control_flow_node;
 
+	// 1 level
 	Vector* function_name;
 	bool (*function) (ContextualStateChart* my_machine, int parent_state, int current_state);
 

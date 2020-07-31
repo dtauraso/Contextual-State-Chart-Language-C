@@ -126,6 +126,133 @@ Data* DataInitBool(bool a)
 }
 
 
+// init state async merge
+// typedef struct ModificationFlags
+// {
+// 	bool is_added;
+// 	bool is_deleted;
+// 	bool is_modified;
+// constructor for modification flags
+ModificationFlags* ModificationFlagsInit()
+{
+	ModificationFlags* my_modification_flags = (ModificationFlags*) malloc(sizeof(ModificationFlags));
+
+	my_modification_flags->is_added = false;
+	my_modification_flags->is_deleted = false;
+	my_modification_flags->is_modified = false;
+
+	return my_modification_flags;
+}
+// }ModificationFlags;
+// typedef struct CollectionState
+// {
+// 	TrieTree* keys;
+
+// 	bool is_dictionary;
+
+// 	bool is_array;
+
+
+
+// }CollectionState;
+enum CollectionStateType{array, dictionary};
+
+CollectionState* CollectionStateInit(int collection_type)
+{
+	CollectionState* my_collection_state = (CollectionState*) malloc(sizeof(CollectionState));
+
+	my_collection_state->keys = TrieTreeInitTrieTree();
+
+	my_collection_state->is_array = collection_type == array? true: false;
+	my_collection_state->is_dictionary = collection_type == dictionary? true: false;
+
+	return my_collection_state;
+}
+TrieTree* CollectionStateGetCollection(State* state)
+{
+	return state->collectionState->keys;
+}
+CollectionState* CollectionStateGetState(State* state)
+{
+	return state->collectionState;
+}
+
+
+// typedef struct PrimitiveState
+// {
+// 	bool is_primitive;
+
+// 	Data* value;
+
+// }PrimitiveState;
+PrimitiveState* PrimitiveStateInit(Data* value)
+{
+	PrimitiveState* my_primitive_state = (PrimitiveState*) malloc(sizeof(PrimitiveState));
+
+	my_primitive_state->is_primitive = true;
+	my_primitive_state->value = value;
+
+	return my_primitive_state;
+}
+Data* PrimitiveStateGetValue(State* state)
+{
+	return state->primitiveState->value;
+}
+
+
+// typedef struct CopyVariableDataUpHierarchyState
+// {
+
+// 	bool is_copied_up_hierarchy;
+// 	Vector* destination_state_parent_name;
+
+// }CopyVariableDataUpHierarchyState;
+CopyVariableDataUpHierarchyState* CopyVariableDataUpHierarchyStateInit()
+{
+	CopyVariableDataUpHierarchyState* copyVariableDataUpHierarchyState = (CopyVariableDataUpHierarchyState*) malloc(sizeof(CopyVariableDataUpHierarchyState));
+	copyVariableDataUpHierarchyState->is_copied_up_hierarchy = false;
+	copyVariableDataUpHierarchyState->destination_state_parent_name = VectorInitVector();
+	return copyVariableDataUpHierarchyState;
+}
+// typedef struct ChildrenOrNextStatesAreParallelState
+// {
+// 	bool next_states_are_parallel_states;
+
+// 	bool children_are_parallel_states;
+
+
+// }ChildrenOrNextStatesAreParallelState;
+enum NeighborType{children, next_states};
+
+ChildrenOrNextStatesAreParallelState* ChildrenOrNextStatesAreParallelStateInit(int neighbor_type)
+{
+	ChildrenOrNextStatesAreParallelState* childrenOrNextStatesAreParallelState = (ChildrenOrNextStatesAreParallelState*) malloc(sizeof(ChildrenOrNextStatesAreParallelState));
+	childrenOrNextStatesAreParallelState->children_are_parallel_states = neighbor_type == children? true: false;
+	childrenOrNextStatesAreParallelState->next_states_are_parallel_states = neighbor_type == next_states? true: false;
+	return childrenOrNextStatesAreParallelState;
+}
+// typedef struct AsynchronousTimelineMergeState
+// {
+// 	// int threshold;
+// 	// int visit_count;
+	
+// 	// TrieTree* parents;
+// 	int threshold;
+// 	int visit_count;
+// 	TrieTree* parents;
+// 	int duration;
+
+// }AsynchronousTimelineMergeState;
+AsynchronousTimelineMergeState* AsynchronousTimelineMergeStateInit()
+{
+	AsynchronousTimelineMergeState* asynchronousTimelineMergeState = (AsynchronousTimelineMergeState*) malloc(sizeof(AsynchronousTimelineMergeState));
+	// 1000 ms = 1 second
+	asynchronousTimelineMergeState->duration = 1000;
+	asynchronousTimelineMergeState->parents = TrieTreeInitTrieTree();
+	asynchronousTimelineMergeState->threshold = 0;
+	asynchronousTimelineMergeState->visit_count = 0;
+	return asynchronousTimelineMergeState;
+}
 // init state
 State* StateInitState(	Vector* name,
 						Vector* next_states,
@@ -165,203 +292,36 @@ void StateAddChildEdge(State* my_state, Vector* child)
 		my_state->children = VectorInitVector();
 	}
 	VectorAppend(my_state->children, child);
+
 	return;
 }
-// init state async merge
-// typedef struct ModificationFlags
-// {
-// 	// modification flags for the recording user changes system
-// 	bool is_added;
-// 	bool is_deleted;
-// 	bool is_modified;
-// constructor for modification flags
-// }ModificationFlags;
-// typedef struct CollectionState
-// {
-// 	// for when this state represents a collection
-// 	// a value state can link to a collection state
-// 	TrieTree* keys;
 
-// 	bool is_dictionary;
-
-// 	bool is_array;
-
-
-
-// }CollectionState;
-
-
-// typedef struct PrimitiveState
-// {
-// 	bool is_primitive;
-
-// 	// for when the state is storing a primitive value
-// 	Data* value;
-
-// }PrimitiveState;
-
-// typedef struct CopyVariableDataUpHierarchyState
-// {
-// 	// for copying up saved items after the current submachine is finished
-// 	// whatever data is in the higher level variable name we will overwrite with the data from the lower level
-
-// 	bool is_copied_up_hierarchy;
-// 	Vector* destination_state_parent_name;
-
-// }CopyVariableDataUpHierarchyState;
-// typedef struct ChildrenOrNextStatesAreParallelState
-// {
-// 	bool next_states_are_parallel_states;
-
-// 	bool children_are_parallel_states;
-
-
-// }ChildrenOrNextStatesAreParallelState;
-// typedef struct AsynchronousTimelineMergeState
-// {
-// 		// operating system stuff
-// 	// https://www.enterpriseintegrationpatterns.com/docs/IEEE_Software_Design_2PC.pdf
-// 	// run state if visit_count == threshhold in 1 pass of trying next states from all timelines
-// 	// This is for when asynchronous timelines merge into a synchronous timeline
-// 	// assume 2 different asynchronous states will try this state at the same time
-// 	// int threshold;
-// 	// int visit_count;
-	
-// 	// lets us quickly check if the state's parent is actually the same one as the parent of the timeline
-// 	// prevents us from having a timeline try states(more than 1 in a row at the time of crossover) in a different timeline before the other
-// 	// timeline tries it
-// 	// keep all asynchronous timelines separated even if they visit a state from another timeline
-// 	// TrieTree* parents;
-
-
-// 	// preventing timeline stalls
-// 	// if we assume this state represents a parent on a timeline
-// 	// then we can time how long it takes for the submachine to finish
-// 	// if the duration > 1 second kill the state(curent state) and all parent states in the timeline
-// 	// exclucding the root state as the root may host more than 1 timeline
-// 	// int duration;
-
-// 	int threshold;
-// 	int visit_count;
-// 	TrieTree* parents;
-// 	int duration;
-
-// }AsynchronousTimelineMergeState;
-
-State* StateInitStateAsyncMerge(Vector* name,
-								Vector* parents,
-								Vector* next_states,
-								Vector* children,
-								Vector* function_name,
-								bool (*function_pointer)(ContextualStateChart* my_machine, int parent_state, int current_state),
-								int threshold)
-{
-	State* my_state = StateInitState(	name,
-										parents,
-										next_states,
-										children,
-										function_name,
-										function_pointer);
-	my_state->threshold = threshold;
-	my_state->visit_count = 0;
-	return my_state;
-}
 // init state children and/or next states are async
-State* StateInitStateChildrenAndOrNextStatesAreAsync(Vector* name,
-								Vector* parents,
-								bool next_states_are_parallel_states,
-								Vector* next_states,
-								bool children_are_parallel_states,
-								Vector* children,
-								Vector* function_name,
-								bool (*function_pointer)(ContextualStateChart* my_machine, int parent_state, int current_state))
-{
-	State* my_state = StateInitState(	name,
-										parents,
-										next_states,
-										children,
-										function_name,
-										function_pointer);
-	my_state->next_states_are_parallel_states = next_states_are_parallel_states;
-	my_state->children_are_parallel_states = children_are_parallel_states;
-
-	return my_state;
-}
 
 // init variablePrimitive
 State* StateInitVariablePrimitive(	Vector* name,
-									Vector* parents,
 									Data* value)
 {
 	State* my_state = StateInitState(	name,
-										parents,
 										NULL,
 										NULL,
 										NULL,
 										NULL);
-	my_state->keys = NULL;
-	my_state->value = value;
-	my_state->is_primitive = 1;
-	my_state->is_dictionary = 0;
-	my_state->is_other_data_structure = 0;
-	my_state->is_control_flow_node = 0;
+	my_state->primitiveState = PrimitiveStateInit(value);
+	// my_state->value = value;
+	// my_state->is_primitive = 1;
 	return my_state;
 }
 // init variableDictionary
-State* StateInitDictionary(	Vector* name,
-							Vector* parents,
-							Vector* variable_names)
-{
-	State* my_state = StateInitState(	name,
-										parents,
-										NULL,
-										NULL,
-										NULL,
-										NULL);
-	if(variable_names == NULL)
-	{
-		return NULL;
-	}
-	my_state->keys = TrieTreeInitTrieTree();
-
-	for(int i = 0; i < VectorGetPopulation(variable_names); i++)
-	{
-		Vector* variable_name = (Vector*) VectorGetItem(variable_names, i);
-		// assume the variable exists
-		// VectorPrint(variable_name);
-		// the variable name should not be altered as all names should be unique
-		TrieTreeInsertWords(my_state->keys, variable_name);
-
-	}
-	// TrieTreePrintTrie(my_state->keys);
-
-	// TrieTreePrintTrieRecursive(my_state->keys, 0, 1, VectorInitVector());
-	my_state->is_primitive = 0;
-	my_state->is_dictionary = 1;
-	my_state->is_other_data_structure = 0;
-	my_state->is_control_flow_node = 0;
-	return my_state;
-}
 // init variableOtherDataStructure
-State* StateInitVariableOtherDataStructure(	Vector* name,
-											Vector* parents)
+State* StateInitVariableCollectionState(Vector* name, int collection_type)
 {
 	State* my_state = StateInitState(	name,
-										parents,
 										NULL,
 										NULL,
 										NULL,
 										NULL);
-	my_state->value = NULL;
-	// if(value != NULL)
-	// {
-	// 	my_state->value = (Data*) malloc(sizeof(Data));
-	// 	memccpy(my_state->value, value, 1, sizeof(Data));
-	// }
-	my_state->is_primitive = 0;
-	my_state->is_dictionary = 0;
-	my_state->is_other_data_structure = 1;
-	my_state->is_control_flow_node = 0;
+	my_state->collectionState = CollectionStateInit(collection_type);
 	return my_state;
 }
 
@@ -430,7 +390,8 @@ State* ContextualStateChartGetVariableState(ContextualStateChart* contextualStat
 {
 	int parent_id = TrieTreeSearch(contextualStateChart->state_names, parent_name);
 	State* parent_state = (State*) VectorGetItem(contextualStateChart->states, parent_id);
-	int variable_id = TrieTreeSearch(parent_state->keys, variable_name);
+	// assume parent_state->collectionState->keys has stuff in it
+	int variable_id = TrieTreeSearch(parent_state->collectionState->keys, variable_name);
 	State* variable_state = (State*) VectorGetItem(contextualStateChart->states, variable_id);
 	return variable_state;
 }
@@ -460,44 +421,44 @@ int StateGetInt(ContextualStateChart* contextualStateChart, Vector* parent_name,
 	// use the keys property from the parent state
 	// my_state->keys
 	State* variable_state = ContextualStateChartGetVariableState(contextualStateChart, parent_name, variable_name);
-	if(variable_state->value->type_id != 1)
+	if(PrimitiveStateGetValue(variable_state)->type_id != 1)
 	{
 		return 0;
 	}
-	return DataGetInt(variable_state->value);
+	return DataGetInt(PrimitiveStateGetValue(variable_state));
 }
 char StateGetChar(ContextualStateChart* contextualStateChart, Vector* parent_name, Vector* variable_name)
 {
 	// use the keys property from the parent state
 	// my_state->keys
 	State* variable_state = ContextualStateChartGetVariableState(contextualStateChart, parent_name, variable_name);
-	if(variable_state->value->type_id != 2)
+	if(PrimitiveStateGetValue(variable_state)->type_id != 2)
 	{
 		return '\0';
 	}
-	return DataGetChar(variable_state->value);
+	return DataGetChar(PrimitiveStateGetValue(variable_state));
 }
 float StateGetFloat(ContextualStateChart* contextualStateChart, Vector* parent_name, Vector* variable_name)
 {
 	// use the keys property from the parent state
 	// my_state->keys
 	State* variable_state = ContextualStateChartGetVariableState(contextualStateChart, parent_name, variable_name);
-	if(variable_state->value->type_id != 3)
+	if(PrimitiveStateGetValue(variable_state)->type_id != 3)
 	{
 		return 0.0;
 	}
-	return DataGetFloat(variable_state->value);
+	return DataGetFloat(PrimitiveStateGetValue(variable_state));
 }
 bool StateGetBool(ContextualStateChart* contextualStateChart, Vector* parent_name, Vector* variable_name)
 {
 	// use the keys property from the parent state
 	// my_state->keys
 	State* variable_state = ContextualStateChartGetVariableState(contextualStateChart, parent_name, variable_name);
-	if(variable_state->value->type_id != 3)
+	if(PrimitiveStateGetValue(variable_state)->type_id != 3)
 	{
 		return 0;
 	}
-	return DataGetBool(variable_state->value);
+	return DataGetBool(PrimitiveStateGetValue(variable_state));
 }
 
 
@@ -527,11 +488,11 @@ void StateSetInt(	ContextualStateChart* contextualStateChart,
 {
 	// use the keys property from the parent state
 	State* variable_state = ContextualStateChartGetVariableState(contextualStateChart, parent_name, variable_name);
-	if(variable_state->value->type_id != 1)
+	if(variable_state->primitiveState->value->type_id != 1)
 	{
 		return;
 	}
-	DataSetInt(variable_state->value, new_int);
+	DataSetInt(variable_state->primitiveState->value, new_int);
 }
 void StateSetChar(	ContextualStateChart* contextualStateChart,
 					Vector* parent_name,
@@ -541,11 +502,11 @@ void StateSetChar(	ContextualStateChart* contextualStateChart,
 	// use the keys property from the parent state
 	// my_state->keys
 	State* variable_state = ContextualStateChartGetVariableState(contextualStateChart, parent_name, variable_name);
-	if(variable_state->value->type_id != 2)
+	if(variable_state->primitiveState->value->type_id != 2)
 	{
 		return;
 	}
-	DataSetChar(variable_state->value, new_char);
+	DataSetChar(variable_state->primitiveState->value, new_char);
 }
 void StateSetFloat(	ContextualStateChart* contextualStateChart,
 					Vector* parent_name,
@@ -555,11 +516,11 @@ void StateSetFloat(	ContextualStateChart* contextualStateChart,
 	// use the keys property from the parent state
 	// my_state->keys
 	State* variable_state = ContextualStateChartGetVariableState(contextualStateChart, parent_name, variable_name);
-	if(variable_state->value->type_id != 3)
+	if(variable_state->primitiveState->value->type_id != 3)
 	{
 		return;
 	}
-	DataSetFloat(variable_state->value, new_float);
+	DataSetFloat(variable_state->primitiveState->value, new_float);
 }
 void StateSetBool(	ContextualStateChart* contextualStateChart,
 					Vector* parent_name,
@@ -569,11 +530,11 @@ void StateSetBool(	ContextualStateChart* contextualStateChart,
 	// use the keys property from the parent state
 	// my_state->keys
 	State* variable_state = ContextualStateChartGetVariableState(contextualStateChart, parent_name, variable_name);
-	if(variable_state->value->type_id != 3)
+	if(variable_state->primitiveState->value->type_id != 3)
 	{
 		return;
 	}
-	DataSetBool(variable_state->value, new_bool);
+	DataSetBool(variable_state->primitiveState->value, new_bool);
 }
 
 // search for neighbors
@@ -626,6 +587,7 @@ void DataPrintData(Data* variable)
 void StatePrintIntsFromVectorAsChars(Vector* my_ints)
 {
 	int size = VectorGetPopulation(my_ints);
+	// printf("size %i\n", size);
 	for(int i = 0; i < size; i++)
 	{
 		int letter = *((int*) VectorGetItem(my_ints, i));
@@ -633,24 +595,79 @@ void StatePrintIntsFromVectorAsChars(Vector* my_ints)
 	}
 
 }
-
-void StatePrintAttribute(int indents, Vector* attribute_name, Vector* attribute)
+enum StateAttributes{_name, _function_name, _next_states, _children};
+void StatePrintAttribute(int indents, Vector* attribute_name, Vector* attribute, int state_attribute)
 {
 	// printf("%sname:\n", TrieTreeMakeIndents(indents));
 	printf("%s", TrieTreeMakeIndents(indents));
 
-	// printing name of attribute
 	StatePrintIntsFromVectorAsChars(attribute_name);
 	printf(":\n%s", TrieTreeMakeIndents(indents));
-	printf("|");
-	StatePrintIntsFromVectorAsChars(attribute);
-	printf("|");
+
+	if(state_attribute == _name || state_attribute == _function_name)
+	{
+			// printing name of attribute
+			printf("|");
+			// what if attibute is 
+			StatePrintIntsFromVectorAsChars(attribute);
+			printf("|");
+	}
+	else if(state_attribute == _next_states || state_attribute == _children)
+	{
+		printf("|print 2 level vector|\n");
+	}
 
 	printf("\n");
 
 }
+void StatePrintPrimitive(State* state, int indents)
+{
+	if(state->primitiveState != NULL && state->collectionState != NULL)
+	{
+		return;
+	}
+	// if primitive exists
+		// print it
+	printf("%s", TrieTreeMakeIndents(indents));
 
-void StatePrintState(State* state, int indents)
+	// printing name of attribute
+	StatePrintIntsFromVectorAsChars(VectorMakeVectorOfChars("variable"));
+
+	printf(":\n%s", TrieTreeMakeIndents(indents));
+	
+	DataPrintData(PrimitiveStateGetValue(state));
+	printf("\n");
+}
+void StatePrintCollection(ContextualStateChart* contextual_state_chart, State* state, int indents)
+{
+	// if collection exits
+		// if it's an array
+			// StatePrintCollection for each state found in array
+		// if it's a dict
+			// StatePrintCollection for each value from each key in dict(dft to get the keys)
+	if(state->primitiveState != NULL && state->collectionState != NULL)
+	{
+		return;
+	}
+	if(state->primitiveState != NULL)
+	{
+		// are at the bottom level
+		StatePrintPrimitive(state, indents);
+	}
+	else if(state->collectionState->is_array)
+	{
+		printf("array\n");
+		for(int i = 0; i < VectorGetPopulation(state->children); i++)
+		{
+			Vector* state_name = (Vector*) VectorGetItem(state->children, i);
+			int state_id = TrieTreeSearch(state->collectionState->keys, state_name);
+			State* my_state = (State*) VectorGetItem(contextual_state_chart->states, state_id);
+			// VectorPrint(state_name);
+			StatePrintCollection(contextual_state_chart, my_state, indents + 3);
+		}
+	}
+}
+void StatePrintState(ContextualStateChart* contextual_state_chart, State* state, int indents)
 {
 
 	if(state == NULL)
@@ -659,37 +676,52 @@ void StatePrintState(State* state, int indents)
 	}
 	// string my_indents = makeSpaces(indents);
 	// State* state = (State*) VectorGetItem(my_machine->states, state_id);
-	StatePrintAttribute(indents,
+	if(state->name != NULL)
+	{
+		StatePrintAttribute(indents,
 						VectorMakeVectorOfChars("name"),
-						state->name);
+						state->name,
+						_name);
 
-
-	StatePrintAttribute(indents,
-						VectorMakeVectorOfChars("next states"),
-						state->next_states);
-	StatePrintAttribute(indents,
-						VectorMakeVectorOfChars("children"),
-						state->children);
-	StatePrintAttribute(indents,
-						VectorMakeVectorOfChars("function name"),
-						state->function_name);
-
-	if(state->value != NULL)
-	{
-		printf("%s", TrieTreeMakeIndents(indents));
-
-		// printing name of attribute
-		StatePrintIntsFromVectorAsChars(VectorMakeVectorOfChars("variable"));
-		printf(":\n%s", TrieTreeMakeIndents(indents));
-		DataPrintData(state->value);
 	}
-	if(state->keys != NULL)
+	if(state->next_states != NULL)
 	{
-		printf("%s", TrieTreeMakeIndents(indents));
-		StatePrintIntsFromVectorAsChars(VectorMakeVectorOfChars("keys"));
-		printf(":\n%s", TrieTreeMakeIndents(indents));
+		StatePrintAttribute(indents,
+						VectorMakeVectorOfChars("next states"),
+						state->next_states,
+						_next_states);
 
-		TrieTreePrintTrieRecursive(state->keys, 0, 1, VectorInitVector());
+	}
+	if(state->children != NULL)
+	{
+		StatePrintAttribute(indents,
+						VectorMakeVectorOfChars("children"),
+						state->children,
+						_children);
+
+	}
+
+	if(state->function_name != NULL)
+	{
+		StatePrintAttribute(indents,
+						VectorMakeVectorOfChars("function name"),
+						state->function_name,
+						_function_name);
+
+	}
+	// printf("here\n");
+	// printf("%i\n", state->primitiveState);
+	if(state->primitiveState != NULL)
+	{
+		StatePrintPrimitive(state, indents);
+	}
+	// printf("here 2\n");
+
+	if(state->collectionState != NULL)
+	{
+		// printf("here again\n");
+		StatePrintCollection(contextual_state_chart, state, indents);
+		// printf("passing\n");
 	}
 	printf("\n\n");
 	
@@ -704,7 +736,7 @@ void ContextualStateChartPrintStateTree(ContextualStateChart* my_machine, int st
 	}
 	State* state = (State*) VectorGetItem(my_machine->states, state_id);
 
-	StatePrintState(state, indents);
+	StatePrintState(my_machine, state, indents);
 
 
 	for(int i = 0; i < VectorGetPopulation(state->children); i++)
@@ -717,6 +749,71 @@ void ContextualStateChartPrintStateTree(ContextualStateChart* my_machine, int st
 }
 
 // evaluator(dfa with setup data structues for nfa)
+void ContextualStateChartPrintStates(ContextualStateChart* contextual_state_chart)
+{
+	for(int i = 0; i < VectorGetPopulation(contextual_state_chart->states); i++)
+	{
+		printf("i %i\n", i);
+		State* my_state = (State*) VectorGetItem(contextual_state_chart->states, i);
+		StatePrintState(contextual_state_chart, my_state, 0);
+	}
+}
+ContextualStateChart* VectorMakeVectorOfChars2(char* my_string)
+{
+	// ContextualStateChart* (so combining the arrays of states will not have the state chart
+	// variable name as part of the paramater list)
+	// Vector* list_of_chars = VectorInitVector();
+	ContextualStateChart* contextual_state_chart = ContextualStateChartInit();
+
+	// using VectorInitVector() lets us autoganerate state names for the array elements
+	// printing this state out will cause a segfault
+	State* structure_state = StateInitVariableCollectionState(VectorInitVector(), array);
+	// StatePrintState(contextual_state_chart, structure_state, 0);
+	VectorAppend(contextual_state_chart->states, structure_state);
+	// where do I add things to keys
+	for(int i = 0; i < strlen(my_string); i++)
+	{
+		// make a 
+
+		// state*
+		// int* char_ptr = (int*) malloc(sizeof(int));
+		// *char_ptr = my_string[i];
+		State* int_state = StateInitVariablePrimitive(
+								TrieTreeInsertWords(contextual_state_chart->state_names,
+													VectorInitVector()),
+								DataInitInt(my_string[i]));
+		// StatePrintState(int_state, 0);
+		VectorAppend(contextual_state_chart->states, int_state);
+		// VectorPrint(int_state->name);
+		// might be wrong
+		StateAddChildEdge(structure_state, int_state->name);
+		Vector* myEdge = (Vector*) VectorGetItem(structure_state->children, i);
+		// VectorPrint(myEdge);
+		// add each state name to the keys so we can find the state
+		TrieTreeInsertWords(structure_state->collectionState->keys, int_state->name);
+		// i -> state name from children -> state id from trie tree search -> state
+		int node_id = TrieTreeSearch(structure_state->collectionState->keys, int_state->name);
+		TrieNode* node = (TrieNode*) VectorGetItem(structure_state->collectionState->keys->trie_tree, node_id);
+		node->state_id = VectorGetLastIndex(contextual_state_chart->states);
+		// printf("%i\n", my_string[i]);
+		// VectorAppend(list_of_chars, char_ptr);
+	}
+	// ContextualStateChartPrintStates(contextual_state_chart);
+	State* my_state = (State*) VectorGetItem(contextual_state_chart->states, 0);
+	StatePrintState(contextual_state_chart, my_state, 0);
+
+	// the strucure state child edge, the int_state name, any other edges that point to it
+	// should be pointing to the same vector made from TrieTreeInsertWords(states->state_names, VectorInitVector())
+
+	// printf("we are here\n%s\n", my_string.c_str());
+	// VectorPrint(list_of_chars);
+	// ContextualStateChartPrintStateTree(contextual_state_chart, 0, 1);
+
+	printf("done\n");
+	return contextual_state_chart;
+
+}
+
 void visit(ContextualStateChart* graph, Vector* start_state, int indents)
 {
 
@@ -731,47 +828,90 @@ void visit(ContextualStateChart* graph, Vector* start_state, int indents)
 
 	*/
 	// add a state called "machine_metrics"
+/*
+	
+	VectorOfInts("my string") -> Vector*
+	ArrayOfVectorsCollectionState(	2,
+					VectorOfInts("my string 1"),
+					VectorOfInts("my string 2")) -> State*
+	f(Vector*, Vector*, Vector*) -> State*
+	State*:
+		{
+			collectionState:
+			{
+				TrieTree* keys
+				bool is_array
+			}
+		}
+	buildDict(
+		VectorPair(VectorOfInts("my key"), ArrayOfVectorsCollectionState(2,
+										VectorOfInts("my string 1"),
+										VectorOfInts("my string 2")))
+						)
+		VectorPair(Vector*|> void* key, State*|> void* value)
+	buildDict(Vector* key_value_pairs)
+	{
+		for pair in key_value_pairs
+			key = pair[0]   // Vector* -> [int*]
+			value = pair[1] // State*
 
-	State* machine_metrics = StateInitDictionary(
-								VectorMakeVectorOfChars("machine metrics"),
-								NULL,
-								VectorMakeVectorOfVectorsOfChars(
-									3,
-									VectorMakeVectorOfChars("next states"),
-									VectorMakeVectorOfChars("parent"),
-									VectorMakeVectorOfChars("indents")
-									)
-							);
+
+	}
+	
+	
+	*/
+	// State* machine_metrics = StateInitDictionary(
+	// 							VectorMakeVectorOfChars("machine metrics"),
+	// 							NULL,
+	// 							VectorMakeVectorOfVectorsOfChars(
+	// 								3,
+	// 								VectorMakeVectorOfChars("next states"),
+	// 								VectorMakeVectorOfChars("parent"),
+	// 								VectorMakeVectorOfChars("indents")
+	// 								)
+	// 						);
 	// StatePrintState(machine_metrics, 0);
 
-	State* next_states = StateInitDictionary(
-							VectorMakeVectorOfChars("next states"),
-							NULL,
-							VectorMakeVectorOfVectorsOfChars(0, VectorInitVector()));
+	// ArrayOfVectorsCollectionState(1, VectorMakeVectorOfChars("start state name")) -> State*
+	/*
+	state*(array of stuff)
+			state*, state*, (array of states)
+				|state*, state*|, |state*, state*| (int state)
+	for ["a", "b c"]
+
+	*/
+	// State* next_states = StateInitVariableCollectionState(
+	// 						VectorMakeVectorOfChars("next states"),
+	// 						array);
+
 	// next_states->keys = TrieTreeInitTrieTree();
 	// loop through start_state
 		// make an int state that holds each int in the vector
 		// add each new name as an empty vector to the keys
 		// take each uniquely formed name and add it to the children vector
-	for(int i = 0; i < VectorGetPopulation(start_state); i++)
-	{
-		// Vector* test = VectorInitVector();
-		Vector* new_name = TrieTreeInsertWords(next_states->keys, VectorInitVector());
-		// printf("%i\n", i);
-		// VectorPrint(new_name);
-		// VectorPrint(start_state);
-		int int_value = *((int*) VectorGetItem(start_state, i));
-		// printf("%i\n", int_value);
-		State* int_state = StateInitVariablePrimitive(
-									new_name,
-									NULL,
-									DataInitInt(int_value));
-		// printf("from state %i\n", int_state->value->_int);
-		// add to graph
-		// add id from graph to next_states->keys[new_name]
-		StatePrintState(int_state, 0);
-	}
-	StatePrintState(next_states, 0);
+	// make a state* for "abcd"
+	// make a state* for state* from above
+	// VectorMakeVectorOfChars("start state name") -> state*
+	// simulate a vector of ints with state*'s
+	// for(int i = 0; i < VectorGetPopulation(start_state); i++)
+	// {
+	// 	// Vector* test = VectorInitVector();
+	// 	Vector* new_name = TrieTreeInsertWords(	next_states->collectionState->keys,
+	// 											VectorInitVector());
+	// 	// printf("%i\n", i);
+	// 	// VectorPrint(new_name);
+	// 	// VectorPrint(start_state);
+	// 	int int_value = *((int*) VectorGetItem(start_state, i));
+	// 	// printf("%i\n", int_value);
+	// 	State* int_state = StateInitVariablePrimitive(
+	// 								new_name,
+	// 								DataInitInt(int_value));
+	// 	// printf("from state %i\n", int_state->value->_int);
+	// 	// add to graph
+	// 	// add id from graph to next_states->keys[new_name]
+	// 	StatePrintState(int_state, 0);
+	// }
+	// StatePrintState(next_states, 0);
 
 	// StateAddChildEdge(next_states, start_state);
 
@@ -793,7 +933,8 @@ void ContextualStateChartTest()
 {
 	ContextualStateChart* graph = ContextualStateChartInit();
 
-	visit(graph, VectorMakeVectorOfChars("start state name"), 0);
+	VectorMakeVectorOfChars2("start state name");
+	// visit(graph, VectorMakeVectorOfChars("start state name"), 0);
 
 }
 /*
