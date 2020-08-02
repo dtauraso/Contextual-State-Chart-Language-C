@@ -37,6 +37,8 @@ void VectorAppendInt(Vector* container, int element);
 // void VectorAppendString(Vector* container, string element);
 
 void VectorAppend(Vector* container, void* element);
+void VectorSet(Vector* container, void* element, int i);
+
 bool VectorPopItem(Vector* container);
 bool VectorPopFirst(Vector* container);
 

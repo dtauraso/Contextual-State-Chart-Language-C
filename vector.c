@@ -189,6 +189,17 @@ void VectorAppend(Vector* container, void* element)
 		//VectorPrint(container);
 
 }
+
+void VectorSet(Vector* container, void* element, int i)
+{
+	if(container == NULL)
+	{
+		return;
+	}
+	container->values[i] = element;
+
+
+}
 bool VectorPopItem(Vector* container)
 {
 	if(container == NULL)
@@ -397,6 +408,22 @@ void VectorPrint(Vector* container)
 // 	}
 // }
 
+// dict methods
+// binsearch (return the integer of the missing item * -1 so the search can detect it's not found
+		// compare(Vector* outer_vector, void* a, void* b) -> bool
+// bool VectorBinSearch(Vector* outer_vector, Vector* vector, Vector* target, void (*function)(Vector* outer_vector, Vector* vector, void* a, void* b))
+// {
+	// assume vector[0] == NULL
+
+	// search for index of target in vector
+		// return a negative value showing position of insert if not found
+		// return a positive value if found
+// }
+// and insert can know where to put it (missing index * -1) make 0 an invalid index)
+// insert new items
+// shift [i, end] items to the right
+// store at i
+// O(nlogn) is acceptable for now(contextual state chart version 1 just needs dict algorithms < n^2)
 void VectorTest()
 {
 	// make a vector

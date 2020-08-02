@@ -1,7 +1,7 @@
 #include "standard_headers.h"
 
 // #include "state.h"
-//#include "vector.h"
+#include "vector.h"
 // #include "trie_tree.h"
 #include "contextual_state_chart.h"
 //#include "trie_node.h"
@@ -466,7 +466,8 @@ int main(int argc, char** argv)
 
 	// }
 	// TrieTreeTest();
-	ContextualStateChartTest();
+	VectorTest();
+	// ContextualStateChartTest();
 	// DynamicMachineTest();
 	// tests pass so far
 	// DynamicMachineTest2();

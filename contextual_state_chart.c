@@ -674,13 +674,9 @@ void StatePrintCollection(ContextualStateChart* contextual_state_chart, State* s
 		for(int i = 0; i < VectorGetPopulation(state->children); i++)
 		{
 			Vector* state_name = (Vector*) VectorGetItem(state->children, i);
-			// trienode id
-			int node_id = TrieTreeSearch(state->collectionState->keys, state_name);
-			// missing something
-			// segfaults
-			// TrieNode* node = (TrieNode*) VectorGetItem(structure_state->collectionState->keys->trie_tree, node_id);
 
-			// claims container is empty but they should have been added
+			int node_id = TrieTreeSearch(state->collectionState->keys, state_name);
+
 			TrieNode* node = (TrieNode*) VectorGetItem(state->collectionState->keys->trie_tree, node_id);
 			State* my_state = (State*) VectorGetItem(contextual_state_chart->states, node->state_id);
 			// VectorPrint(state_name);
@@ -835,6 +831,50 @@ ContextualStateChart* VectorMakeVectorOfChars2(char* my_string)
 
 }
 
+// i -> state name from children -> state id from trie tree search -> state
+// i -> state id from children -> state
+
+ContextualStateChart* ContextualStateChartTransferArray(ContextualStateChart* contextualStateChart,
+														ContextualStateChart* array)
+{
+	// array[0] is the start node
+	// contextualStateChart.append(start node)
+	// start_node_id = len(contextualStatechart)
+	// array->states vector of states
+	/*
+	contextualStateChart.append(array->states[0])
+	start_node_id = len(contextualStatechart) - 1
+	for i in range(1, array->states)
+		state = array->states[i]
+		contextualStateChart->states.append(state)
+
+		contextualStateChart->states[start_node_id]->children.append(state->name)
+
+		all should be already unique so state->name will not be altered
+		contextualStateChart
+						->states[start_node_id]
+						->collectionState
+						->keys.add(state->name)
+		last_trie_node_id = contextualStateChart
+						->states[start_node_id]
+						->collectionState
+						->keys.search(state->name)
+		last_trie_node = contextualStateChart
+						->states[start_node_id]
+						->collectionState
+						->keys
+						->trie_tree[last_trie_node_i]
+		last_trie_node.state_id = len(contextualStatechart) - 1
+
+
+	*/
+	// 
+	// contextualStateChart->state_names
+
+	// 
+	
+
+}
 void visit(ContextualStateChart* graph, Vector* start_state, int indents)
 {
 

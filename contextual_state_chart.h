@@ -69,8 +69,10 @@ typedef struct ContextualStateChart
 
 	// variations of the same state in different situations represent
 	// the idea of context and are identified by slightly different state names
+
+	// state are sorted by state name
 	Vector* states;
-	TrieTree* state_names;
+	// TrieTree* state_names;
 	// root is position 0
 
 
@@ -90,7 +92,7 @@ typedef struct CollectionState
 {
 	// for when this state represents a collection
 	// a value state can link to a collection state
-	TrieTree* keys;
+	// TrieTree* keys;
 
 	bool is_dictionary;
 
@@ -153,7 +155,8 @@ typedef struct AsynchronousTimelineMergeState
 
 	int threshold;
 	int visit_count;
-	TrieTree* parents;
+	// id's are sorted by state name
+	Vector* parents;
 	int duration;
 
 }AsynchronousTimelineMergeState;
@@ -165,13 +168,16 @@ typedef struct State
 	// primitive value
 	// dictionary
 	// root for any other data structure
+
+	int id;
 	// 1 level
 	Vector* name;
 
-	// 2 levels
+	// 1 level
 	Vector* next_states;
 
-	// 2 levels
+	// 1 level
+	// id's are sorted by state name if state is a dictionary state
 	Vector* children;
 
 	AsynchronousTimelineMergeState* asynchronousTimelineMergeState;
