@@ -130,6 +130,7 @@ and lets us use 1 array to store the state id numbers in the child array
 
 // }
 
+// 2-3-4 tree
 // typedef struct BalancedTreeNode
 // {
 //     Vector* keys;
