@@ -37,7 +37,7 @@ void VectorAppendInt(Vector* container, int element);
 // void VectorAppendString(Vector* container, string element);
 
 void VectorAppend(Vector* container, void* element);
-void VectorSet(Vector* container, void* element, int i);
+void VectorSetInt(Vector* container, int element, int i);
 
 bool VectorPopItem(Vector* container);
 bool VectorPopFirst(Vector* container);
@@ -51,6 +51,7 @@ void VectorShiftItems(Vector* container, int index);
 
 
 void VectorShiftLeft(Vector* container, int start, int end);
+void VectorShiftRight(Vector* container, int index);
 
 
 

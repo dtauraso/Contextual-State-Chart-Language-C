@@ -2,6 +2,7 @@
 
 // #include "state.h"
 #include "vector.h"
+#include "balanced_tree_node.h"
 // #include "trie_tree.h"
 #include "contextual_state_chart.h"
 //#include "trie_node.h"
@@ -466,7 +467,8 @@ int main(int argc, char** argv)
 
 	// }
 	// TrieTreeTest();
-	VectorTest();
+	// VectorTest();
+	BalancedTreeNodeTest();
 	// ContextualStateChartTest();
 	// DynamicMachineTest();
 	// tests pass so far

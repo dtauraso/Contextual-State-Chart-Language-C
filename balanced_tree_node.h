@@ -13,7 +13,12 @@ typedef struct HashNode
 
 typedef struct BalancedTreeNode
 {
+    int parent;
     Vector* keys;
     Vector* children;
 }BalancedTreeNode;
+
+
+void BalancedTreeNodeTest();
+
 #endif
