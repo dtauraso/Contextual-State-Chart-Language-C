@@ -349,10 +349,24 @@ void BalancedTreeNodeInsert(Vector* tree, int current_node, int interval_id, int
         root node
             slit down
         internal node
-            split across
+            get the interval
+            f()
+            {
+                split across
+                use the interval with newly dsitributed child nodes to find the right child
+                to recurse on
+                return the id number of the newly added child so we can recurse on the new child
+                BalancedTreeNodeInsert(tree, new_child_id, interval_id = -1, new_key)
+                becuase the new nodes are 2-Nodes there will be no need to also return an interval id
+
+            }
 
         leaf node(not the root)
             split across
+            do differently cause we don't need to recurse as we have found the node to insert at
+            split across
+            use the interval with newly dsitributed child nodes to find the right child
+            the interval in this case is only used to find the child, not used for recursing or inserting
         */ 
     // 4-Node internal node
     if(children_count == 4)
@@ -370,7 +384,7 @@ void BalancedTreeNodeInsert(Vector* tree, int current_node, int interval_id, int
         // recurse
         BalancedTreeNodeInsert(tree, next_node, interval, new_key);
     }
-    // leaf node
+    // leaf node (should never have 3 keys)
     else if(children_count == 0)
     {
         // if current leaf node has 3 items(4-Node leaf node)
