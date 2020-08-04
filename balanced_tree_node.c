@@ -305,6 +305,7 @@ void BalancedTreeNodeSplit(Vector* tree, int current_node, int parent_interval_i
         
         else
         {
+            // cases are right but the code blocks may be different than expected
             // the parent isn't a 4-Node as we would have converted it last recursive call
             // if it was
             BalancedTreeNode* parent = (BalancedTreeNode*) VectorGetItem(tree, node->parent);
@@ -327,6 +328,14 @@ void BalancedTreeNodeSplit(Vector* tree, int current_node, int parent_interval_i
         
     
 }
+int splitAcross(Vector* tree, int current_node, int parent_interval_id, int new_key)
+{
+    // split across
+    // store the integers into a vector
+    // find the interval of insert
+    // choose the currect newly split node and return it's id
+    return 0;
+}
 void BalancedTreeNodeInsert(Vector* tree, int current_node, int interval_id, int new_key)
 {
     if(tree == NULL)
@@ -340,84 +349,129 @@ void BalancedTreeNodeInsert(Vector* tree, int current_node, int interval_id, int
         return;
     }
     int children_count = VectorGetPopulation(node->children);
+    int key_count = VectorGetPopulation(node->keys);
     // if the 4-Node has a parent
         // find the interval
         // split
         // use the interval to figure out the child to recurse on
         /*
-        kinds of 4-Nodes
+        kinds of 4-Nodes(preprocess the 4-Node into a 3-Node or 2-Node before processing the node)
+        when splitting across make the nodes first, then use the cases for making the connections
         root node
-            slit down
+            split down
         internal node
             get the interval
             f()
             {
                 split across
+                check both new children and the parent to figure out what node to pick
+                use a vector holding pointers to all 4 items
+                return the node_id found that I should be currently on after splitting and before processing the insert cases
+                so next part can figure out what child's child to find
+
+                find interval
                 use the interval with newly dsitributed child nodes to find the right child
-                to recurse on
+                split across to make the new child nodes
+                return the interval_id(fails cause we will not see the children locations anymore)
+                original intervals [0, 1](left child) [2, 3] (right chld)
+                use %2 to select the proper child's children after picking the child
+                to recurse on the child's children
+
                 return the id number of the newly added child so we can recurse on the new child
                 BalancedTreeNodeInsert(tree, new_child_id, interval_id = -1, new_key)
-                becuase the new nodes are 2-Nodes there will be no need to also return an interval id
 
             }
 
         leaf node(not the root)
+            find interval
             split across
             do differently cause we don't need to recurse as we have found the node to insert at
             split across
             use the interval with newly dsitributed child nodes to find the right child
             the interval in this case is only used to find the child, not used for recursing or inserting
+        
+        kinds of 3-Nodes
+            internal
+                find interval and recurse
+            leaf
+                insert item
+        
+        kinds of 2-Nodes
+            internal
+                find interval and recurse
+            leaf
+                insert item
+
+        tree examples
+
+        parent is a 2-Node and it's right most child is a 4-Node
+        a1
+            a2|a3
+            a4|a5|a6
+        
+        4 different insert places that require the 4-Node to split across
+    
+
+        
         */ 
-    // 4-Node internal node
-    if(children_count == 4)
+    // preprocess the 4-Node to a 2-Node or 3-Node
+    // 4-Nodes
+    // root
+    if(node->parent == -1 && key_count == 3)
     {
-        // preemptive split (saving us from cascading changes)
+        // split down
+        // splitDown(Vector* tree, int current_node)
+        // // split
+        // BalancedTreeNodeSplit(tree, current_node, -1);
     }
+    // internal node or leaf node
+    else if(node->parent >= 0)
+    {
+        if(key_count == 3)
+        {
+            if(children_count == 4 || children_count == 0)
+            {
+                // split across
+                /*
+                    chosen_child_node = splitAcross(Vector* tree,
+                                                    int current_node,
+                                                    int parent_interval_id,
+                                                    int new_key)
+
+                */
+                // update node using chosen_child_node
+
+            }
+        }
+    }
+    // find interval for recurse or to insert
+    int interval = BalancedTreeNodeFindInterval(node->keys, new_key);
+
     // 2-Node, 3-Node internal node
     if(children_count >= 2 && children_count <= 3)
     {
         // printf("2<= children_count <= 3\n");
-        // find interval
-        int interval = BalancedTreeNodeFindInterval(node->keys, new_key);
         int next_node = *(int*) VectorGetItem(node->children, interval);
         // printf("here\n");
         // recurse
         BalancedTreeNodeInsert(tree, next_node, interval, new_key);
     }
-    // leaf node (should never have 3 keys)
+    // 2-Node, 3-Node leaf node
     else if(children_count == 0)
     {
-        // if current leaf node has 3 items(4-Node leaf node)
-        int key_count = VectorGetPopulation(node->keys);
-        if(key_count == 3)
-        {
-            // split
-            BalancedTreeNodeSplit(tree, current_node, -1);
-            // recurse
-            int interval = BalancedTreeNodeFindInterval(node->keys, new_key);
-            // printf("branch out at %i\n", interval);
 
-            int child = *((int*) VectorGetItem(node->children, interval));
-            BalancedTreeNodeInsert(tree, child, interval, new_key);
+        // printf("new value %i our interval %i, %i\n", new_key, interval, VectorGetPopulation(node->keys));
+        // nth interval
+        if(interval == VectorGetPopulation(node->keys))
+        {
+            VectorAppendInt(node->keys, new_key);
         }
+        // [0, n - 1] intervals consistent with i: [0, len(keys) - 1]
         else
         {
-
-            // else find location to insert
-            int interval = BalancedTreeNodeFindInterval(node->keys, new_key);
-            // printf("new value %i our interval %i, %i\n", new_key, interval, VectorGetPopulation(node->keys));
-            // nth interval
-            if(interval == VectorGetPopulation(node->keys))
-            {
-                VectorAppendInt(node->keys, new_key);
-            }
-            // [0, n - 1] intervals consistent with i: [0, len(keys) - 1]
-            else
-            {
-                // printf("%i right shift time, location for key %i\n", new_key, interval);
-                VectorShiftRight(node->keys, interval);
-                VectorSetInt(node->keys, new_key, interval);
-            }
+            // printf("%i right shift time, location for key %i\n", new_key, interval);
+            VectorShiftRight(node->keys, interval);
+            VectorSetInt(node->keys, new_key, interval);
         }
     }
 }
