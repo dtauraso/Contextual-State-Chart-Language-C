@@ -313,7 +313,7 @@ void BalancedTreeNodeSplit(Vector* tree, int current_node, int parent_interval_i
             {
                 // middle chld is the 4-Node we want to split
             }
-            else if(parent_interval_id == 1)
+            else if(parent_interval_id == 0)
             {
                 // first node is the 4-Node we want to split
             }
@@ -340,6 +340,20 @@ void BalancedTreeNodeInsert(Vector* tree, int current_node, int interval_id, int
         return;
     }
     int children_count = VectorGetPopulation(node->children);
+    // if the 4-Node has a parent
+        // find the interval
+        // split
+        // use the interval to figure out the child to recurse on
+        /*
+        kinds of 4-Nodes
+        root node
+            slit down
+        internal node
+            split across
+
+        leaf node(not the root)
+            split across
+        */ 
     // 4-Node internal node
     if(children_count == 4)
     {
@@ -461,7 +475,7 @@ void BalancedTreeNodeTest()
 
     BalancedTreeNodeInsert(my_tree, 0, -1, 9);
 
-    BalancedTreeNodeInsert(my_tree, 0, -1, 10);
+    // BalancedTreeNodeInsert(my_tree, 0, -1, 10);
 
     // BalancedTreeNodeInsert(my_tree, 0, 5);
 
