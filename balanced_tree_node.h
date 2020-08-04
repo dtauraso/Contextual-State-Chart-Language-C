@@ -2,21 +2,22 @@
 #define HASH_NODE
 #include "vector.h"
 
-typedef struct HashNode
-{
-
-    void* key; // point to same state name in the main array
-    int value; // id number of the state in the main array
-    Vector* chain;
-    bool is_start_of_chain;
-}HashNode;
-
 typedef struct BalancedTreeNode
 {
     int parent;
     Vector* keys;
     Vector* children;
 }BalancedTreeNode;
+
+BalancedTreeNode* BalancedTreeNodeInit();
+BalancedTreeNode* BalancedTreeNodeInitWithKey(int key);
+int BalancedTreeNodeFindInterval(Vector* keys, int new_key);
+void BalancedTreeNodeSplit(Vector* tree, int current_node, int parent_interval_id);
+void BalancedTreeNodeInsert(Vector* tree, int current_node, int interval_id, int new_key);
+void BalancedTreeNodePrintTree(Vector* tree, int current_node, int indents);
+
+
+
 
 
 void BalancedTreeNodeTest();

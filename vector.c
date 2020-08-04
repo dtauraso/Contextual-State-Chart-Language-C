@@ -350,31 +350,30 @@ void VectorShiftLeft(Vector* container, int start, int end)
 void VectorShiftRight(Vector* container, int index)
 {
 	// extend the vector by 1 unit if we are on the last index
+	// assume the user will use VectorSetInt next
 	// printf("index %i\n");
-	if(index == container->population - 1)
+	if(container->population == container->size)
 	{
 		// printf("in deep shit\n");
 		container->size += 1;
 
 		container->values = (void**) realloc(container->values, sizeof(void*) * container->size);
 
-		// int* dummy_element_ptr = (int*) malloc(sizeof(int));
-		// *dummy_element_ptr = 20;
+		// int* element_ptr = (int*) malloc(sizeof(int));
+		// *element_ptr = 20;
 
 		container->values[container->population] = NULL;
 
 		container->population += 1;
-		// printf("done\n");
-		// return;
 	}
-	// for(int i = 0; i < container->population; i++)
-	// {
-	// 	int* key = *((int*) container->values[i]);
+	// printf("before shift\n");
+	// for(int i = 0; i < VectorGetPopulation(container); i++)
+    // {
+    //     int key = *((int*) VectorGetItem(container, i));
 
-	// 	printf("|%i|\n", key);
-	// }
-	// printf("done printing\n");
-	// exit(1);
+    //     printf("|%i|", key);
+    // }
+	// printf("\n");
 	// i > index not i >= index is vital or we will accidentally shift ouside our intended bounds
 	for(int i = container->population - 1; i > index; i--)
 	{
@@ -383,17 +382,15 @@ void VectorShiftRight(Vector* container, int index)
 		// printf("value %i\n", *((int*) container->values[i]));
 		container->values[i - 1] = NULL;
 	}
+	// printf("after shift\n");
+	// for(int i = 0; i < VectorGetPopulation(container); i++)
+    // {
+    //     int key = ((int*) VectorGetItem(container, i));
 
-	// printf("done shifting\n");
-	// for(int i = 0; i < container->population; i++)
-	// {
-	// 	int* key = ((int*) container->values[i]);
+    //     printf("|%i|", key);
+    // }
+	// printf("\n");
 
-	// 	printf("|%i|\n", key);
-	// }
-
-	// exit(1);
-	// container->population++;
 }
 void VectorSetInt(Vector* container, int element, int i)
 {
@@ -401,11 +398,10 @@ void VectorSetInt(Vector* container, int element, int i)
 	{
 		return;
 	}
-	printf("set int\n");
+	// printf("set int\n");
 	int* element_ptr = (int*) malloc(sizeof(int));
 	*element_ptr = element;
 	container->values[i] = element_ptr;
-	// container->population++;
 
 }
 
