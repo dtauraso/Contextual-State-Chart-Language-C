@@ -12,8 +12,15 @@ typedef struct BalancedTreeNode
 BalancedTreeNode* BalancedTreeNodeInit();
 BalancedTreeNode* BalancedTreeNodeInitWithKey(int key);
 int BalancedTreeNodeFindInterval(Vector* keys, int new_key);
+void BalancedTreeNodeSplitDown(Vector* tree, int current_node);
 void BalancedTreeNodeSplit(Vector* tree, int current_node, int parent_interval_id);
+
+int BalancedTreeNodeSplitAcross(Vector* tree, int current_node, int parent_interval_id, int new_key);
+
 void BalancedTreeNodeInsert(Vector* tree, int current_node, int interval_id, int new_key);
+
+void BalancedTreeNodeInsertTest(Vector* my_tree, int arg_count, ...);
+
 void BalancedTreeNodePrintTree(Vector* tree, int current_node, int indents);
 
 
