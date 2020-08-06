@@ -20,7 +20,7 @@ Vector* VectorInitVector()
 	new_container->values = NULL;
 	new_container->size = 0;
 	new_container->population = 0;
-	new_container->first = 0;
+	new_container->start = -1;
 	new_container->end = 0;
 	// new_container->is_empty = true;
 	// from C's point of view new_container == NULL
@@ -37,7 +37,7 @@ Vector* VectorInitVectorSize(int size)
 	new_container->values = (void**) malloc(sizeof(void*) * size);
 	new_container->size = size;
 	new_container->population = 0;
-	new_container->first = 0;
+	new_container->start = -1;
 	new_container->end = 0;
 	// new_container->is_empty = true;
 	return new_container;
@@ -48,7 +48,7 @@ bool VectorDeleteVector(Vector* container)
 	{
 		return false;
 	}
-	for(int i = 0; i < container->population; i++)
+	for(int i = container->start; i < container->end; i++)
 	{
 		free(container->values[i]);
 		container->values[i] = NULL;
@@ -61,7 +61,7 @@ bool VectorDeleteVector(Vector* container)
 Vector* VectorCopyVector(Vector* my_vector)
 {
 	Vector* new_vector = VectorInitVector();
-	for(int i = 0; i < VectorGetPopulation(my_vector); i++)
+	for(int i = my_vector->start; i < my_vector->end; i++)
 	{
 		int integer_to_append = *((int*) VectorGetItem(my_vector, i));
 		VectorAppendInt(new_vector, integer_to_append);
@@ -75,7 +75,7 @@ int VectorGetLastIndex(Vector* container)
 	{
 		return -1;
 	}
-	return container->population - 1;
+	return container->end - 1;
 }
 // for unsorted only
 void* VectorGetItem(Vector* container, int i)
@@ -91,38 +91,17 @@ void* VectorGetItem(Vector* container, int i)
 		printf("container is empty\n");
 		return NULL;
 	}
-	else if(i < container->population && i >= 0)
+	else if(i < container->end && i >= 0)
 	{
 		// printf("item |%i|\n", container->values[i]);
 		return container->values[i];
 	}
 	else
 	{
-		//printf("out of bounds\n");
+		printf("out of bounds\n");
 		return NULL;
 	}
 
-}
-void VectorSetItemToNull(Vector* container, int i)
-{
-	// very unsafe to use
-	// only use if the population size has already been adjusted
-	//printf("set to null\n");
-	if(container == NULL)
-	{
-		return;
-	}
-	if(i < container->population && i >= 0)
-	{
-		//printf("item |%x|\n", container->values[i]);
-		container->values[i] = NULL;
-		
-	}
-	else
-	{
-		//printf("out of bounds\n");
-		return;
-	}
 }
 int VectorGetPopulation(Vector* container)
 {
@@ -131,6 +110,15 @@ int VectorGetPopulation(Vector* container)
 		return -1;
 	}
 	return container->population;
+}
+int VectorGetEnd(Vector* container)
+{
+		if(container == NULL)
+	{
+		return -1;
+	}
+	return container->end;
+
 }
 void VectorAppendInt(Vector* container, int element)
 {
@@ -158,10 +146,10 @@ void VectorAppend(Vector* container, void* element)
 		container->values = (void**) malloc(sizeof(void*));
 		container->size = 1;
 		container->values[0] = element;
-		container->population = 1;
+		container->start++;
 
 	}
-	else if(container->population == container->size)
+	else if(container->end == container->size)
 	{
 
 		//printf("size %i\n", container->size);
@@ -169,21 +157,13 @@ void VectorAppend(Vector* container, void* element)
 		container->size *= 2;
 
 		container->values = (void**) realloc(container->values, sizeof(void*) * container->size);
-
-
-		container->values[container->population] = element;
-		container->population += 1;
-
-		
 	}
-	else if(container->population < container->size)
-	{
-		//printf("regular\n");
 
-		container->values[container->population] = element;
-		container->population += 1;
+	container->values[container->end] = element;
+	container->population += 1;
+	
+	container->end++;
 
-	}
 	// container->is_empty = false;
 		//printf("result\n");
 		//VectorPrint(container);
@@ -199,11 +179,13 @@ bool VectorPopItem(Vector* container)
 	//printf("here %i\n", container->population - 1);
 	//VectorPrint(container);
 
-	int index = container->population - 1;
+	int index = container->end - 1;
 	free(container->values[index]);
 	container->values[index] = NULL;
 
 	container->population -= 1;
+	container->end--;
+
 	//VectorPrint(container);
 	return true;
 ;
@@ -215,25 +197,6 @@ bool VectorPopFirst(Vector* container)
 		return false;
 	}
 	return VectorDeleteItem(container, 0);
-}
-void VectorIncrementTopInt(Vector* container)
-{
-	if(container == NULL)
-	{
-		return;
-	}
-	//printf("here %i\n", container->population);
-	//		VectorPrint(container);
-	if(container->population > 0)
-	{
-		int index = container->population - 1;
-		//free(container->values[index]);
-		//container->values[index] = NULL;
-		*((int*) container->values[index]) += 1;
-		//container->population -= 1;
-		//VectorPrint(container);
-
-	}
 }
 bool VectorDeleteItem(Vector* container, int index)
 {
@@ -251,10 +214,10 @@ bool VectorDeleteItem(Vector* container, int index)
 	//printf("%i\n", *x);
 	free(container->values[index]);
 	container->values[index] = NULL;
-	if(index < container->population)
+	if(index < container->end)
 	{
 		// printf("%i %i\n", index + 1, container->population);
-		for(int i = index + 1; i < container->population; i++)
+		for(int i = index + 1; i < container->end; i++)
 		{
 			container->values[i - 1] = container->values[i];
 
@@ -264,29 +227,31 @@ bool VectorDeleteItem(Vector* container, int index)
 		// VectorPrint(container);
 
 		container->population--;
+		container->end--;
+
 		// printf("%i\n", container->population);
 	}
 	return true;
 
 }
-bool VectorDeleteAllItems(Vector* container)
-{
-	// assuems all elements are primitives
-	if(container == NULL)
-	{
-		return false;
-	}
-	for(int i = 0; i < container->population; i++)
-	{
-		free(container->values[i]);
-		container->values[i] = NULL;
-	}
-	free(container->values);
-	container->values = NULL;
-	free(container);
-	container = NULL;
-	return true;
-}
+// bool VectorDeleteAllItems(Vector* container)
+// {
+// 	// assuems all elements are primitives
+// 	if(container == NULL)
+// 	{
+// 		return false;
+// 	}
+// 	for(int i = 0; i < container->population; i++)
+// 	{
+// 		free(container->values[i]);
+// 		container->values[i] = NULL;
+// 	}
+// 	free(container->values);
+// 	container->values = NULL;
+// 	free(container);
+// 	container = NULL;
+// 	return true;
+// }
 bool VectorDeleteAllItems2(Vector* container)
 {
 	// assuems all elements are primitives
@@ -294,7 +259,7 @@ bool VectorDeleteAllItems2(Vector* container)
 	{
 		return false;
 	}
-	for(int i = 0; i < container->population; i++)
+	for(int i = container->start; i < container->end; i++)
 	{
 		free(container->values[i]);
 		container->values[i] = NULL;
@@ -303,6 +268,8 @@ bool VectorDeleteAllItems2(Vector* container)
 	container->values = NULL;
 	container->population = 0;
 	container->size = 0;
+	container->start = -1;
+	container->end = 0;
 	// free(container);
 	// container = NULL;
 	return true;
@@ -310,12 +277,12 @@ bool VectorDeleteAllItems2(Vector* container)
 
 void VectorShiftItems(Vector* container, int index)
 {
-	if(container == NULL || index >= container->population)
+	if(container == NULL || index >= container->end)
 	{
 		return;
 	}
 
-	for(int i = index + 1; i < container->population; i++)
+	for(int i = index + 1; i < container->end; i++)
 	{
 		container->values[i - 1] = container->values[i];
 
@@ -323,6 +290,7 @@ void VectorShiftItems(Vector* container, int index)
 
 	}
 	container->population--;
+	container->end--;
 	
 }
 
@@ -333,7 +301,7 @@ void VectorShiftLeft(Vector* container, int start, int end)
 	{
 		return;
 	}
-	if(container->population <= start + 1)
+	if(container->end <= start + 1)
 	{
 		return;
 	}
@@ -353,9 +321,9 @@ void VectorShiftRight(Vector* container, int index)
 	// assume the user will use VectorSetInt next
 	// printf("index %i\n");
 	// container->end == container->size instead
-	if(container->population == container->size)
+	if(container->end == container->size)
 	{
-		// printf("in deep shit\n");
+		printf("in deep shit\n");
 		container->size += 1;
 
 		// ads another block of memeory to the right end of the array
@@ -364,38 +332,46 @@ void VectorShiftRight(Vector* container, int index)
 		// int* element_ptr = (int*) malloc(sizeof(int));
 		// *element_ptr = 20;
 
-		container->values[container->population] = NULL;
+		container->values[container->end] = NULL;
 
 		// changing the order of items in array should not affect the total items being counted
 		// a variable measuring the last index used in the array should be used instead
-		container->population += 1;
-	}
-	// printf("before shift\n");
-	// for(int i = 0; i < VectorGetPopulation(container); i++)
-    // {
-    //     int key = *((int*) VectorGetItem(container, i));
+		// container->population += 1;
+		container->end++;
 
-    //     printf("|%i|", key);
-    // }
-	// printf("\n");
+	}
+	printf("before shift\n");
+	for(int i = 0; i < VectorGetEnd(container); i++)
+    {
+        int key = ((int*) VectorGetItem(container, i));
+
+        printf("|%i|", key);
+    }
+	printf("\n");
 	// i > index not i >= index is vital or we will accidentally shift ouside our intended bounds
 	// start 1 place after the last known item so we guarantee we are shifting all item within the range
 	// int i = container->end
-	for(int i = container->population; i > index; i--)
+	// printf("start %i, end %i\n", index, container->end - 1);
+	for(int i = container->end; i > index; i--)
 	{
 		// printf("%i <= %i\n", i, i - 1);
 		container->values[i] = container->values[i - 1];
-		// printf("value %i\n", *((int*) container->values[i]));
+		// printf("i %i value %i\n", i, ((int*) container->values[i]));
 		container->values[i - 1] = NULL;
 	}
-	// printf("after shift\n");
-	// for(int i = 0; i < VectorGetPopulation(container); i++)
-    // {
-    //     int key = ((int*) VectorGetItem(container, i));
+	// printf("0 value %i\n", ((int*) container->values[0]));
+	// printf("1 value %i\n", ((int*) container->values[1]));
 
-    //     printf("|%i|", key);
-    // }
-	// printf("\n");
+
+	printf("after shift %i, %i\n", 0, VectorGetEnd(container) - 1);
+	for(int i = 0; i < VectorGetEnd(container); i++)
+    {
+		printf("i %i ", i);
+        int key = ((int*) VectorGetItem(container, i));
+
+        printf("|%i|\n", key);
+    }
+	// printf("\n\n");
 
 }
 void VectorSetInt(Vector* container, int element, int i)
@@ -404,22 +380,35 @@ void VectorSetInt(Vector* container, int element, int i)
 	{
 		return;
 	}
-	// printf("set int\n");
-	int* element_ptr = (int*) malloc(sizeof(int));
-	*element_ptr = element;
-	container->values[i] = element_ptr;
+	printf("set int %i %i \n", i, container->end);
+	if(i < container->end && i >= 0)
+	{
+		printf("item |%i|\n", container->values[i]);
+		if(container->values[i] == 0)
+		{
+			printf("adjusting the population\n");
+			container->population++;
+		}
+		int* element_ptr = (int*) malloc(sizeof(int));
+		*element_ptr = element;
+		container->values[i] = element_ptr;
+
+	}
+	
 	// if the value was null before then update the population
 
 }
 void VectorReset(Vector* container)
 {
-	for(int i = 0; i < VectorGetPopulation(container); i++)
+	for(int i = container->start; i < container->end; i++)
     {
         free(container->values[i]);
     }
     container->values = (void**) malloc(sizeof(void*));
     container->population = 0;
     container->size = 1;
+	container->start = -1;
+	container->end = 0;
 
 
 }

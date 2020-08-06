@@ -13,7 +13,7 @@ typedef struct Vector
 
 	// special window variables for the recording user changes system
 	// [first, end)
-	int first;
+	int start;
 	int end;
 
 	// use start and end to indicate the range of data focused on in a slice as nothing is deleted
@@ -31,9 +31,10 @@ Vector* VectorCopyVector(Vector* my_vector);
 
 int VectorGetLastIndex(Vector* container);
 void* VectorGetItem(Vector* container, int i);
-void VectorSetItemToNull(Vector* container, int i);
 
 int VectorGetPopulation(Vector* container);
+int VectorGetEnd(Vector* container);
+
 void VectorAppendInt(Vector* container, int element);
 // void VectorAppendString(Vector* container, string element);
 
@@ -45,10 +46,9 @@ void VectorReset(Vector* container);
 bool VectorPopItem(Vector* container);
 bool VectorPopFirst(Vector* container);
 
-void VectorIncrementTopInt(Vector* container);
 
 bool VectorDeleteItem(Vector* container, int index);
-bool VectorDeleteAllItems(Vector* container);
+// bool VectorDeleteAllItems(Vector* container);
 bool VectorDeleteAllItems2(Vector* container);
 void VectorShiftItems(Vector* container, int index);
 
