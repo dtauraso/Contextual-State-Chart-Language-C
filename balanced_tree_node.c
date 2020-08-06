@@ -354,7 +354,6 @@ void BalancedTreeNodeSplitDown(Vector* tree, int current_node)
     VectorAppendInt(a->keys, *((int*) VectorGetItem(node->keys, 0)));
     // if 4-Node has children send 2 of them to a
     VectorAppendInt(b->keys, *((int*) VectorGetItem(node->keys, 2)));
-    printf("here\n");
 
     // printf( "values copied down %i, %i\n",
     //         *((int*) a->keys->values[0]),
@@ -369,7 +368,10 @@ void BalancedTreeNodeSplitDown(Vector* tree, int current_node)
         VectorAppendInt(b->children, *((int*) VectorGetItem(node->children, 2)));
         VectorAppendInt(b->children, *((int*) VectorGetItem(node->children, 3)));
 
+        VectorReset(node->children);
+
     }
+
     // free the excess memory in the former 4-Node
     int middle_value = *((int*) node->keys->values[1]);
 
@@ -378,7 +380,10 @@ void BalancedTreeNodeSplitDown(Vector* tree, int current_node)
     VectorAppendInt(node->keys, middle_value);
 
     // clear out all children from former 4-Node
-    VectorReset(node->children);
+    // printf("here\n");
+
+    // problem line here
+    // can't reset empty children
 
     VectorAppend(tree, a);
     int id_a = VectorGetLastIndex(tree);
@@ -659,12 +664,11 @@ void BalancedTreeNodeTest()
 
     // BalancedTreeNodeInsertTest(my_tree, 6, 3, 2, 1, 4, -1, 0);
 
-    BalancedTreeNodeInsertTest(my_tree, 3, 3, 2, 1);
+    BalancedTreeNodeInsertTest(my_tree, 6, 3, 2, 1, -1, 4, -2);
 
     // BalancedTreeNodeInsert(my_tree, 0, -1, 3);
 
     // BalancedTreeNodePrintTree(my_tree, 0, 0);
-
     exit(1);
     // BalancedTreeNodeInsert(my_tree, 0, -1, 1);
 

@@ -289,7 +289,7 @@ void VectorShiftItems(Vector* container, int index)
 		container->values[i] = NULL;
 
 	}
-	container->population--;
+	// container->population--;
 	container->end--;
 	
 }
@@ -321,6 +321,7 @@ void VectorShiftRight(Vector* container, int index)
 	// assume the user will use VectorSetInt next
 	// printf("index %i\n");
 	// container->end == container->size instead
+	int end = container->end;
 	if(container->end == container->size)
 	{
 		printf("in deep shit\n");
@@ -338,21 +339,24 @@ void VectorShiftRight(Vector* container, int index)
 		// a variable measuring the last index used in the array should be used instead
 		// container->population += 1;
 		container->end++;
+		end = container->end - 1;
 
 	}
-	printf("before shift\n");
-	for(int i = 0; i < VectorGetEnd(container); i++)
-    {
-        int key = ((int*) VectorGetItem(container, i));
+	// will fail if the container doesn't need to be resized
+	// printf("before shift\n");
+	// for(int i = 0; i < VectorGetEnd(container); i++)
+    // {
+    //     int key = ((int*) VectorGetItem(container, i));
 
-        printf("|%i|", key);
-    }
-	printf("\n");
+    //     printf("|%i|", key);
+    // }
+	// printf("\n");
 	// i > index not i >= index is vital or we will accidentally shift ouside our intended bounds
 	// start 1 place after the last known item so we guarantee we are shifting all item within the range
 	// int i = container->end
+	// we want the position 
 	// printf("start %i, end %i\n", index, container->end - 1);
-	for(int i = container->end; i > index; i--)
+	for(int i = end; i > index; i--)
 	{
 		// printf("%i <= %i\n", i, i - 1);
 		container->values[i] = container->values[i - 1];
@@ -363,14 +367,14 @@ void VectorShiftRight(Vector* container, int index)
 	// printf("1 value %i\n", ((int*) container->values[1]));
 
 
-	printf("after shift %i, %i\n", 0, VectorGetEnd(container) - 1);
-	for(int i = 0; i < VectorGetEnd(container); i++)
-    {
-		printf("i %i ", i);
-        int key = ((int*) VectorGetItem(container, i));
+	// printf("after shift %i, %i\n", 0, VectorGetEnd(container) - 1);
+	// for(int i = 0; i < VectorGetEnd(container); i++)
+    // {
+	// 	printf("i %i ", i);
+    //     int key = ((int*) VectorGetItem(container, i));
 
-        printf("|%i|\n", key);
-    }
+    //     printf("|%i|\n", key);
+    // }
 	// printf("\n\n");
 
 }
@@ -400,6 +404,11 @@ void VectorSetInt(Vector* container, int element, int i)
 }
 void VectorReset(Vector* container)
 {
+	printf("size %i, population %i, start %i, end %i\n",
+			container->size,
+			container->population,
+			container->start,
+			container->end);
 	for(int i = container->start; i < container->end; i++)
     {
         free(container->values[i]);
