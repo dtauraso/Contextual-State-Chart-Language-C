@@ -324,7 +324,7 @@ void VectorShiftRight(Vector* container, int index)
 	int end = container->end;
 	if(container->end == container->size)
 	{
-		printf("in deep shit\n");
+		// printf("in deep shit\n");
 		container->size += 1;
 
 		// ads another block of memeory to the right end of the array
@@ -384,13 +384,13 @@ void VectorSetInt(Vector* container, int element, int i)
 	{
 		return;
 	}
-	printf("set int %i %i \n", i, container->end);
+	// printf("set int %i %i \n", i, container->end);
 	if(i < container->end && i >= 0)
 	{
-		printf("item |%i|\n", container->values[i]);
+		// printf("item |%i|\n", container->values[i]);
 		if(container->values[i] == 0)
 		{
-			printf("adjusting the population\n");
+			// printf("adjusting the population\n");
 			container->population++;
 		}
 		int* element_ptr = (int*) malloc(sizeof(int));
@@ -404,11 +404,11 @@ void VectorSetInt(Vector* container, int element, int i)
 }
 void VectorReset(Vector* container)
 {
-	printf("size %i, population %i, start %i, end %i\n",
-			container->size,
-			container->population,
-			container->start,
-			container->end);
+	// printf("size %i, population %i, start %i, end %i\n",
+	// 		container->size,
+	// 		container->population,
+	// 		container->start,
+	// 		container->end);
 	for(int i = container->start; i < container->end; i++)
     {
         free(container->values[i]);
@@ -443,6 +443,41 @@ void VectorPrint(Vector* container)
 			void* a = container->values[i];
 			int* b = (int*) a;
 			printf("|%c|", *b);
+			
+			//printf("|item|");
+		}
+	}
+	if(container->population == 0)
+	{
+		printf("none");
+	}
+	printf("\n\n");
+	
+
+}
+
+void VectorPrintInts(Vector* container)
+{
+	if(container == NULL)
+	{
+
+		printf("empty container\n");
+		return;
+	}
+	// printf("printing container pop %i, size %i\n", container->population, container->size);
+	for(int i = 0; i < container->population; i++)
+	{
+		//printf("i %i\n", i);
+		if(container->values[i] == NULL)
+		{
+			printf("|NULL|\n");
+		}
+		else
+		{
+			//printf("|%x|", container->values[i]);
+			void* a = container->values[i];
+			int* b = (int*) a;
+			printf("|%i|", *b);
 			
 			//printf("|item|");
 		}

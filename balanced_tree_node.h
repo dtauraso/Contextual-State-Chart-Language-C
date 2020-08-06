@@ -18,7 +18,7 @@ void BalancedTreeNodeSplit(Vector* tree, int current_node, int parent_interval_i
 int BalancedTreeNodeSplitAcross(Vector* tree, int current_node, int parent_interval_id, int new_key);
 
 void BalancedTreeNodeInsert(Vector* tree, int current_node, int interval_id, int new_key);
-
+void BalancedTreeNodeInsertKey(BalancedTreeNode* node, int new_key);
 void BalancedTreeNodeInsertTest(Vector* my_tree, int arg_count, ...);
 
 void BalancedTreeNodePrintTree(Vector* tree, int current_node, int indents);

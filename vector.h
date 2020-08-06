@@ -62,6 +62,8 @@ void VectorTest();
 
 
 void VectorPrint(Vector* container);
+void VectorPrintInts(Vector* container);
+
 void VectorPrintVectorOfStrings(Vector* container);
 
 // void VectorPrintStrings(Vector* container);

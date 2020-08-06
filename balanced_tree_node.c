@@ -427,9 +427,17 @@ int BalancedTreeNodeSplitAcross(Vector* tree, int current_node, int parent_inter
     // setup data to copy to parent
     int middle_key = *((int*) VectorGetItem(node->keys, 1));
 
-    printf("insert %i into node %i's keys\n", middle_key, node->parent);
-    printf("parent's children size %i\n", parent->children->population);
-    return current_node;
+    // setup collection of keys for interval finding laster
+    Vector* keys_for_interval_finding = VectorInitVector();
+
+    for(int i = node->keys->start; i < node->keys->end; i++)
+    {
+        VectorAppendInt(keys_for_interval_finding, *((int*) VectorGetItem(node->keys, i)));
+
+    }
+    // VectorAppendInt(keys_for_interval_finding, *((int*) VectorGetItem(node->keys, 0));
+    // VectorAppendInt(keys_for_interval_finding, *((int*) VectorGetItem(node->keys, 0));
+    // VectorAppendInt(keys_for_interval_finding, *((int*) VectorGetItem(node->keys, 0));
 
     // restructure current node as the "left" node
     int first_key = *((int*) VectorGetItem(node->keys, 0));
@@ -444,7 +452,7 @@ int BalancedTreeNodeSplitAcross(Vector* tree, int current_node, int parent_inter
         Vector* children = VectorInitVector();
 
         // printf("doesn't come here\n");
-        for(int i = 0; i < VectorGetPopulation(node->children); i++)
+        for(int i = node->children->start; i < node->children->end; i++)
         {
             VectorAppendInt(children, *((int*) VectorGetItem(node->children, i)));
 
@@ -461,10 +469,15 @@ int BalancedTreeNodeSplitAcross(Vector* tree, int current_node, int parent_inter
         VectorDeleteAllItems2(children);
         free(children);
     }
+    printf("insert %i into node %i's keys\n", middle_key, node->parent);
+    printf("parent's children size %i\n", parent->children->population);
+
     // left is restructured and has it's new key and new children
     // right has been made with it's new key and new children
 
     // insert middle item to parent by finding the interval
+    BalancedTreeNodeInsertKey(parent, middle_key);
+
     // rearange parent's children by case
     // middle child or leftmost node
     if((parent_interval_id == 1 && VectorGetPopulation(parent->children) == 3) ||
@@ -477,7 +490,7 @@ int BalancedTreeNodeSplitAcross(Vector* tree, int current_node, int parent_inter
 
         // right shift [parent_interval_id + 1, end] by 1 unit
         // [1, 2] end = 2 and it's the rightmost place we copy data into
-
+        VectorShiftRight(parent->children, parent_interval_id + 1);
 
     }
     else if(parent_interval_id == VectorGetPopulation(parent->children))
@@ -488,6 +501,23 @@ int BalancedTreeNodeSplitAcross(Vector* tree, int current_node, int parent_inter
 
     }
     // insert parent->children[parent_interval_id + 1]
+    VectorSetInt(parent->children, right_node_id, parent_interval_id + 1);
+    VectorPrintInts(keys_for_interval_finding);
+    int interval = BalancedTreeNodeFindInterval(keys_for_interval_finding, new_key);
+    printf("our interval %i\n", interval);
+    printf("avaliable nodes current %i, right %i\n", current_node, right_node_id);
+    int chosen_node = 0;
+    if(interval >= 0 && interval <= 1)
+    {
+        printf("node is %i\n", current_node);
+        chosen_node = current_node;
+    }
+    else if(interval >= 2 && interval <= 3)
+    {
+        printf("node is %i\n", right_node_id);
+        chosen_node = right_node_id;
+    }
+    return chosen_node;
 
 
     // insert the right node as a new child to parent
@@ -582,10 +612,12 @@ void BalancedTreeNodeInsert(Vector* tree, int current_node, int parent_interval_
                                             current_node,
                                             parent_interval_id,
                                             new_key);
+                printf("node id for insert %i\n", chosen_child_node);
+                BalancedTreeNodePrintTree(tree, 0, 1);
 
                 
                 // update node using chosen_child_node
-
+                node = (BalancedTreeNode*) VectorGetItem(tree, chosen_child_node);
             }
         }
     }
@@ -664,7 +696,7 @@ void BalancedTreeNodeTest()
 
     // BalancedTreeNodeInsertTest(my_tree, 6, 3, 2, 1, 4, -1, 0);
 
-    BalancedTreeNodeInsertTest(my_tree, 6, 3, 2, 1, -1, 4, -2);
+    BalancedTreeNodeInsertTest(my_tree, 7, 3, 2, 1, -1, 4, -2, 0);
 
     // BalancedTreeNodeInsert(my_tree, 0, -1, 3);
 
