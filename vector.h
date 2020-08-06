@@ -12,8 +12,9 @@ typedef struct Vector
 	// bool is_empty;
 
 	// special window variables for the recording user changes system
+	// [first, end)
 	int first;
-	int last;
+	int end;
 
 	// use start and end to indicate the range of data focused on in a slice as nothing is deleted
 	// untill after the state function finishes collecting the user changes 
@@ -38,6 +39,8 @@ void VectorAppendInt(Vector* container, int element);
 
 void VectorAppend(Vector* container, void* element);
 void VectorSetInt(Vector* container, int element, int i);
+void VectorReset(Vector* container);
+
 
 bool VectorPopItem(Vector* container);
 bool VectorPopFirst(Vector* container);

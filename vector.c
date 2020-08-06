@@ -21,7 +21,7 @@ Vector* VectorInitVector()
 	new_container->size = 0;
 	new_container->population = 0;
 	new_container->first = 0;
-	new_container->last = 0;
+	new_container->end = 0;
 	// new_container->is_empty = true;
 	// from C's point of view new_container == NULL
 
@@ -38,7 +38,7 @@ Vector* VectorInitVectorSize(int size)
 	new_container->size = size;
 	new_container->population = 0;
 	new_container->first = 0;
-	new_container->last = 0;
+	new_container->end = 0;
 	// new_container->is_empty = true;
 	return new_container;
 }
@@ -352,11 +352,13 @@ void VectorShiftRight(Vector* container, int index)
 	// extend the vector by 1 unit if we are on the last index
 	// assume the user will use VectorSetInt next
 	// printf("index %i\n");
+	// container->end == container->size instead
 	if(container->population == container->size)
 	{
 		// printf("in deep shit\n");
 		container->size += 1;
 
+		// ads another block of memeory to the right end of the array
 		container->values = (void**) realloc(container->values, sizeof(void*) * container->size);
 
 		// int* element_ptr = (int*) malloc(sizeof(int));
@@ -364,6 +366,8 @@ void VectorShiftRight(Vector* container, int index)
 
 		container->values[container->population] = NULL;
 
+		// changing the order of items in array should not affect the total items being counted
+		// a variable measuring the last index used in the array should be used instead
 		container->population += 1;
 	}
 	// printf("before shift\n");
@@ -375,7 +379,9 @@ void VectorShiftRight(Vector* container, int index)
     // }
 	// printf("\n");
 	// i > index not i >= index is vital or we will accidentally shift ouside our intended bounds
-	for(int i = container->population - 1; i > index; i--)
+	// start 1 place after the last known item so we guarantee we are shifting all item within the range
+	// int i = container->end
+	for(int i = container->population; i > index; i--)
 	{
 		// printf("%i <= %i\n", i, i - 1);
 		container->values[i] = container->values[i - 1];
@@ -402,10 +408,21 @@ void VectorSetInt(Vector* container, int element, int i)
 	int* element_ptr = (int*) malloc(sizeof(int));
 	*element_ptr = element;
 	container->values[i] = element_ptr;
+	// if the value was null before then update the population
 
 }
+void VectorReset(Vector* container)
+{
+	for(int i = 0; i < VectorGetPopulation(container); i++)
+    {
+        free(container->values[i]);
+    }
+    container->values = (void**) malloc(sizeof(void*));
+    container->population = 0;
+    container->size = 1;
 
 
+}
 void VectorPrint(Vector* container)
 {
 	if(container == NULL)
