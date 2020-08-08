@@ -363,6 +363,14 @@ void VectorShiftRight(Vector* container, int index)
 		// printf("i %i value %i\n", i, ((int*) container->values[i]));
 		container->values[i - 1] = NULL;
 	}
+	// this function comes before VectorSetInt so we don't want to adjust begin
+	// as we are making space for the new item to be inserted.
+	// index + 1 is the new start
+	// printf("start %i, index %i\n", container->start, index);
+	// if(container->start == index)
+	// {
+	// 	container->start++;
+	// }
 	// printf("0 value %i\n", ((int*) container->values[0]));
 	// printf("1 value %i\n", ((int*) container->values[1]));
 
@@ -415,9 +423,10 @@ void VectorReset(Vector* container)
     }
     container->values = (void**) malloc(sizeof(void*));
     container->population = 0;
-    container->size = 1;
+    container->size = 0;
 	container->start = -1;
 	container->end = 0;
+	// this function works becuase it always comes before VectorSetInt which ensures start > -1
 
 
 }
