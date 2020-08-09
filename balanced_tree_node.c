@@ -593,18 +593,44 @@ void BalancedTreeNodeDelete(Vector* tree, int current_node, int parent_interval_
             // convert to a 3-Node or a 4-Node
             /*
             node's immediate left or right sibling has 2 or 3 elements
+                test left and right
+                node is in begin, middle, or end
+                # of chldren is 3 or 4
                 rotate left
                 rotate right
                     steal the siblings 0th or nth key
                     steal the siblings 0th or nth child
                     spare keys and chldren in ranges [1, n] or [0, n-1]
                     insert the new key and child using shifting, setting, and appending
+                    PAY DAD
 
             node's immediate left and right sibling are 2-Nodes
                 fuse
                 
             node's immediate left and right sibling are 2-Nodes and the parent is a 2-Node
                 shrink tree
+
+            save, delete, restore
+
+
+            // rotate cases
+            if no left sibling
+                check the right sibling
+                if 3-Node or 4-Node
+                    rotate right
+                    return
+            else if no right sibling or
+                both siblings are there
+                check the left sibling
+                if 3-Node or 4-Node
+                    rotate left
+                    return
+            
+            we now have both nodes and parent
+            if 2-Node and parent is not a 2-Node
+                    fuse
+            else if 2-Node and parent is a 2-node
+                    shrink root
 
             */
 
