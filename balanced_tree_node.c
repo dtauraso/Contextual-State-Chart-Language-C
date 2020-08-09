@@ -386,6 +386,11 @@ void BalancedTreeNodeSplitDown(Vector* tree, int current_node)
         VectorAppendInt(b->children, *((int*) VectorGetItem(node->children, 2)));
         VectorAppendInt(b->children, *((int*) VectorGetItem(node->children, 3)));
 
+        // update the children's parents on the newly shifted children
+        BalancedTreeNodeUpdateParentOnNewlyShiftedChildren(tree, a, id_a);
+        BalancedTreeNodeUpdateParentOnNewlyShiftedChildren(tree, b, id_b);
+
+        // clear out all children from the 4-Node
         VectorReset(node->children);
 
     }
@@ -397,29 +402,11 @@ void BalancedTreeNodeSplitDown(Vector* tree, int current_node)
 
     VectorAppendInt(node->keys, middle_value);
 
-    // clear out all children from former 4-Node
-    // printf("here\n");
-
-    // problem line here
-    // can't reset empty children
-
-
-    // store the ids of the 2-Nodes in tree as the first 2 children of the
+    // store the ids of the 2-Nodes in tree as the first 2 children of the reset 4-Node
     VectorAppendInt(node->children, id_a);
     VectorAppendInt(node->children, id_b);
 
-    if(original_children_size == 4)
-    {
-        // update the children's parents on the newly assigned children
-        BalancedTreeNodeUpdateParentOnNewlyShiftedChildren(tree, a, id_a);
-        BalancedTreeNodeUpdateParentOnNewlyShiftedChildren(tree, b, id_b);
-    }
-        
-    // former 4-Node
     // the former 4-Node should now be a 2-Node
-    // printf("print split tree\n");
-    // BalancedTreeNodePrintTree(tree, current_node, 0);        
-
 }
 int BalancedTreeNodeSplitAcross(Vector* tree, int current_node, int parent_interval_id, int new_key)
 {
