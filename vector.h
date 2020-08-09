@@ -53,7 +53,7 @@ bool VectorDeleteAllItems2(Vector* container);
 void VectorShiftItems(Vector* container, int index);
 
 
-void VectorShiftLeft(Vector* container, int start, int end);
+void VectorShiftLeft(Vector* container);
 void VectorShiftRight(Vector* container, int index);
 
 

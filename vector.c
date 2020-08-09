@@ -294,24 +294,27 @@ void VectorShiftItems(Vector* container, int index)
 	
 }
 
-void VectorShiftLeft(Vector* container, int start, int end)
+void VectorShiftLeft(Vector* container)
 {
 	//printf("insert location bounds %i %i\n", start, end);
-	if(container == NULL || start < 0 || end > start)
+	if(container == NULL)
 	{
 		return;
 	}
-	if(container->end <= start + 1)
-	{
-		return;
-	}
-	// assume start >= end
-	// assume container size > start+1
-	for(int i = start + 1; i >= end; i--)
-	{
-		container->values[i] = container->values[i - 1];
+	container->size++;
+	container->values = (void**) realloc(container->values, sizeof(void*) * container->size);
+	container->end++;
+	// if(container->end <= start + 1)
+	// {
+	// 	return;
+	// }
+	// // assume start >= end
+	// // assume container size > start+1
+	// for(int i = start + 1; i >= end; i--)
+	// {
+	// 	container->values[i] = container->values[i - 1];
 
-	}
+	// }
 	//container->values[start] = NULL;
 }
 
