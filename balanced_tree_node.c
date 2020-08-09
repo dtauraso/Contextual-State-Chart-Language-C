@@ -382,12 +382,12 @@ void BalancedTreeNodeSplitDown(Vector* tree, int current_node)
     //         *((int*) a->keys->values[0]),
     //         *((int*) b->keys->values[0]));
     int original_children_size = VectorGetPopulation(node->children);
-    printf("size %i\n", original_children_size);
+    // printf("size %i\n", original_children_size);
     // somehow this test doesn't always work
     // the population of items isn't correct
     if(VectorGetPopulation(node->children) == 4)
     {
-        printf("doesn't come here\n");
+        // printf("doesn't come here\n");
         VectorAppendInt(a->children, *((int*) VectorGetItem(node->children, 0)));
         VectorAppendInt(a->children, *((int*) VectorGetItem(node->children, 1)));
 
@@ -419,8 +419,8 @@ void BalancedTreeNodeSplitDown(Vector* tree, int current_node)
 int BalancedTreeNodeSplitAcross(Vector* tree, int current_node, int parent_interval_id, int new_key)
 {
     // split across
-    printf("current node %i, parent interval id %i new key %i\n",
-            current_node, parent_interval_id, new_key);
+    // printf("current node %i, parent interval id %i new key %i\n",
+    //         current_node, parent_interval_id, new_key);
     BalancedTreeNode* node = (BalancedTreeNode*) VectorGetItem(tree, current_node);
     if(node == NULL)
     {
@@ -447,7 +447,7 @@ int BalancedTreeNodeSplitAcross(Vector* tree, int current_node, int parent_inter
     // setup collection of keys for interval finding laster
     Vector* keys_for_interval_finding = VectorInitVector();
 
-    printf("here\n");
+    // printf("here\n");
     // printf("size %i\n", VectorGetPopulation(node->keys));
     // has items but the start index hasn't been updated to 0 yet
     for(int i = node->keys->start; i < node->keys->end; i++)
@@ -463,7 +463,7 @@ int BalancedTreeNodeSplitAcross(Vector* tree, int current_node, int parent_inter
     // restructure current node as the "left" node
     int first_key = *((int*) VectorGetItem(node->keys, 0));
     VectorReset(node->keys);
-    printf("here 2\n");
+    // printf("here 2\n");
     VectorAppendInt(node->keys, first_key);
 
     // redistribute children from current node to "left" node and right node
@@ -499,7 +499,7 @@ int BalancedTreeNodeSplitAcross(Vector* tree, int current_node, int parent_inter
         VectorDeleteAllItems2(children);
         free(children);
     }
-    printf("insert %i into node %i's keys\n", middle_key, node->parent);
+    // printf("insert %i into node %i's keys\n", middle_key, node->parent);
     // printf("parent's children size %i\n", parent->children->population);
 
     // left is restructured and has it's new key and new children
@@ -508,10 +508,10 @@ int BalancedTreeNodeSplitAcross(Vector* tree, int current_node, int parent_inter
     // insert middle item to parent by finding the interval
     BalancedTreeNodeInsertKey(parent, middle_key);
 
-    printf("parent_interval_id %i, population %i\n",
-            parent_interval_id,
-            VectorGetPopulation(parent->children));
-    printf("parent %i old child count %i\n", node->parent, parent->children->population);
+    // printf("parent_interval_id %i, population %i\n",
+    //         parent_interval_id,
+    //         VectorGetPopulation(parent->children));
+    // printf("parent %i old child count %i\n", node->parent, parent->children->population);
 
     // rearange parent's children by case
     // middle child or leftmost node
@@ -536,14 +536,14 @@ int BalancedTreeNodeSplitAcross(Vector* tree, int current_node, int parent_inter
         // last node is the 4-Node we want to split
         // left shift
         // realloc memory to the right by 1 unit
-        printf("left shift\n");
+        // printf("left shift\n");
         VectorShiftLeft(parent->children);
         // return current_node;
 
     }
     // insert parent->children[parent_interval_id + 1]
     VectorSetInt(parent->children, right_node_id, parent_interval_id + 1);
-    printf("parent %i new child count %i\n", node->parent, parent->children->population);
+    // printf("parent %i new child count %i\n", node->parent, parent->children->population);
     VectorPrintInts(keys_for_interval_finding);
     int interval = BalancedTreeNodeFindInterval(keys_for_interval_finding, new_key, isGreaterThan);
     // printf("our interval %i\n", interval);
@@ -689,6 +689,11 @@ void BalancedTreeNodeInsert(Vector* tree, int current_node, int parent_interval_
         BalancedTreeNodeInsertKey(node, new_key);
     }
 }
+
+void BalancedTreeNodeDelete(Vector* tree, int current_node, int parent_interval_id, int new_key)
+{
+    
+}
 char* TrieTreeMakeIndents(int number_of_indents)
 {
 	// printf("indents to make %i\n", number_of_indents);
@@ -757,9 +762,11 @@ void BalancedTreeNodeTest()
     // 18, 0, 1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 works till 21
     // the split down fails on inserting 21
     // works now as the population is right
-    BalancedTreeNodeInsertTest(my_tree, 18, 0, 1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21);//, 10, 11, 12, 13);
+    // BalancedTreeNodeInsertTest(my_tree, 18, 0, 1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21);//, 10, 11, 12, 13);
 
     // middle node test for 3-Nodes -> 4-Nodes
+    // works for 3-Nodes -> 4-Nodes
+    BalancedTreeNodeInsertTest(my_tree, 23, 30, 20, 10, -10, 40, -20, 0, -30, 1, 2, -1, -2, -3, -4, -5, 31, 32, 21, 22, 23, 3, -6, 33);
 
     /*
 
