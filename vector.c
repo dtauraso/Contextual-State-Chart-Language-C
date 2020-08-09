@@ -55,6 +55,7 @@ bool VectorDeleteVector(Vector* container)
 	}
 	free(container->values);
 	container->values = NULL;
+	container->population = 0;
 	// container->is_empty = true;
 	return true;
 }
@@ -160,7 +161,7 @@ void VectorAppend(Vector* container, void* element)
 	}
 
 	container->values[container->end] = element;
-	container->population += 1;
+	container->population++;
 	
 	container->end++;
 
@@ -303,6 +304,8 @@ void VectorShiftLeft(Vector* container)
 	}
 	container->size++;
 	container->values = (void**) realloc(container->values, sizeof(void*) * container->size);
+	container->values[container->end] = NULL;
+
 	container->end++;
 	// if(container->end <= start + 1)
 	// {
@@ -378,14 +381,14 @@ void VectorShiftRight(Vector* container, int index)
 	// printf("1 value %i\n", ((int*) container->values[1]));
 
 
-	// printf("after shift %i, %i\n", 0, VectorGetEnd(container) - 1);
-	// for(int i = 0; i < VectorGetEnd(container); i++)
-    // {
-	// 	printf("i %i ", i);
-    //     int key = ((int*) VectorGetItem(container, i));
+	printf("after shift %i, %i\n", 0, VectorGetEnd(container) - 1);
+	for(int i = 0; i < VectorGetEnd(container); i++)
+    {
+		printf("i %i ", i);
+        int key = ((int*) VectorGetItem(container, i));
 
-    //     printf("|%i|\n", key);
-    // }
+        printf("|%i|\n", key);
+    }
 	// printf("\n\n");
 
 }
@@ -398,10 +401,10 @@ void VectorSetInt(Vector* container, int element, int i)
 	// printf("set int %i %i \n", i, container->end);
 	if(i < container->end && i >= 0)
 	{
-		// printf("item |%i|\n", container->values[i]);
-		if(container->values[i] == 0)
+		printf("item |%i|\n", container->values[i]);
+		if(container->values[i] == NULL)
 		{
-			// printf("adjusting the population\n");
+			printf("adjusting the population\n");
 			container->population++;
 		}
 		int* element_ptr = (int*) malloc(sizeof(int));
