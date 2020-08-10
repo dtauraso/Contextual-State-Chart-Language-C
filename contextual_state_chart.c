@@ -799,14 +799,20 @@ ContextualStateChart* VectorMakeVectorOfChars2(char* my_string)
 	for(int i = 0; i < strlen(my_string); i++)
 	{
 		// make a 
-		State* int_state = StateInitVariablePrimitive(VectorInitVector(), DataInitInt(5));
+		State* int_state = StateInitVariablePrimitive(VectorInitVector(), DataInitInt((i * 3) + 1));
+
+		printf("i %i\n", i);
+		// VectorShiftRight(contextual_state_chart->states, 0);
+		// VectorSet(contextual_state_chart->states, int_state, 0);
 		VectorAppend(contextual_state_chart->states, int_state);
-		int int_state_id = VectorGetPopulation(contextual_state_chart->states) - 1;
+		int int_state_id = VectorGetLastIndex(contextual_state_chart->states);
 		// printf("name %i, size %i\n", int_state_id, contextual_state_chart->states->size);
 		// add int_state_id to the state name
 		int_state->name = VectorConvertIntToVectorOfInts(int_state_id);
+		printf("name: ");
+
 		VectorPrintInts(int_state->name);
-		printf("here\n");
+		printf("\n");
 		BalancedTreeNodeInsert(	contextual_state_chart->states,
 								contextual_state_chart->state_ids,
 								contextual_state_chart->state_ids->start,
@@ -814,12 +820,13 @@ ContextualStateChart* VectorMakeVectorOfChars2(char* my_string)
 								int_state_id
 								);
 		printf("inserted\n");
-		BalancedTreeNodePrintTreeOfStates(	contextual_state_chart->states,
-											contextual_state_chart->state_ids,
-											0,
-											1);
+		
+		// if(i == 4)
+		// {
+			
 
-		exit(1);
+		// }
+
 
 		// state*
 		// int* char_ptr = (int*) malloc(sizeof(int));
@@ -833,7 +840,7 @@ ContextualStateChart* VectorMakeVectorOfChars2(char* my_string)
 		// VectorPrint(int_state->name);
 		// might be wrong
 		// StateAddChildEdge(structure_state, int_state->name);
-		Vector* myEdge = (Vector*) VectorGetItem(structure_state->children, i);
+		// Vector* myEdge = (Vector*) VectorGetItem(structure_state->children, i);
 		// VectorPrint(myEdge);
 		// add each state name to the keys so we can find the state
 		// TrieTreeInsertWords(structure_state->collectionState->keys, int_state->name);
@@ -844,6 +851,13 @@ ContextualStateChart* VectorMakeVectorOfChars2(char* my_string)
 		// printf("%i\n", my_string[i]);
 		// VectorAppend(list_of_chars, char_ptr);
 	}
+	printf("print out tree\n");
+	BalancedTreeNodePrintTreeOfStates(
+		contextual_state_chart->states,
+		contextual_state_chart->state_ids,
+		0,
+		1);
+	exit(1);
 	// ContextualStateChartPrintStates(contextual_state_chart);
 	State* my_state = (State*) VectorGetItem(contextual_state_chart->states, 0);
 	StatePrintState(contextual_state_chart, my_state, 0);

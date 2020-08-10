@@ -55,7 +55,10 @@ void VectorShiftItems(Vector* container, int index);
 
 void VectorShiftLeft(Vector* container);
 void VectorShiftRight(Vector* container, int index);
+void VectorSetInt(Vector* container, int element, int i);
 
+
+void VectorSet(Vector* container, void* element, int i);
 
 
 void VectorTest();

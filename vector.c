@@ -325,9 +325,11 @@ void VectorShiftRight(Vector* container, int index)
 {
 	// extend the vector by 1 unit if we are on the last index
 	// assume the user will use VectorSetInt next
-	// printf("index %i\n");
+	// printf("VectorShiftRight\n");
+	// printf("index %i\n", index);
 	// container->end == container->size instead
 	int end = container->end;
+	// printf("end %i, size %i\n", container->end, container->size);
 	if(container->end == container->size)
 	{
 		// printf("in deep shit\n");
@@ -389,7 +391,7 @@ void VectorShiftRight(Vector* container, int index)
 
     //     printf("|%i|\n", key);
     // }
-	// printf("\n\n");
+	// printf("\n");
 
 }
 void VectorSetInt(Vector* container, int element, int i)
@@ -412,10 +414,40 @@ void VectorSetInt(Vector* container, int element, int i)
 		container->values[i] = element_ptr;
 
 	}
-	
-	// if the value was null before then update the population
 
 }
+void VectorSet(Vector* container, void* element, int i)
+{
+	if(container == NULL)
+	{
+		return;
+	}
+
+	// printf("set value at %i \n", i);
+	if(i < container->end && i >= 0)
+	{
+		// printf("item |%i|\n", container->values[i]);
+		if(container->values[i] == NULL)
+		{
+			// printf("adjusting the population\n");
+			container->population++;
+		}
+		container->values[i] = element;
+
+	}
+	// printf("after set %i, %i\n", 0, VectorGetEnd(container) - 1);
+	// for(int i = 0; i < VectorGetEnd(container); i++)
+    // {
+	// 	printf("i %i ", i);
+    //     int key = ((int*) VectorGetItem(container, i));
+
+    //     printf("|%i|\n", key);
+    // }
+	// printf("\n");
+
+
+}
+
 void VectorReset(Vector* container)
 {
 	// printf("size %i, population %i, start %i, end %i\n",
@@ -501,7 +533,7 @@ void VectorPrintInts(Vector* container)
 	{
 		printf("none");
 	}
-	printf("\n\n");
+	// printf("\n\n");
 	
 
 }

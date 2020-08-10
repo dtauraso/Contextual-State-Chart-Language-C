@@ -167,9 +167,44 @@ bool BalancedTreeNodeVectorIsGreaterThan(Vector* states, int i, int j)
 {
     // get the state names
     // compare the vectors
-    printf("compare the vector names here\n");
-    exit(1);
+    printf("compare the vector names here %i, %i\n", i, j);
+    // int* stuff = states->values[i];
+    // printf("%i\n", VectorGetPopulation(states));
+    // printf("%i\n", states->values[i]);
+    State* state_i = (State*) VectorGetItem(states, i);
+    State* state_j = (State*) VectorGetItem(states, j);
+    // printf("got the states\n");
+    // VectorPrintInts(state_i->name);
+    // printf("\n");
+    printf("value %i\n", state_i->primitiveState->value->_int);
+    VectorPrintInts(state_j->name);
+    printf("value %i\n", state_j->primitiveState->value->_int);
+    if(VectorGetPopulation(state_i->name) > VectorGetPopulation(state_j->name))
+    {
+        return true;
+    }
+    else if(VectorGetPopulation(state_i->name) < VectorGetPopulation(state_j->name))
+    {
+        return false;
+    }
+    else
+    {
+        for(int i = 0; i < state_i->name->end; i++)
+        {
+            int value_i = *((int*) VectorGetItem(state_i->name, i));
+            int value_j = *((int*) VectorGetItem(state_j->name, i));
+            if(value_i <= value_j)
+            {
+                return false;
+            }
+        }
+    }
     return true;
+
+    // exit(1);
+    // return true if state_i > state_j
+    // return false if state_i <= state_j
+    // return true;
 }
 // Vector* states
 int BalancedTreeNodeFindInterval(Vector* states, Vector* keys, int new_key, bool (*comparator)(Vector* states, int i, int j))
