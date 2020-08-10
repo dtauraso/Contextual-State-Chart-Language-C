@@ -505,6 +505,44 @@ void VectorPrintInts(Vector* container)
 	
 
 }
+void VectorPrintIntsAsChars(Vector* container)
+{
+	if(container == NULL)
+	{
+
+		printf("empty container\n");
+		return;
+	}
+	printf("|");
+	// printf("printing container pop %i, size %i\n", container->population, container->size);
+	for(int i = 0; i < container->population; i++)
+	{
+		//printf("i %i\n", i);
+		if(container->values[i] == NULL)
+		{
+			printf("|NULL|\n");
+		}
+		else
+		{
+			//printf("|%x|", container->values[i]);
+			void* a = container->values[i];
+			int* b = (int*) a;
+			printf("%c", *b);
+			
+			//printf("|item|");
+		}
+	}
+	printf("|");
+
+	if(container->population == 0)
+	{
+		printf("none");
+	}
+	printf("\n\n");
+	
+
+}
+
 // void VectorPrintVectorOfStrings(Vector* container)
 // {
 // 	if(container == NULL)
@@ -592,6 +630,28 @@ Vector* VectorMakeVectorOfChars(char* my_string)
 	// VectorPrint(list_of_chars);
 	// printf("done\n");
 	return list_of_chars;
+
+}
+Vector* VectorConvertIntToVectorOfInts(int my_value)
+{
+
+	if(my_value < 0)
+	{
+		printf("VectorConvertIntToVectorOfInts only accepts an integer in the range of [0, n]\n");
+		return NULL;
+	}
+	Vector* list_of_integers = VectorInitVector();
+
+	while(my_value > 0)
+	{
+		int last_digit = my_value % 10;
+		VectorShiftRight(list_of_integers, 0);
+		VectorSetInt(list_of_integers, last_digit, 0);
+		my_value /= 10;
+	}
+	return list_of_integers;
+	// void VectorShiftRight(Vector* container, int index)
+	// void VectorSetInt(Vector* container, int element, int i)
 
 }
 Vector* VectorMakeVectorOfVectorsOfChars(int arg_count, ...)

@@ -63,12 +63,16 @@ void VectorTest();
 
 void VectorPrint(Vector* container);
 void VectorPrintInts(Vector* container);
+void VectorPrintIntsAsChars(Vector* container);
+
 
 void VectorPrintVectorOfStrings(Vector* container);
 
 // void VectorPrintStrings(Vector* container);
 
 Vector* VectorMakeVectorOfChars(char* my_string);
+Vector* VectorConvertIntToVectorOfInts(int my_value);
+
 Vector* VectorMakeVectorOfVectorsOfChars(int arg_count, ...);
 
 // Vector* VectorAddStringToVector1(string string_1);

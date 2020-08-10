@@ -1,8 +1,8 @@
 
 
-include_and_c_files =  main.c vector.c vector.h balanced_tree_node.c balanced_tree_node.h standard_includes.h
+include_and_c_files =  main.c vector.c vector.h balanced_tree_node.c balanced_tree_node.h contextual_state_chart.c contextual_state_chart.h standard_includes.h
 
-object_files =  main.o vector.o balanced_tree_node.o
+object_files =  main.o vector.o balanced_tree_node.o contextual_state_chart.o
 
 
 

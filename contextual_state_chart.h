@@ -1,14 +1,17 @@
 #ifndef STATE3
 #define STATE3
 #include "standard_headers.h"
+#include "vector.h"
+
 // #include <stdbool.h>
 // #include "stdlib.h"
 // #include <stdio.h>
 // #include <string.h>
 // #include "trie_node.h"
+// #include "balanced_tree_node.h"
 // #include "multiway_lines_node.h"
-#include "vector.h"
-#include "trie_tree.h"
+// #include "vector.h"
+// #include "trie_tree.h"
 // #include <map>
 // #include <set>
 //#include "state_machine.h"
@@ -70,8 +73,10 @@ typedef struct ContextualStateChart
 	// variations of the same state in different situations represent
 	// the idea of context and are identified by slightly different state names
 
-	// state are sorted by state name
-	Vector* states;
+	Vector* states;  // array
+
+	// 234 tree ids are sorted by state name
+	Vector* state_ids; // 234 tree
 	// TrieTree* state_names;
 	// root is position 0
 
@@ -259,21 +264,21 @@ void printArrayOfStrings(Vector* array_of_strings, int indent_level);
 void printState(State* my_state, int indent_level);
 int computeIndex(int offset, int state_name);
 
-TrieTree* searchState1(
-					TrieTree* my_trie_tree,
-					Vector* name, // strings
-					Vector* start_children,  // array of strings
-					Vector* children, // array of strings
-					Vector* next_states, // array of strings
-					Data* value); // primitive
+// TrieTree* searchState1(
+// 					TrieTree* my_trie_tree,
+// 					Vector* name, // strings
+// 					Vector* start_children,  // array of strings
+// 					Vector* children, // array of strings
+// 					Vector* next_states, // array of strings
+// 					Data* value); // primitive
 
-TrieTree* insertState1(
-					TrieTree* my_trie_tree,
-					Vector* name, // strings
-					Vector* start_children,  // array of strings
-					Vector* children, // array of strings
-					Vector* next_states, // array of strings
-					Data* value); // primitive
+// TrieTree* insertState1(
+// 					TrieTree* my_trie_tree,
+// 					Vector* name, // strings
+// 					Vector* start_children,  // array of strings
+// 					Vector* children, // array of strings
+// 					Vector* next_states, // array of strings
+// 					Data* value); // primitive
 
 void printStateTrie(ContextualStateChart* my_dynamic_machine
 // , string root

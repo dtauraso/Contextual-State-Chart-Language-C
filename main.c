@@ -1,10 +1,11 @@
-#include "standard_headers.h"
+// #include "standard_headers.h"
 
 // #include "state.h"
-#include "vector.h"
-#include "balanced_tree_node.h"
+// #include "vector.h"
+// #include "contex.h"
 // #include "trie_tree.h"
 #include "contextual_state_chart.h"
+
 //#include "trie_node.h"
 
 // #include "scanner.h"
@@ -468,8 +469,8 @@ int main(int argc, char** argv)
 	// }
 	// TrieTreeTest();
 	// VectorTest();
-	BalancedTreeNodeTest();
-	// ContextualStateChartTest();
+	// BalancedTreeNodeTest();
+	ContextualStateChartTest();
 	// DynamicMachineTest();
 	// tests pass so far
 	// DynamicMachineTest2();
