@@ -317,7 +317,7 @@ State* StateInitVariableCollectionState(Vector* name, int collection_type)
 {
 	State* my_state = StateInitState(	name,
 										NULL,
-										NULL,
+										VectorInitVector(),
 										NULL,
 										NULL);
 	my_state->collectionState = CollectionStateInit(collection_type);
@@ -346,6 +346,8 @@ ContextualStateChart* ContextualStateChartInit()
 	my_state_chart->state_ids = VectorInitVector();
 	BalancedTreeNode* empty_node = BalancedTreeNodeInit();
 	VectorAppend(my_state_chart->state_ids, empty_node);
+
+	my_state_chart->root_state_id = 0;
 	return my_state_chart;
 }
 
@@ -569,7 +571,7 @@ void DataPrintData(Data* variable)
 	{
 		case 1:
 		{
-			printf("%i", variable->_int);
+			printf("%c", variable->_int);
 			break;
 		}
 		case 2:
@@ -602,6 +604,28 @@ void StatePrintIntsFromVectorAsChars(Vector* my_ints)
 
 }
 enum StateAttributes{_name, _function_name, _next_states, _children};
+void StatePrintAttributeSequence(Vector* attribute)
+{
+
+	printf("[");
+
+	if(VectorGetPopulation(attribute) > 0)
+	{
+		for(int i = attribute->start; i < attribute->end; i++)
+		{
+			// printf("i %i\n", i);
+			int state_id = *((int*) VectorGetItem(attribute, i));
+			printf("%i", state_id);
+			// StatePrintIntsFromVectorAsChars((Vector*) VectorGetItem(attribute, i));
+			if(i < VectorGetPopulation(attribute) - 1)
+			{
+				printf(", ");
+			}	
+		}
+	}
+	printf("]");
+
+}
 void StatePrintAttribute(int indents, Vector* attribute_name, Vector* attribute, int state_attribute)
 {
 	// printf("%sname:\n", TrieTreeMakeIndents(indents));
@@ -610,33 +634,8 @@ void StatePrintAttribute(int indents, Vector* attribute_name, Vector* attribute,
 	StatePrintIntsFromVectorAsChars(attribute_name);
 	printf(":\n%s", BalancedTreeNodeMakeIndents(indents));
 
-	if(state_attribute == _name || state_attribute == _function_name)
-	{
-		// printing name of attribute
-		printf("|");
-		// what if attibute is 
-		StatePrintIntsFromVectorAsChars(attribute);
-		printf("|");
-	}
-	else if(state_attribute == _next_states || state_attribute == _children)
-	{
-		// printf("|print 2 level vector|\n");
-		printf("[");
-		for(int i = 0; i < VectorGetPopulation(attribute); i++)
-		{
-			printf("\'");
-			// what if attibute is 
-			StatePrintIntsFromVectorAsChars((Vector*) VectorGetItem(attribute, i));
-			printf("\'");
-			if(i < VectorGetPopulation(attribute) - 1)
-			{
-				printf(", ");
-			}
-			
-		}
-		printf("]");
-	}
-
+	StatePrintAttributeSequence(attribute);
+	// maybe print out a sequence of characters for the function name
 	printf("\n");
 
 }
@@ -671,23 +670,27 @@ void StatePrintCollection(ContextualStateChart* contextual_state_chart, State* s
 	}
 	if(state->primitiveState != NULL)
 	{
+		printf("%sprimitive state\n", BalancedTreeNodeMakeIndents(indents));
 		// are at the bottom level
 		StatePrintPrimitive(state, indents);
 	}
 	else if(state->collectionState->is_array)
 	{
-		printf("array\n");
-		for(int i = 0; i < VectorGetPopulation(state->children); i++)
-		{
-			Vector* state_name = (Vector*) VectorGetItem(state->children, i);
+		printf("%sarray\n", BalancedTreeNodeMakeIndents(indents));
+		// printf("size %i\n", VectorGetPopulation(state->children));
+		StatePrintAttributeSequence(state->children);
+		// for(int i = state->children->start; i < state->children->end; i++)
+		// {
+		// 	// printf("%i\n", i);
+		// 	int state_id = *((int*) VectorGetItem(state->children, i));
 
-			// int node_id = TrieTreeSearch(state->collectionState->keys, state_name);
+		// 	// int node_id = TrieTreeSearch(state->collectionState->keys, state_name);
 
-			// TrieNode* node = (TrieNode*) VectorGetItem(state->collectionState->keys->trie_tree, node_id);
-			// State* my_state = (State*) VectorGetItem(contextual_state_chart->states, node->state_id);
-			// VectorPrint(state_name);
-			// StatePrintCollection(contextual_state_chart, my_state, indents + 3);
-		}
+		// 	// TrieNode* node = (TrieNode*) VectorGetItem(state->collectionState->keys->trie_tree, node_id);
+		// 	State* my_state = (State*) VectorGetItem(contextual_state_chart->states, state_id);
+		// 	// VectorPrint(my_state->name);
+		// 	StatePrintCollection(contextual_state_chart, my_state, indents + 3);
+		// }
 	}
 }
 void StatePrintState(ContextualStateChart* contextual_state_chart, State* state, int indents)
@@ -740,13 +743,13 @@ void StatePrintState(ContextualStateChart* contextual_state_chart, State* state,
 	}
 	// printf("here 2\n");
 
-	if(state->collectionState != NULL)
-	{
-		// printf("here again\n");
-		StatePrintCollection(contextual_state_chart, state, indents);
-		// printf("passing\n");
-	}
-	printf("\n\n");
+	// if(state->collectionState != NULL)
+	// {
+	// 	// printf("here again\n");
+	// 	StatePrintCollection(contextual_state_chart, state, indents);
+	// 	// printf("passing\n");
+	// }
+	printf("\n");
 	
 
 
@@ -764,9 +767,10 @@ void ContextualStateChartPrintStateTree(ContextualStateChart* my_machine, int st
 
 	for(int i = 0; i < VectorGetPopulation(state->children); i++)
 	{
-		Vector* child = (Vector*) VectorGetItem(state->children, i);
+		int child_id = *((int*) VectorGetItem(state->children, i));
+		// printf("state id %i\n");
 		// int new_id = TrieTreeSearch(my_machine->state_names, child);
-		// ContextualStateChartPrintStateTree(my_machine, new_id, indents + 3);
+		ContextualStateChartPrintStateTree(my_machine, child_id, indents + 3);
 	}
 
 }
@@ -776,105 +780,70 @@ void ContextualStateChartPrintStates(ContextualStateChart* contextual_state_char
 {
 	for(int i = 0; i < VectorGetPopulation(contextual_state_chart->states); i++)
 	{
-		printf("i %i\n", i);
+		// printf("i %i\n", i);
 		State* my_state = (State*) VectorGetItem(contextual_state_chart->states, i);
 		StatePrintState(contextual_state_chart, my_state, 0);
 	}
 }
 
-ContextualStateChart* VectorMakeVectorOfChars2(char* my_string)
+ContextualStateChart* CSCStateChartFromString(char* my_string)
 {
 	// ContextualStateChart* (so combining the arrays of states will not have the state chart
 	// variable name as part of the paramater list)
-	// Vector* list_of_chars = VectorInitVector();
 	ContextualStateChart* contextual_state_chart = ContextualStateChartInit();
 
 	// using VectorInitVector() lets us autoganerate state names for the array elements
-	// printing this state out will cause a segfault
+
 	State* structure_state = StateInitVariableCollectionState(VectorInitVector(), array);
-	// StatePrintState(contextual_state_chart, structure_state, 0);
+
 	// adding stuff to dict
 	VectorAppend(contextual_state_chart->states, structure_state);
 	// where do I add things to keys
 	for(int i = 0; i < strlen(my_string); i++)
 	{
 		// make a 
-		State* int_state = StateInitVariablePrimitive(VectorInitVector(), DataInitInt((i * 3) + 1));
 
-		printf("i %i\n", i);
-		// VectorShiftRight(contextual_state_chart->states, 0);
-		// VectorSet(contextual_state_chart->states, int_state, 0);
+		State* int_state = StateInitVariablePrimitive(VectorInitVector(), DataInitInt(my_string[i]));
+
+
 		VectorAppend(contextual_state_chart->states, int_state);
 		int int_state_id = VectorGetLastIndex(contextual_state_chart->states);
-		// printf("name %i, size %i\n", int_state_id, contextual_state_chart->states->size);
+		// might be a memory leak
 		// add int_state_id to the state name
 		int_state->name = VectorConvertIntToVectorOfInts(int_state_id);
-		printf("name: ");
-
-		VectorPrintInts(int_state->name);
-		printf("\n");
 		BalancedTreeNodeInsert(	contextual_state_chart->states,
 								contextual_state_chart->state_ids,
 								contextual_state_chart->state_ids->start,
 								-1,
 								int_state_id
 								);
-		printf("inserted\n");
 		
-		// if(i == 4)
-		// {
-			
+		VectorAppendInt(structure_state->children, int_state_id);
 
-		// }
-
-
-		// state*
-		// int* char_ptr = (int*) malloc(sizeof(int));
-		// *char_ptr = my_string[i];
-		// State* int_state = StateInitVariablePrimitive(
-		// 						TrieTreeInsertWords(contextual_state_chart->state_names,
-		// 											VectorInitVector()),
-		// 						DataInitInt(my_string[i]));
-		// StatePrintState(int_state, 0);
-		// VectorAppend(contextual_state_chart->states, int_state);
-		// VectorPrint(int_state->name);
-		// might be wrong
-		// StateAddChildEdge(structure_state, int_state->name);
-		// Vector* myEdge = (Vector*) VectorGetItem(structure_state->children, i);
-		// VectorPrint(myEdge);
-		// add each state name to the keys so we can find the state
-		// TrieTreeInsertWords(structure_state->collectionState->keys, int_state->name);
-		// i -> state name from children -> state id from trie tree search -> state
-		// int node_id = TrieTreeSearch(structure_state->collectionState->keys, int_state->name);
-		// TrieNode* node = (TrieNode*) VectorGetItem(structure_state->collectionState->keys->trie_tree, node_id);
-		// node->state_id = VectorGetLastIndex(contextual_state_chart->states);
-		// printf("%i\n", my_string[i]);
-		// VectorAppend(list_of_chars, char_ptr);
 	}
-	printf("print out tree\n");
-	BalancedTreeNodePrintTreeOfStates(
-		contextual_state_chart->states,
-		contextual_state_chart->state_ids,
-		0,
-		1);
-	exit(1);
+	return contextual_state_chart;
+
+}
+/*
+	// printf("print out tree\n");
+	// BalancedTreeNodePrintTreeOfStates(
+	// 	contextual_state_chart->states,
+	// 	contextual_state_chart->state_ids,
+	// 	0,
+	// 	1);
+	// exit(1);
 	// ContextualStateChartPrintStates(contextual_state_chart);
-	State* my_state = (State*) VectorGetItem(contextual_state_chart->states, 0);
-	StatePrintState(contextual_state_chart, my_state, 0);
-
-	// the strucure state child edge, the int_state name, any other edges that point to it
-	// should be pointing to the same vector made from TrieTreeInsertWords(states->state_names, VectorInitVector())
-
+	// State* my_state = (State*) VectorGetItem(contextual_state_chart->states, 0);
+	// StatePrintState(contextual_state_chart, my_state, 0);
+	// StatePrintCollection(contextual_state_chart, my_state, 0);
+	// ContextualStateChartPrintStateTree(contextual_state_chart, 0, 0);
 	// printf("we are here\n%s\n", my_string.c_str());
 	// VectorPrint(list_of_chars);
 	// ContextualStateChartPrintStateTree(contextual_state_chart, 0, 1);
 
-	printf("done\n");
-	return contextual_state_chart;
+	// printf("done\n");
 
-}
-
-// i -> state name from children -> state id from trie tree search -> state
+*/
 // i -> state id from children -> state
 
 /*
@@ -954,56 +923,43 @@ makePair(Vector*, StateChart*) -> Vector* [void*, void*]
 makeDict(int count, Vector* key_value_1, Vector* key_value_2, ...) -> StateChart*
 
 uses no temporary state variables
+
+getValue(get(get(contextual_state_chart, "my_key_string"), "my_second_key_string"))
+
+contextual_state_chart["my_key_string"]["my_second_key_string"]
+
+get(Vector*, char*) -> Vector*
+get([array_of_states, dict_of_ids, root_state_id]) -> 
+	[array_of_states, dict_of_child_ids_found_from_the_first_key, id_of_value_state]
+// return a new state chart with different values for the dict and the root node id
+
+getValue(state_chart*) -> void* from root
+what do I do with the array?
+this should be able to return an array or a dict or a primitive with each one clearly deliniated
+[states, state_ids]
+[array_of_states, dict_of_ids]
 */
 
-ContextualStateChart* ContextualStateChartNestArray(ContextualStateChart* contextualStateChart,
-													ContextualStateChart* array)
+ContextualStateChart* ContextualStateChartNestArray(ContextualStateChart* contextual_state_chart)
 {
-	// assume each contextual state chart is a dictionary that allows duplicate names
-	// for each variable name that is the same we will have a unique parent name so we
-	// identify the right variable name
-	// user will search using (chart, parent_state_name, variable_state_name)
-	// copy the pointers from array to the main chart
-	// erase the data in the array but not the states
-	// erase the array pointer
 
-	// array[0] is the start node
-	// contextualStateChart.append(start node)
-	// start_node_id = len(contextualStatechart)
-	// array->states vector of states
-	/*
-	contextualStateChart.append(array->states[0])
-	start_node_id = len(contextualStatechart) - 1
-	for i in range(1, array->states)
-		state = array->states[i]
-		contextualStateChart->states.append(state)
+	// make an outer state
+	State* structure_state = StateInitVariableCollectionState(VectorInitVector(), array);
 
-		contextualStateChart->states[start_node_id]->children.append(state->name)
-
-		all should be already unique so state->name will not be altered
-		contextualStateChart
-						->states[start_node_id]
-						->collectionState
-						->keys.add(state->name)
-		last_trie_node_id = contextualStateChart
-						->states[start_node_id]
-						->collectionState
-						->keys.search(state->name)
-		last_trie_node = contextualStateChart
-						->states[start_node_id]
-						->collectionState
-						->keys
-						->trie_tree[last_trie_node_i]
-		last_trie_node.state_id = len(contextualStatechart) - 1
-
-
-	*/
-	// 
-	// contextualStateChart->state_names
-
-	// 
+	VectorAppend(contextual_state_chart->states, structure_state);
+	int id = VectorGetPopulation(contextual_state_chart->states) - 1;
+	BalancedTreeNodeInsert(	contextual_state_chart->states,
+							contextual_state_chart->state_ids,
+							contextual_state_chart->state_ids->start,
+							-1,
+							id
+							);
+	VectorAppendInt(structure_state->children, contextual_state_chart->root_state_id);
+	contextual_state_chart->root_state_id = id;
+	// root_state_id
+	// add it to the begining
 	
-	return NULL;
+	return contextual_state_chart;
 
 }
 void visit(ContextualStateChart* graph, Vector* start_state, int indents)
@@ -1131,7 +1087,11 @@ void ContextualStateChartTest()
 	// 		StateInitVariablePrimitive(VectorMakeVectorOfChars2("my_string"),
 	// 		DataInitInt(5)));
 
-	VectorMakeVectorOfChars2("start state name");
+	ContextualStateChart* contextual_state_chart = ContextualStateChartNestArray(
+														CSCStateChartFromString("start state name"));
+	// printf("start %i\n", contextual_state_chart->root_state_id);
+	ContextualStateChartPrintStateTree(contextual_state_chart, contextual_state_chart->root_state_id, 0);
+	// ["start state name"]
 	// visit(graph, VectorMakeVectorOfChars("start state name"), 0);
 
 }

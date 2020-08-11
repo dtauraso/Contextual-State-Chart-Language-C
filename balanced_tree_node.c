@@ -167,7 +167,7 @@ bool BalancedTreeNodeVectorIsGreaterThan(Vector* states, int i, int j)
 {
     // get the state names
     // compare the vectors
-    printf("compare the vector names here %i, %i\n", i, j);
+    // printf("compare the vector names here %i, %i\n", i, j);
     // int* stuff = states->values[i];
     // printf("%i\n", VectorGetPopulation(states));
     // printf("%i\n", states->values[i]);
@@ -176,9 +176,10 @@ bool BalancedTreeNodeVectorIsGreaterThan(Vector* states, int i, int j)
     // printf("got the states\n");
     // VectorPrintInts(state_i->name);
     // printf("\n");
-    printf("value %i\n", state_i->primitiveState->value->_int);
-    VectorPrintInts(state_j->name);
-    printf("value %i\n", state_j->primitiveState->value->_int);
+    // printf("value %i\n", state_i->primitiveState->value->_int);
+    // VectorPrintInts(state_j->name);
+    // printf("\n");
+    // printf("value %i\n", state_j->primitiveState->value->_int);
     if(VectorGetPopulation(state_i->name) > VectorGetPopulation(state_j->name))
     {
         return true;
@@ -189,17 +190,27 @@ bool BalancedTreeNodeVectorIsGreaterThan(Vector* states, int i, int j)
     }
     else
     {
+        // |9||50||41|
+        // doesn't completely work to compare vector versions of ints, but the 234 tree is doing fine
         for(int i = 0; i < state_i->name->end; i++)
         {
             int value_i = *((int*) VectorGetItem(state_i->name, i));
             int value_j = *((int*) VectorGetItem(state_j->name, i));
-            if(value_i <= value_j)
+            // printf("i %i, j %i\n", value_i, value_j);
+            if(value_i < value_j)
             {
+                // printf("false\n");
                 return false;
+            }
+            if(value_i > value_j)
+            {
+                // printf("true\n");
+                return true;
             }
         }
     }
-    return true;
+    // printf("false\n");
+    return false;
 
     // exit(1);
     // return true if state_i > state_j
@@ -220,7 +231,7 @@ int BalancedTreeNodeFindInterval(Vector* states, Vector* keys, int new_key, bool
         return 0;
     }
     int key = *(int*) VectorGetItem(keys, i);
-    printf("about to compare\n");
+    // printf("about to compare\n");
     while(comparator(states, new_key, key))
     {
         // printf("here\n");
@@ -444,7 +455,7 @@ int BalancedTreeNodeSplitAcross(Vector* states, Vector* tree, int current_node, 
     // insert parent->children[parent_interval_id + 1]
     VectorSetInt(parent->children, right_node_id, parent_interval_id + 1);
     // printf("parent %i new child count %i\n", node->parent, parent->children->population);
-    VectorPrintInts(keys_for_interval_finding);
+    // VectorPrintInts(keys_for_interval_finding);
     int interval = BalancedTreeNodeFindInterval(states, keys_for_interval_finding, new_key, BalancedTreeNodeVectorIsGreaterThan);
     // printf("our interval %i\n", interval);
     // printf("avaliable nodes current %i, right %i\n", current_node, right_node_id);
@@ -482,9 +493,9 @@ int BalancedTreeNodeSplitAcross(Vector* states, Vector* tree, int current_node, 
 // Vector* states
 void BalancedTreeNodeInsertIntoContainer(Vector* states, Vector* container, int value)
 {
-    printf("about to insert into container\n");
+    // printf("about to insert into container\n");
     int interval = BalancedTreeNodeFindInterval(states, container, value, BalancedTreeNodeVectorIsGreaterThan);
-    printf("have the interval\n");
+    // printf("have the interval\n");
     // use this code for inserting children
     // nth interval
     if(interval == VectorGetPopulation(container))
@@ -513,7 +524,7 @@ void BalancedTreeNodeInsert(Vector* states, Vector* tree, int current_node, int 
     {
         return;
     }
-    printf("inserting\n");
+    // printf("inserting\n");
     int children_count = VectorGetPopulation(node->children);
     int key_count = VectorGetPopulation(node->keys);
     /*
@@ -538,7 +549,7 @@ void BalancedTreeNodeInsert(Vector* states, Vector* tree, int current_node, int 
     // root
     if(node->parent == -1 && key_count == 3)
     {
-        printf("split down\n");
+        // printf("split down\n");
         // split down
         BalancedTreeNodeSplitDown(tree, current_node);
         // // split
@@ -552,7 +563,7 @@ void BalancedTreeNodeInsert(Vector* states, Vector* tree, int current_node, int 
             if(children_count == 4 || children_count == 0)
             {
                 // split across
-                printf("split across\n");
+                // printf("split across\n");
                 
                 int chosen_child_node = BalancedTreeNodeSplitAcross(
                                             states,
@@ -590,7 +601,7 @@ void BalancedTreeNodeInsert(Vector* states, Vector* tree, int current_node, int 
     // 2-Node, 3-Node leaf node
     else if(children_count == 0)
     {
-        printf("insert only\n");
+        // printf("insert only\n");
         // printf("new value %i our interval %i, %i\n", new_key, interval, VectorGetPopulation(node->keys));
         BalancedTreeNodeInsertIntoContainer(states, node->keys, new_key);
     }

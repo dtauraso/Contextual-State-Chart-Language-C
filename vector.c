@@ -16,6 +16,7 @@ typedef struct Vector
 
 Vector* VectorInitVector()
 {
+	// printf("VectorInitVector\n");
 	Vector* new_container = (Vector*) malloc(sizeof(Vector));
 	new_container->values = NULL;
 	new_container->size = 0;
@@ -86,6 +87,7 @@ void* VectorGetItem(Vector* container, int i)
 		return NULL;
 
 	}
+	// printf("VectorGetItem start %i\n", container->start);
 	// printf("getting item %i, %i\n", i, container->population);
 	if(container->population == 0)
 	{
@@ -139,6 +141,8 @@ void VectorAppend(Vector* container, void* element)
 	{
 		return;
 	}
+	// printf("VectorAppend start %i\n", container->start);
+
 	//printf("TrieTreePush %i, size %i\n", container->population, container->size);
 
 	if(container->size == 0)
@@ -153,8 +157,7 @@ void VectorAppend(Vector* container, void* element)
 	else if(container->end == container->size)
 	{
 
-		//printf("size %i\n", container->size);
-
+		// printf("size %i\n", container->size);
 		container->size *= 2;
 
 		container->values = (void**) realloc(container->values, sizeof(void*) * container->size);
@@ -164,6 +167,7 @@ void VectorAppend(Vector* container, void* element)
 	container->population++;
 	
 	container->end++;
+	// printf("VectorAppend end start %i\n", container->start);
 
 	// container->is_empty = false;
 		//printf("result\n");
@@ -302,6 +306,7 @@ void VectorShiftLeft(Vector* container)
 	{
 		return;
 	}
+	// printf("VectorShiftLeft start %i\n", container->start);
 	container->size++;
 	container->values = (void**) realloc(container->values, sizeof(void*) * container->size);
 	container->values[container->end] = NULL;
@@ -328,6 +333,7 @@ void VectorShiftRight(Vector* container, int index)
 	// printf("VectorShiftRight\n");
 	// printf("index %i\n", index);
 	// container->end == container->size instead
+	// printf("VectorShiftRight start %i\n", container->start);
 	int end = container->end;
 	// printf("end %i, size %i\n", container->end, container->size);
 	if(container->end == container->size)
@@ -394,12 +400,17 @@ void VectorShiftRight(Vector* container, int index)
 	// printf("\n");
 
 }
+/*
+VectorShiftRight start -1
+VectorSetInt start -1
+*/
 void VectorSetInt(Vector* container, int element, int i)
 {
 	if(container == NULL)
 	{
 		return;
 	}
+	// printf("VectorSetInt start %i\n", container->start);
 	// printf("set int %i %i \n", i, container->end);
 	if(i < container->end && i >= 0)
 	{
@@ -408,6 +419,10 @@ void VectorSetInt(Vector* container, int element, int i)
 		{
 			// printf("adjusting the population\n");
 			container->population++;
+			if(container->population == 1)
+			{
+				container->start = 0;
+			}
 		}
 		int* element_ptr = (int*) malloc(sizeof(int));
 		*element_ptr = element;
@@ -431,6 +446,10 @@ void VectorSet(Vector* container, void* element, int i)
 		{
 			// printf("adjusting the population\n");
 			container->population++;
+			if(container->population == 1)
+			{
+				container->start = 0;
+			}
 		}
 		container->values[i] = element;
 

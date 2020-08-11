@@ -74,9 +74,11 @@ typedef struct ContextualStateChart
 	// the idea of context and are identified by slightly different state names
 
 	Vector* states;  // array
+	int root_state_id;
 
 	// 234 tree ids are sorted by state name
 	Vector* state_ids; // 234 tree
+
 	// TrieTree* state_names;
 	// root is position 0
 
@@ -173,17 +175,23 @@ typedef struct State
 	// primitive value
 	// dictionary
 	// root for any other data structure
-
+	// all vectors are 1 level
 	int id;
-	// 1 level
+
 	Vector* name;
 
-	// 1 level
+
 	Vector* next_states;
 
-	// 1 level
+
 	// id's are sorted by state name if state is a dictionary state
 	Vector* children;
+
+	bool is_control_flow_node;
+
+
+	Vector* function_name;
+	bool (*function) (ContextualStateChart* my_machine, int parent_state, int current_state);
 
 	AsynchronousTimelineMergeState* asynchronousTimelineMergeState;
 	ChildrenOrNextStatesAreParallelState* childrenOrNextStatesAreParallelState;
@@ -193,13 +201,6 @@ typedef struct State
 	ModificationFlags* modificationFlags;
 	CollectionState* collectionState;
 	PrimitiveState* primitiveState;
-
-	bool is_control_flow_node;
-
-	// 1 level
-	Vector* function_name;
-	bool (*function) (ContextualStateChart* my_machine, int parent_state, int current_state);
-
 }State;
 
 
@@ -258,7 +259,7 @@ State* DynamicStateMakeVariable(
 void DynamicMachineTest2();
 
 void DynamicMachineTest();
-
+ContextualStateChart* CSCStateChartFromString(char* input);
 void printArraysOfStrings(Vector* arrays_of_strings, int indent_level);
 void printArrayOfStrings(Vector* array_of_strings, int indent_level);
 void printState(State* my_state, int indent_level);
