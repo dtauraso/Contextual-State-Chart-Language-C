@@ -565,31 +565,38 @@ void VectorPrintIntsAsChars(Vector* container)
 		return;
 	}
 	printf("|");
-	// printf("printing container pop %i, size %i\n", container->population, container->size);
-	for(int i = 0; i < container->population; i++)
+	if(VectorGetPopulation(container) > 0)
 	{
-		//printf("i %i\n", i);
-		if(container->values[i] == NULL)
+		for(int i = container->start; i < container->end; i++)
 		{
-			printf("|NULL|\n");
-		}
-		else
-		{
-			//printf("|%x|", container->values[i]);
-			void* a = container->values[i];
-			int* b = (int*) a;
-			printf("%c", *b);
-			
-			//printf("|item|");
+			//printf("i %i\n", i);
+			if(container->values[i] == NULL)
+			{
+				printf("|NULL|\n");
+			}
+			else
+			{
+				//printf("|%x|", container->values[i]);
+				void* a = container->values[i];
+				int* b = (int*) a;
+				// the char equivalent may not be veiwable or may display in an unexpected way
+				// it prints fine if it's printing as an integer
+				printf("%c", *b);
+				
+				//printf("|item|");
+			}
 		}
 	}
 	printf("|");
+	// printf("printing container pop %i, size %i\n", container->population, container->size);
+	
+
 
 	if(container->population == 0)
 	{
 		printf("none");
 	}
-	printf("\n\n");
+	printf("\n");
 	
 
 }

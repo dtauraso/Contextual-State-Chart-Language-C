@@ -204,6 +204,8 @@ typedef struct State
 }State;
 
 
+State* StateInitKey(Vector* name);
+
 // dynamic state funcitons
 // DynamicState* DynamicStateInitDynamicState(	Vector* name, // strings
 // 								Vector* parents,  // array of strings
