@@ -21,7 +21,8 @@ Vector* VectorInitVector()
 	new_container->values = NULL;
 	new_container->size = 0;
 	new_container->population = 0;
-	new_container->start = -1;
+
+	new_container->start = 0;
 	new_container->end = 0;
 	// new_container->is_empty = true;
 	// from C's point of view new_container == NULL
@@ -38,7 +39,7 @@ Vector* VectorInitVectorSize(int size)
 	new_container->values = (void**) malloc(sizeof(void*) * size);
 	new_container->size = size;
 	new_container->population = 0;
-	new_container->start = -1;
+	new_container->start = 0;
 	new_container->end = 0;
 	// new_container->is_empty = true;
 	return new_container;
@@ -94,7 +95,7 @@ void* VectorGetItem(Vector* container, int i)
 		printf("container is empty\n");
 		return NULL;
 	}
-	else if(i < container->end && i >= 0)
+	else if(i < container->end && i >= container->start)
 	{
 		// printf("item |%i|\n", container->values[i]);
 		return container->values[i];
@@ -151,7 +152,7 @@ void VectorAppend(Vector* container, void* element)
 		container->values = (void**) malloc(sizeof(void*));
 		container->size = 1;
 		container->values[0] = element;
-		container->start++;
+		// container->start++;
 
 	}
 	else if(container->end == container->size)
@@ -273,7 +274,7 @@ bool VectorDeleteAllItems2(Vector* container)
 	container->values = NULL;
 	container->population = 0;
 	container->size = 0;
-	container->start = -1;
+	container->start = 0;
 	container->end = 0;
 	// free(container);
 	// container = NULL;
@@ -419,6 +420,7 @@ void VectorSetInt(Vector* container, int element, int i)
 		{
 			// printf("adjusting the population\n");
 			container->population++;
+			// is this needed?
 			if(container->population == 1)
 			{
 				container->start = 0;
@@ -446,6 +448,8 @@ void VectorSet(Vector* container, void* element, int i)
 		{
 			// printf("adjusting the population\n");
 			container->population++;
+
+			// is this needed?
 			if(container->population == 1)
 			{
 				container->start = 0;
@@ -481,7 +485,7 @@ void VectorReset(Vector* container)
     container->values = (void**) malloc(sizeof(void*));
     container->population = 0;
     container->size = 0;
-	container->start = -1;
+	container->start = 0;
 	container->end = 0;
 	// this function works becuase it always comes before VectorSetInt which ensures start > -1
 
@@ -496,7 +500,7 @@ void VectorPrint(Vector* container)
 		return;
 	}
 	// printf("printing container pop %i, size %i\n", container->population, container->size);
-	for(int i = 0; i < container->population; i++)
+	for(int i = container->start; i < container->end; i++)
 	{
 		//printf("i %i\n", i);
 		if(container->values[i] == NULL)
@@ -531,7 +535,7 @@ void VectorPrintInts(Vector* container)
 		return;
 	}
 	// printf("printing container pop %i, size %i\n", container->population, container->size);
-	for(int i = 0; i < container->population; i++)
+	for(int i = container->start; i < container->end; i++)
 	{
 		//printf("i %i\n", i);
 		if(container->values[i] == NULL)
@@ -565,26 +569,23 @@ void VectorPrintIntsAsChars(Vector* container)
 		return;
 	}
 	printf("|");
-	if(VectorGetPopulation(container) > 0)
+	for(int i = container->start; i < container->end; i++)
 	{
-		for(int i = container->start; i < container->end; i++)
+		//printf("i %i\n", i);
+		if(container->values[i] == NULL)
 		{
-			//printf("i %i\n", i);
-			if(container->values[i] == NULL)
-			{
-				printf("|NULL|\n");
-			}
-			else
-			{
-				//printf("|%x|", container->values[i]);
-				void* a = container->values[i];
-				int* b = (int*) a;
-				// the char equivalent may not be veiwable or may display in an unexpected way
-				// it prints fine if it's printing as an integer
-				printf("%c", *b);
-				
-				//printf("|item|");
-			}
+			printf("|NULL|\n");
+		}
+		else
+		{
+			//printf("|%x|", container->values[i]);
+			void* a = container->values[i];
+			int* b = (int*) a;
+			// the char equivalent may not be veiwable or may display in an unexpected way
+			// it prints fine if it's printing as an integer
+			printf("%c", *b);
+			
+			//printf("|item|");
 		}
 	}
 	printf("|");

@@ -620,19 +620,16 @@ void StatePrintAttributeSequence(Vector* attribute)
 
 	printf("[");
 
-	if(VectorGetPopulation(attribute) > 0)
+	for(int i = attribute->start; i < attribute->end; i++)
 	{
-		for(int i = attribute->start; i < attribute->end; i++)
+		// printf("i %i\n", i);
+		int state_id = *((int*) VectorGetItem(attribute, i));
+		printf("%i", state_id);
+		// StatePrintIntsFromVectorAsChars((Vector*) VectorGetItem(attribute, i));
+		if(i < VectorGetPopulation(attribute) - 1)
 		{
-			// printf("i %i\n", i);
-			int state_id = *((int*) VectorGetItem(attribute, i));
-			printf("%i", state_id);
-			// StatePrintIntsFromVectorAsChars((Vector*) VectorGetItem(attribute, i));
-			if(i < VectorGetPopulation(attribute) - 1)
-			{
-				printf(", ");
-			}	
-		}
+			printf(", ");
+		}	
 	}
 	printf("]");
 
@@ -991,15 +988,17 @@ Vector* CSCMakePair(Vector* key, ContextualStateChart* value)
 
 void CSCTAdjustNeighborLinks(Vector* neighbor_links, int old_size)
 {
-	if(VectorGetPopulation(neighbor_links) > 0)
+	if(neighbor_links == NULL)
 	{
-		// printf("%i\n", )
-		for(int j = neighbor_links->start; j < neighbor_links->end; j++)
-		{
-			int* our_original_number = (int*) neighbor_links->values[j];
-			(*our_original_number) += old_size;
-		}
+		return;
 	}
+	// printf("%i\n", )
+	for(int j = neighbor_links->start; j < neighbor_links->end; j++)
+	{
+		int* our_original_number = (int*) neighbor_links->values[j];
+		(*our_original_number) += old_size;
+	}
+	
 }
 void CSCTransfer(	ContextualStateChart* chart_1,
 					ContextualStateChart* chart_2)
@@ -1025,7 +1024,7 @@ void CSCTransfer(	ContextualStateChart* chart_1,
 	chart_2->states->values = NULL;
 	chart_2->states->population = 0;
 	chart_2->states->size = 0;
-	chart_2->states->start = -1;
+	chart_2->states->start = 0;
 	chart_2->states->end = 0;
 	free(chart_2->states);
 	chart_2->states = NULL;
@@ -1034,7 +1033,7 @@ void CSCTransfer(	ContextualStateChart* chart_1,
 	chart_2->state_ids->values = NULL;
 	chart_2->state_ids->population = 0;
 	chart_2->state_ids->size = 0;
-	chart_2->state_ids->start = -1;
+	chart_2->state_ids->start = 0;
 	chart_2->state_ids->end = 0;
 	free(chart_2->state_ids);
 	chart_2->state_ids = NULL;
@@ -1072,6 +1071,7 @@ ContextualStateChart* CSCMakeDict(int number_of_pairs, ...)
 		// add key state to state array and the state id dict
 		VectorAppend(my_chart_dict->states, key_state);
 		int key_state_id = VectorGetPopulation(my_chart_dict->states) - 1;
+		key_state->id = key_state_id;
 		BalancedTreeNodeInsert(	my_chart_dict->states,
 								my_chart_dict->state_ids,
 								my_chart_dict->state_ids->start,
@@ -1236,14 +1236,24 @@ void ContextualStateChartTest()
 	// 													CSCStateChartFromString("start state name"));
 									// VectorMakeVectorOfChars
 	ContextualStateChart* contextual_state_chart = CSCMakeDict(
-														1,
+														2,
 														CSCMakePair(
 																VectorMakeVectorOfChars("next states"),
-																CSCNestArray(CSCStateChartFromString("start state"))));
+																CSCNestArray(CSCStateChartFromString("start state"))),
+														CSCMakePair(
+																VectorMakeVectorOfChars("another key"),
+																CSCStateChartFromString("value"))
+														);
+	/*
+	id 0
+	name:
+	|another key|
+	*/
 	ContextualStateChartPrintStates(contextual_state_chart);
 	BalancedTreeNodePrintTree(	contextual_state_chart->state_ids,
 								contextual_state_chart->state_ids->start,
 								0);
+	// make sure the data structure flags are appropriately set for the data structure states
 
 	// printf("start %i\n", contextual_state_chart->root_state_id);
 	// ContextualStateChartPrintStateTree(contextual_state_chart, contextual_state_chart->root_state_id, 0);
