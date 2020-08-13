@@ -1007,7 +1007,8 @@ getValue(state_chart*) -> void* from root
 
 */
 
-ContextualStateChart* CSCNestArray(ContextualStateChart* contextual_state_chart)
+ContextualStateChart* CSCNestArray(	/*int number_of_items, */
+									ContextualStateChart* contextual_state_chart)
 {
 
 	// make an outer state
@@ -1025,6 +1026,10 @@ ContextualStateChart* CSCNestArray(ContextualStateChart* contextual_state_chart)
 	contextual_state_chart->root_state_id = id;
 	// root_state_id
 	// add it to the begining
+
+	// make a new array state
+	// transfer each chart to the new chart and add new edges from the structure state's chilren
+
 	
 	return contextual_state_chart;
 
@@ -1051,6 +1056,7 @@ void CSCTAdjustNeighborLinks(Vector* neighbor_links, int old_size)
 	}
 	
 }
+// make an (*our_original_number) += old_size; version for a 234 tree array
 void CSCTransfer(	ContextualStateChart* chart_1,
 					ContextualStateChart* chart_2)
 {
@@ -1063,8 +1069,19 @@ void CSCTransfer(	ContextualStateChart* chart_1,
 		// VectorPrintIntsAsChars(state->name);
 		// asjust children and next_states links to account for the new items being added
 		// the ids will be different in char_1 from what they were in chart_2
-		CSCTAdjustNeighborLinks(state->children, old_size);
+		// if our state chart is a dict then maybe we can't assume the children only have int* in them?
+		if(state->collectionState == NULL){}
+		else if(state->collectionState->is_string || state->collectionState->is_array)
+		{
+			CSCTAdjustNeighborLinks(state->children, old_size);
+		}
+		else if(state->collectionState->is_dictionary)
+		{
+			BalancedTreeNodeDFTUpdateValue(state->children, state->children->start, old_size);
+		}
 		CSCTAdjustNeighborLinks(state->next_states, old_size);
+
+		
 
 		
 		VectorAppend(chart_1->states, state);
@@ -1108,6 +1125,8 @@ ContextualStateChart* CSCMakeDict(int number_of_pairs, ...)
 
 	va_start(ap, number_of_pairs);
 	// do I have a state representing the dict?
+	// what if the value is a dict?
+	// children edges aren't getting updated when new things(a dict) are added
 	for(int i = 0; i < number_of_pairs; i++)
 	{
 		// printf("%i\n", i);
@@ -1146,6 +1165,8 @@ ContextualStateChart* CSCMakeDict(int number_of_pairs, ...)
 		// printf("old size %i\n", VectorGetPopulation(my_chart_dict->states));
 		int old_size = VectorGetPopulation(my_chart_dict->states);
 		// transfter states from value to my_chart_dict
+		// the bug involves items that were copied in that where not updated but this should be updating them
+		// the dict that was copied over didn't get it's edges copied over properly, but the array and the string was copied over right
 		CSCTransfer(my_chart_dict, value);
 		// printf("new chart\n");
 		// printf("here 2\n");
@@ -1191,12 +1212,6 @@ void CSCPrintArray(ContextualStateChart* contextual_state_chart, int current_sta
 	{
 		int value_state_id = *((int*) VectorGetItem(current_state->children, i));
 
-		// State* value_state = (State*) VectorGetItem(contextual_state_chart->states, i);
-
-		// if(char_state->primitiveState == NULL) return;
-		// DataPrintData(char_state->primitiveState->value);
-		// printf("about to trash dict %i\n", value_state_id);
-		// exit(1);
 		CSCPrintDict(contextual_state_chart, value_state_id, indents);
 	}
 }
@@ -1205,6 +1220,7 @@ void CSCPrintDict(ContextualStateChart* contextual_state_chart, int current_stat
 	if(contextual_state_chart == NULL || current_state_id < 0) return;
 	// printf("here %i\n", current_state_id);
 	State* current_state = (State*) VectorGetItem(contextual_state_chart->states, current_state_id);
+	if(current_state == NULL) return;
 	if(current_state->collectionState == NULL) return;
 
 	// printf("%i\n", current_state->collectionState);
@@ -1234,12 +1250,13 @@ void CSCPrintDict(ContextualStateChart* contextual_state_chart, int current_stat
 	{
 		printf("{");
 		// get the key value pair
-		Vector* keys = BalancedTreeNodeDFT(contextual_state_chart->state_ids, current_state_id, VectorInitVector());
+		Vector* keys = BalancedTreeNodeDFT(current_state->children, 0, VectorInitVector());
 		for(int i = keys->start; i < keys->end; i++)
 		{
 			// print key
-			int key_state_id = *((int*) VectorGetItem(keys, i));
+			// printf("our new key index %i\n", i);
 
+			int key_state_id = *((int*) VectorGetItem(keys, i));
 			// CSCPrintDict(contextual_state_chart, key_state_id, indents);
 			State* key_state = (State*) VectorGetItem(contextual_state_chart->states, key_state_id);
 			printf("\"", indent_string);
@@ -1258,7 +1275,7 @@ void CSCPrintDict(ContextualStateChart* contextual_state_chart, int current_stat
 		}
 
 		// call PrintDict on all values that are dictionaries
-		printf("}\n", indent_string);	
+		printf("}", indent_string);	
 	}
 }
 void visit(ContextualStateChart* graph, Vector* start_state, int indents)
@@ -1389,7 +1406,13 @@ void ContextualStateChartTest()
 	// ContextualStateChart* contextual_state_chart = CSCNestArray(
 	// 													CSCStateChartFromString("start state name"));
 									// VectorMakeVectorOfChars
-	ContextualStateChart* contextual_state_chart = CSCMakeDict(
+	// nesting dicts doesn't work
+	ContextualStateChart* contextual_state_chart = 
+										CSCMakeDict(
+											1,
+											CSCMakePair(
+												VectorMakeVectorOfChars("master key"),
+												CSCMakeDict(
 														2,
 														CSCMakePair(
 																VectorMakeVectorOfChars("next states"),
@@ -1397,19 +1420,51 @@ void ContextualStateChartTest()
 														CSCMakePair(
 																VectorMakeVectorOfChars("another key"),
 																CSCStateChartFromString("value"))
-														);
+												)
+											)
+										);
+	/*
+	id 1
+	name:
+	|master key|
+
+	next states:
+	[2]
+
+	id 2
+	name:
+	||none
+
+	children:
+	[15, 1]
+	type: dictionary
+	*/
+	ContextualStateChartPrintStates(contextual_state_chart);
+	printf("\n\n\n");
+
+	// contextual_state_chart = CSCMakeDict(
+	// 									2,
+	// 									CSCMakePair(
+	// 											VectorMakeVectorOfChars("next states"),
+	// 											CSCNestArray(CSCStateChartFromString("start state"))),
+	// 									CSCMakePair(
+	// 											VectorMakeVectorOfChars("another key"),
+	// 											CSCStateChartFromString("value"))
+	// 							);
+
 	/*
 	id 0
 	name:
 	|another key|
 	*/
-	ContextualStateChartPrintStates(contextual_state_chart);
-	// BalancedTreeNodePrintTree(	contextual_state_chart->state_ids,
-	// 							contextual_state_chart->state_ids->start,
-	// 							0);
+	// ContextualStateChartPrintStates(contextual_state_chart);
+	BalancedTreeNodePrintTree(	contextual_state_chart->state_ids,
+								contextual_state_chart->state_ids->start,
+								0);
 	CSCPrintDict(	contextual_state_chart,
 					contextual_state_chart->state_ids->start,
 					0);
+	printf("\n");
 	// make sure the data structure flags are appropriately set for the data structure states
 
 	// printf("start %i\n", contextual_state_chart->root_state_id);
