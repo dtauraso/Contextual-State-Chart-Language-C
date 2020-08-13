@@ -77,6 +77,7 @@ typedef struct ContextualStateChart
 	int root_state_id;
 
 	// 234 tree ids are sorted by state name
+	// if the state chart is a dict then these hold the keys
 	Vector* state_ids; // 234 tree
 
 	// TrieTree* state_names;
@@ -106,6 +107,12 @@ typedef struct CollectionState
 	bool is_array;
 
 	bool is_string;
+
+
+	// "is value" flags
+	bool is_value;
+
+	bool is_control_flow_node;
 
 
 }CollectionState;
@@ -188,6 +195,8 @@ typedef struct State
 	// id's are sorted by state name if state is a dictionary state
 	Vector* children;
 
+	// 234 tree
+	Vector* variables;
 	bool is_control_flow_node;
 
 
