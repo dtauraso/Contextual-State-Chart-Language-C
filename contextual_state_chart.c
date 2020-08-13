@@ -1406,23 +1406,26 @@ void ContextualStateChartTest()
 	// ContextualStateChart* contextual_state_chart = CSCNestArray(
 	// 													CSCStateChartFromString("start state name"));
 									// VectorMakeVectorOfChars
-	// nesting dicts doesn't work
+	/*
+	s("my string") = CSCStateChartFromString("start state")
+	a[state_chart] = CSCNestArray(state_chart)
+
+
+	a[s("myString")]
+	*/
+	#define s(a) CSCStateChartFromString(a) 		// string
+	#define a(a) CSCNestArray(a) 					// array
+	#define v(a) VectorMakeVectorOfChars(a)			// vector
+	#define p(a, b) CSCMakePair(a, b)				// pair
+	// variadic macro
+	#define d(i, ...) CSCMakeDict(i, ##__VA_ARGS__) // dictonary
+
 	ContextualStateChart* contextual_state_chart = 
-										CSCMakeDict(
-											1,
-											CSCMakePair(
-												VectorMakeVectorOfChars("master key"),
-												CSCMakeDict(
-														2,
-														CSCMakePair(
-																VectorMakeVectorOfChars("next states"),
-																CSCNestArray(CSCStateChartFromString("start state"))),
-														CSCMakePair(
-																VectorMakeVectorOfChars("another key"),
-																CSCStateChartFromString("value"))
-												)
-											)
-										);
+		CSCMakeDict(1,
+			p(	v("master key"),
+				d(	2,
+					p(v("next states"), a(s("start state"))),
+					p(v("another key"), s("value")))));
 	/*
 	id 1
 	name:
