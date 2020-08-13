@@ -22,6 +22,8 @@ void BalancedTreeNodeInsertIntoContainer(Vector* states, Vector* container, int 
 void BalancedTreeNodeInsertTest(Vector* my_tree, int arg_count, ...);
 
 void BalancedTreeNodePrintTree(Vector* tree, int current_node, int indents);
+Vector* BalancedTreeNodeDFT(Vector* tree, int current_node, Vector* nodes);
+
 char* BalancedTreeNodeMakeIndents(int number_of_indents);
 void BalancedTreeNodePrintTreeOfStates(Vector* states, Vector* tree, int current_node, int indents);
 

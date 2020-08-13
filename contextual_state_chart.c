@@ -156,15 +156,15 @@ ModificationFlags* ModificationFlagsInit()
 
 
 // }CollectionState;
-enum CollectionStateType{array, dictionary};
+enum CollectionStateType{string, array, dictionary};
 
 CollectionState* CollectionStateInit(int collection_type)
 {
 	CollectionState* my_collection_state = (CollectionState*) malloc(sizeof(CollectionState));
 
+	my_collection_state->is_string = collection_type == string? true: false;
 	my_collection_state->is_array = collection_type == array? true: false;
 	my_collection_state->is_dictionary = collection_type == dictionary? true: false;
-
 	return my_collection_state;
 }
 // TrieTree* CollectionStateGetCollection(State* state)
@@ -322,6 +322,12 @@ State* StateInitVariableCollectionState(Vector* name, int collection_type)
 										NULL,
 										NULL);
 	my_state->collectionState = CollectionStateInit(collection_type);
+	if(my_state->collectionState->is_dictionary)
+	{
+		BalancedTreeNode* empty_node = BalancedTreeNodeInit();
+		VectorAppend(my_state->children, empty_node);
+
+	}
 	return my_state;
 }
 
@@ -634,7 +640,7 @@ void StatePrintAttributeSequence(Vector* attribute)
 	printf("]");
 
 }
-void StatePrintAttribute(int indents, Vector* attribute_name, Vector* attribute, int state_attribute)
+void StatePrintAttribute(State* state, int indents, Vector* attribute_name, Vector* attribute, int state_attribute)
 {
 	// printf("%sname:\n", TrieTreeMakeIndents(indents));
 	printf("%s", BalancedTreeNodeMakeIndents(indents));
@@ -645,6 +651,21 @@ void StatePrintAttribute(int indents, Vector* attribute_name, Vector* attribute,
 	if(state_attribute == _name)
 	{
 		VectorPrintIntsAsChars(attribute);
+	}
+	else if(state_attribute == _children)
+	{
+		if(state->collectionState == NULL) return;
+		if(state->collectionState->is_dictionary)
+		{
+
+			Vector* key_ids = BalancedTreeNodeDFT(attribute, 0, VectorInitVector());
+
+			StatePrintAttributeSequence(key_ids);
+		}
+		else if(state->collectionState->is_array || state->collectionState->is_string)
+		{
+			StatePrintAttributeSequence(attribute);
+		}
 	}
 	else
 	{
@@ -721,7 +742,9 @@ void StatePrintState(ContextualStateChart* contextual_state_chart, State* state,
 	printf("%sid %i\n", BalancedTreeNodeMakeIndents(indents), state->id);
 	if(state->name != NULL)
 	{
-		StatePrintAttribute(indents,
+		StatePrintAttribute(
+						state,
+						indents,
 						VectorMakeVectorOfChars("name"),
 						state->name,
 						_name);
@@ -729,7 +752,9 @@ void StatePrintState(ContextualStateChart* contextual_state_chart, State* state,
 	}
 	if(state->next_states != NULL)
 	{
-		StatePrintAttribute(indents,
+		StatePrintAttribute(
+						state,
+						indents,
 						VectorMakeVectorOfChars("next states"),
 						state->next_states,
 						_next_states);
@@ -737,7 +762,9 @@ void StatePrintState(ContextualStateChart* contextual_state_chart, State* state,
 	}
 	if(state->children != NULL)
 	{
-		StatePrintAttribute(indents,
+		StatePrintAttribute(
+						state,
+						indents,
 						VectorMakeVectorOfChars("children"),
 						state->children,
 						_children);
@@ -746,7 +773,9 @@ void StatePrintState(ContextualStateChart* contextual_state_chart, State* state,
 
 	if(state->function_name != NULL)
 	{
-		StatePrintAttribute(indents,
+		StatePrintAttribute(
+						state,
+						indents,
 						VectorMakeVectorOfChars("function name"),
 						state->function_name,
 						_function_name);
@@ -758,14 +787,23 @@ void StatePrintState(ContextualStateChart* contextual_state_chart, State* state,
 	{
 		StatePrintPrimitive(state, indents);
 	}
-	// printf("here 2\n");
-
-	// if(state->collectionState != NULL)
-	// {
-	// 	// printf("here again\n");
-	// 	StatePrintCollection(contextual_state_chart, state, indents);
-	// 	// printf("passing\n");
-	// }
+	if(state->collectionState != NULL)
+	{
+		printf("%stype: ", BalancedTreeNodeMakeIndents(indents));
+		if(state->collectionState->is_string)
+		{
+			printf("string");
+		}
+		if(state->collectionState->is_array)
+		{
+			printf("array");
+		}
+		if(state->collectionState->is_dictionary)
+		{
+			printf("dictionary");
+		}
+		printf("\n");
+	}
 	printf("\n");
 	
 
@@ -813,8 +851,8 @@ ContextualStateChart* CSCStateChartFromString(char* my_string)
 
 	// using VectorInitVector() lets us autoganerate state names for the array elements
 
-	State* structure_state = StateInitVariableCollectionState(VectorInitVector(), array);
-
+	State* structure_state = StateInitVariableCollectionState(VectorInitVector(), string);
+	// structure_state->collectionState = CollectionStateInit(string);
 	// adding stuff to dict
 	VectorAppend(contextual_state_chart->states, structure_state);
 	// where do I add things to keys
@@ -954,6 +992,19 @@ get([array_of_states, dict_of_ids, root_state_id]) ->
 // return a new state chart with different values for the dict and the root node id
 
 getValue(state_chart*) -> void* from root
+
+
+
+{
+	key: value
+}
+
+{
+	key: {
+		key: value
+	}
+}
+
 */
 
 ContextualStateChart* CSCNestArray(ContextualStateChart* contextual_state_chart)
@@ -961,7 +1012,7 @@ ContextualStateChart* CSCNestArray(ContextualStateChart* contextual_state_chart)
 
 	// make an outer state
 	State* structure_state = StateInitVariableCollectionState(VectorInitVector(), array);
-
+	// structure_state->collectionState = CollectionStateInit(array);
 	VectorAppend(contextual_state_chart->states, structure_state);
 	int id = VectorGetPopulation(contextual_state_chart->states) - 1;
 	BalancedTreeNodeInsert(	contextual_state_chart->states,
@@ -1011,6 +1062,7 @@ void CSCTransfer(	ContextualStateChart* chart_1,
 		State* state = (State*) VectorGetItem(chart_2->states, i);
 		// VectorPrintIntsAsChars(state->name);
 		// asjust children and next_states links to account for the new items being added
+		// the ids will be different in char_1 from what they were in chart_2
 		CSCTAdjustNeighborLinks(state->children, old_size);
 		CSCTAdjustNeighborLinks(state->next_states, old_size);
 
@@ -1050,11 +1102,12 @@ ContextualStateChart* CSCMakeDict(int number_of_pairs, ...)
 	// the finished state chart is then returned
 	ContextualStateChart* my_chart_dict = ContextualStateChartInit();
 	State* structure_state = StateInitVariableCollectionState(VectorInitVector(), dictionary);
+	VectorAppend(my_chart_dict->states, structure_state);
 
 	va_list ap;
 
 	va_start(ap, number_of_pairs);
-
+	// do I have a state representing the dict?
 	for(int i = 0; i < number_of_pairs; i++)
 	{
 		// printf("%i\n", i);
@@ -1077,6 +1130,14 @@ ContextualStateChart* CSCMakeDict(int number_of_pairs, ...)
 								my_chart_dict->state_ids->start,
 								-1,
 								key_state_id);
+
+		// add each key to the structure states children too
+		BalancedTreeNodeInsert(	my_chart_dict->states,
+								structure_state->children,
+								0,
+								-1,
+								key_state_id);
+
 		// printf("here\n");
 		// ContextualStateChartPrintStateTree(value, value->root_state_id, 0);
 		// ContextualStateChartPrintStates(my_chart_dict);
@@ -1084,6 +1145,7 @@ ContextualStateChart* CSCMakeDict(int number_of_pairs, ...)
 		// transfer all the states in value to my_chart_dict
 		// printf("old size %i\n", VectorGetPopulation(my_chart_dict->states));
 		int old_size = VectorGetPopulation(my_chart_dict->states);
+		// transfter states from value to my_chart_dict
 		CSCTransfer(my_chart_dict, value);
 		// printf("new chart\n");
 		// printf("here 2\n");
@@ -1092,10 +1154,6 @@ ContextualStateChart* CSCMakeDict(int number_of_pairs, ...)
 
 		// ContextualStateChartPrintStateTree(value, value->root_state_id, 0);
 
-		// link the "key" state to the root value state via next array
-		// how do we get the root state after transfer?
-		// we have a pointer to the state before transfer but not the id after transfer
-		// transfer appends states to the end of the previous array
 		int new_value_state_id = old_size + value_state_id;
 
 		key_state->next_states = VectorInitVector();
@@ -1106,6 +1164,102 @@ ContextualStateChart* CSCMakeDict(int number_of_pairs, ...)
 		// cleanup
 	}
 	return my_chart_dict;
+}
+
+// PRINT ContextualStateChart DICTIONARY
+void CSCPrintString(ContextualStateChart* contextual_state_chart, int current_state_id, int indents)
+{
+	if(contextual_state_chart == NULL || current_state_id < 0) return;
+	State* current_state = (State*) VectorGetItem(contextual_state_chart->states, current_state_id);
+
+	// printf("%i\n", current_state_id);
+
+	for(int i = current_state->children->start; i < current_state->children->end; i++)
+	{
+		// printf("%i\n", i);
+		int char_state_id = *((int*) VectorGetItem(current_state->children, i));
+		State* char_state = (State*) VectorGetItem(contextual_state_chart->states, char_state_id);
+		if(char_state->primitiveState == NULL) return;
+		DataPrintData(char_state->primitiveState->value);
+	}
+}
+void CSCPrintArray(ContextualStateChart* contextual_state_chart, int current_state_id, int indents)
+{
+	if(contextual_state_chart == NULL || current_state_id < 0) return;
+	State* current_state = (State*) VectorGetItem(contextual_state_chart->states, current_state_id);
+	for(int i = current_state->children->start; i < current_state->children->end; i++)
+	{
+		int value_state_id = *((int*) VectorGetItem(current_state->children, i));
+
+		// State* value_state = (State*) VectorGetItem(contextual_state_chart->states, i);
+
+		// if(char_state->primitiveState == NULL) return;
+		// DataPrintData(char_state->primitiveState->value);
+		// printf("about to trash dict %i\n", value_state_id);
+		// exit(1);
+		CSCPrintDict(contextual_state_chart, value_state_id, indents);
+	}
+}
+void CSCPrintDict(ContextualStateChart* contextual_state_chart, int current_state_id, int indents)
+{
+	if(contextual_state_chart == NULL || current_state_id < 0) return;
+	// printf("here %i\n", current_state_id);
+	State* current_state = (State*) VectorGetItem(contextual_state_chart->states, current_state_id);
+	if(current_state->collectionState == NULL) return;
+
+	// printf("%i\n", current_state->collectionState);
+
+	char* indent_string = BalancedTreeNodeMakeIndents(indents);
+	if(current_state->collectionState->is_string)
+	{
+		printf("\"", indent_string);
+		// printf("trashed string\n");
+		
+		CSCPrintString(contextual_state_chart, current_state_id, indents);
+		// exit(1);
+		printf("\"", indent_string);
+
+		// exit(1);
+	}
+	else if(current_state->collectionState->is_array)
+	{
+		printf("[", indent_string);
+		// printf("trashed array\n");
+
+		CSCPrintArray(contextual_state_chart, current_state_id, indents);
+		printf("]", indent_string);
+
+	}
+	else if(current_state->collectionState->is_dictionary)
+	{
+		printf("{");
+		// get the key value pair
+		Vector* keys = BalancedTreeNodeDFT(contextual_state_chart->state_ids, current_state_id, VectorInitVector());
+		for(int i = keys->start; i < keys->end; i++)
+		{
+			// print key
+			int key_state_id = *((int*) VectorGetItem(keys, i));
+
+			// CSCPrintDict(contextual_state_chart, key_state_id, indents);
+			State* key_state = (State*) VectorGetItem(contextual_state_chart->states, key_state_id);
+			printf("\"", indent_string);
+			// printf("trashed string\n");
+			StatePrintIntsFromVectorAsChars(key_state->name);
+			// CSCPrintString(contextual_state_chart, key_state_id, indents);
+			// exit(1);
+			printf("\" : ", indent_string);
+			// printf("key state id %i\n", key_state_id);
+			int value_id = *((int*) VectorGetItem(key_state->next_states, 0));
+			// printf("value state id %i\n", value_id);
+
+			CSCPrintDict(contextual_state_chart, value_id, indents);
+			if(i < keys->end - 1) printf(", ");
+
+		}
+
+		// call PrintDict on all values that are dictionaries
+		printf("}\n", indent_string);	
+	}
 }
 void visit(ContextualStateChart* graph, Vector* start_state, int indents)
 {
@@ -1250,9 +1404,12 @@ void ContextualStateChartTest()
 	|another key|
 	*/
 	ContextualStateChartPrintStates(contextual_state_chart);
-	BalancedTreeNodePrintTree(	contextual_state_chart->state_ids,
-								contextual_state_chart->state_ids->start,
-								0);
+	// BalancedTreeNodePrintTree(	contextual_state_chart->state_ids,
+	// 							contextual_state_chart->state_ids->start,
+	// 							0);
+	CSCPrintDict(	contextual_state_chart,
+					contextual_state_chart->state_ids->start,
+					0);
 	// make sure the data structure flags are appropriately set for the data structure states
 
 	// printf("start %i\n", contextual_state_chart->root_state_id);

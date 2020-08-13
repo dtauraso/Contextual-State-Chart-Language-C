@@ -105,6 +105,7 @@ typedef struct CollectionState
 
 	bool is_array;
 
+	bool is_string;
 
 
 }CollectionState;
@@ -233,6 +234,11 @@ State* StateInitKey(Vector* name);
 // // , string element
 // );
 
+
+void CSCPrintString(ContextualStateChart* contextual_state_chart, int current_state_id, int indents);
+
+void CSCPrintArray(ContextualStateChart* contextual_state_chart, int current_state_id, int indents);
+void CSCPrintDict(ContextualStateChart* contextual_state_chart, int current_state_id, int indents);
 
 
 

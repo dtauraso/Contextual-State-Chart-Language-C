@@ -763,6 +763,42 @@ void BalancedTreeNodePrintTree(Vector* tree, int current_node, int indents)
 
 }
 
+Vector* BalancedTreeNodeDFT(Vector* tree, int current_node, Vector* nodes)
+{
+    if(tree == NULL)
+    {
+        return nodes;
+    }
+    BalancedTreeNode* node = (BalancedTreeNode*) VectorGetItem(tree, current_node);
+
+    if(node == NULL)
+    {
+        return nodes;
+    }
+    // printf("size %i\n", VectorGetPopulation(node->keys));
+    // printf( "%s(%i) parent %i ",
+    //         BalancedTreeNodeMakeIndents(indents),
+    //         current_node,
+    //         node->parent);
+    for(int i = 0; i < VectorGetEnd(node->keys); i++)
+    {
+        int key = *((int*) VectorGetItem(node->keys, i));
+
+        VectorAppendInt(nodes, key);
+        // printf("|%i|", key);
+    }
+    // printf( "\n%s-----------\n",
+    //         BalancedTreeNodeMakeIndents(indents));
+    for(int i = 0; i < VectorGetEnd(node->children); i++)
+    {
+        int child = *((int*) VectorGetItem(node->children, i));
+        nodes = BalancedTreeNodeDFT(tree, child, nodes);
+
+    }
+    return nodes;
+
+}
+
 void BalancedTreeNodePrintTreeOfStates(Vector* states, Vector* tree, int current_node, int indents)
 {
     if(tree == NULL)
