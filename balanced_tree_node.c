@@ -828,7 +828,7 @@ void BalancedTreeNodeDFTUpdateValue(Vector* tree, int current_node, int offset)
     for(int i = 0; i < VectorGetEnd(node->children); i++)
     {
         int child = *((int*) VectorGetItem(node->children, i));
-        BalancedTreeNodeDFT(tree, child, offset);
+        BalancedTreeNodeDFTUpdateValue(tree, child, offset);
 
     }
     return;

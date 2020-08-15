@@ -77,7 +77,7 @@ typedef struct ContextualStateChart
 	int root_state_id;
 
 	// 234 tree ids are sorted by state name
-	// if the state chart is a dict then these hold the keys
+	// so we can access any state using the state name
 	Vector* state_ids; // 234 tree
 
 	// TrieTree* state_names;
@@ -87,6 +87,9 @@ typedef struct ContextualStateChart
 
 }ContextualStateChart;
 
+
+void CSCTransfer(	ContextualStateChart* chart_1,
+					ContextualStateChart* chart_2);
 
 typedef struct ModificationFlags
 {
@@ -491,6 +494,8 @@ void DataDeleteDataVector(Data* variable);
 // 	bool is_end_state,
 // 	bool is_data_state);
 // void deleteContextState(ContextState* node);
+ContextualStateChart* CSCNestArray(	int number_of_items, ...);
+
 void ContextualStateChartTest();
 
 #endif
