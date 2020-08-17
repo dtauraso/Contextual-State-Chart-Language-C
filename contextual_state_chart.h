@@ -78,6 +78,7 @@ typedef struct ContextualStateChart
 
 	// 234 tree ids are sorted by state name
 	// so we can access any state using the state name
+	// if the state chart is a dictionary then the state_ids hold the ids of the keys only
 	Vector* state_ids; // 234 tree
 
 	// TrieTree* state_names;
@@ -107,15 +108,16 @@ typedef struct CollectionState
 
 	bool is_dictionary;
 
+	bool is_set;
+
 	bool is_array;
 
 	bool is_string;
 
-
-	// "is value" flags
 	bool is_value;
 
-	bool is_control_flow_node;
+// if the variables are only accessible from the parent then we don't need to worry about things being flat
+// parent -> [unique var name,..]
 
 
 }CollectionState;
@@ -198,8 +200,6 @@ typedef struct State
 	// id's are sorted by state name if state is a dictionary state
 	Vector* children;
 
-	// 234 tree
-	Vector* variables;
 	bool is_control_flow_node;
 
 

@@ -700,6 +700,163 @@ void BalancedTreeNodeDelete(Vector* tree, int current_node, int parent_interval_
             // swap values (node, and in-order something leaf)
     
 }
+bool BalancedTreeNodeVectorIsGreaterThan2(Vector* states, Vector* search_name, int i)
+{
+    // get the state names
+    // compare the vectors
+    // printf("compare the vector names here %i, %i\n", i, j);
+    // int* stuff = states->values[i];
+    // printf("%i\n", VectorGetPopulation(states));
+    // printf("%i\n", states->values[i]);
+    State* state_i = (State*) VectorGetItem(states, i);
+    // printf("got the states\n");
+    // VectorPrintInts(state_i->name);
+    // printf("\n");
+    // printf("value %i\n", state_i->primitiveState->value->_int);
+    // VectorPrintInts(state_j->name);
+    // printf("\n");
+    // printf("value %i\n", state_j->primitiveState->value->_int);
+    if(VectorGetPopulation(search_name) > VectorGetPopulation(state_i->name))
+    {
+        return true;
+    }
+    else if(VectorGetPopulation(search_name) < VectorGetPopulation(state_i->name))
+    {
+        return false;
+    }
+    else
+    {
+        // |9||50||41|
+        // doesn't completely work to compare vector versions of ints, but the 234 tree is doing fine
+        for(int i = 0; i < search_name->end; i++)
+        {
+            int value_search = *((int*) VectorGetItem(search_name, i));
+            int value_i = *((int*) VectorGetItem(state_i->name, i));
+            // printf("i %i, j %i\n", value_i, value_j);
+            if(value_search < value_i)
+            {
+                // printf("false\n");
+                return false;
+            }
+            if(value_search > value_i)
+            {
+                // printf("true\n");
+                return true;
+            }
+        }
+    }
+    // printf("false\n");
+    return false;
+
+    // exit(1);
+    // return true if state_i > state_j
+    // return false if state_i <= state_j
+    // return true;
+}
+bool BalancedTreeNodeVectorIsEqual(Vector* states, Vector* search_name, int key)
+{
+
+    // states is actually the 234 tree so we are trying to cast an in* into a State*
+    State* state_key = (State*) VectorGetItem(states, key);
+    // printf("checking for equality\n");
+    // printf("%i\n", VectorGetPopulation(search_name));
+    // VectorPrintInts(state_key->name);
+    // seg fault
+    // printf("%i\n", VectorGetPopulation(state_key->name));
+
+    if(VectorGetPopulation(search_name) > VectorGetPopulation(state_key->name))
+    {
+        return false;
+    }
+    else if(VectorGetPopulation(search_name) < VectorGetPopulation(state_key->name))
+    {
+        return false;
+    }
+    else
+    {
+        // printf("counts are the same\n");
+        // |9||50||41|
+        // doesn't completely work to compare vector versions of ints, but the 234 tree is doing fine
+        for(int i = search_name->start; i < search_name->end; i++)
+        {
+            int value_search = *((int*) VectorGetItem(search_name, i));
+            int value_key = *((int*) VectorGetItem(state_key->name, i));
+            // printf("search %i, key %i\n", value_search, value_key);
+            if(value_search != value_key)
+            {
+                // printf("false\n");
+                return false;
+            }
+        }
+    }
+    // printf("false\n");
+    return true;
+}
+int BalancedTreeNodeFindMatch(  Vector* states,
+                                Vector* keys,
+                                Vector* search_key,
+                                bool (*comparator)( Vector* states,
+                                                    Vector* search_name,
+                                                    int key))
+{
+
+    // printf("population %i\n", VectorGetPopulation(keys));
+    VectorPrintIntsAsChars(search_key);
+    for(int i = keys->start; i < keys->end; i++)
+    {
+        // printf("i %i\n", i);
+        // it claims an out of bounds error
+        int key = *((int*) VectorGetItem(keys, i));
+        // printf("our key %i\n", key);
+        if(comparator(states, search_key, key))
+        {
+            return key;
+        }
+    }
+    return -1;
+}
+
+int BalancedTreeNodeFindIntervalForSearch(  Vector* states,
+                                            Vector* keys,
+                                            Vector* search_key,
+                                            bool (*comparator)( Vector* states,
+                                                                Vector* search_name,
+                                                                int i))
+{
+
+    // find the interval
+    int interval = -1;
+
+    // halt when new_key < key
+    int i = 0;
+    if(i >= VectorGetPopulation(keys))
+    {
+        return 0;
+    }
+    // int key = *(int*) VectorGetItem(keys, i);
+    // State* key_state = (State*) VectorGetItem(states, key);
+
+    // printf("about to compare\n");
+    while(comparator(states, search_key, i))
+    {
+        // printf("here\n");
+        i++;
+        if(i >= VectorGetPopulation(keys))
+        {
+            break;
+        }
+        // key = *(int*) VectorGetItem(keys, i);
+    }
+    interval = i;
+    // printf("interval %i\n", interval);
+    // if it's larger than all the keys it must be in the last interval
+    if(interval == -1)
+    {
+        interval = VectorGetPopulation(keys);
+    }
+    return interval;
+}
+
 int BalancedTreeNodeSearchForVariableName(Vector* states, Vector* state_ids, Vector* parent_state_name, Vector* variable_state_name)
 {
 
@@ -715,10 +872,47 @@ int BalancedTreeNodeSearchForVariableName(Vector* states, Vector* state_ids, Vec
     return 0;
 }
 
-int BalancedTreeNodeSearch(Vector* tree, int current_node, Vector* name)
+int BalancedTreeNodeSearch(Vector* states, Vector* tree, int current_node, Vector* name)
 {
     // once we find a match, return the key
-    return 0;
+    if(tree == NULL)
+    {
+        return -99;
+    }
+    BalancedTreeNode* node = (BalancedTreeNode*) VectorGetItem(tree, current_node);
+
+    if(node == NULL)
+    {
+        return -1;
+    }
+
+    int children_count = VectorGetPopulation(node->children);
+
+    int key_count = VectorGetPopulation(node->keys);
+    // the vector is setup wrong 
+    // maybe the structrue is wrong
+    // maybe the setup is wrong
+    // the vector's populations are -1 which is supposed to be impossible
+    VectorPrintIntsAsChars(name);
+    // printf("keys %i\n", key_count);
+    // (0) parent -1 |1|
+    int found_key = BalancedTreeNodeFindMatch(states, node->keys, name, BalancedTreeNodeVectorIsEqual);
+    // printf("key %i\n", found_key);
+    if(found_key > -1)
+    {
+        return found_key;
+    }
+    else
+    {
+        int interval = BalancedTreeNodeFindIntervalForSearch(   states,
+                                                                node->children,
+                                                                name,
+                                                                BalancedTreeNodeVectorIsGreaterThan2);
+        int next_node = *(int*) VectorGetItem(node->children, interval);
+
+        return BalancedTreeNodeSearch(states, tree, next_node, name);
+
+    }
 }
 char* BalancedTreeNodeMakeIndents(int number_of_indents)
 {
@@ -834,6 +1028,8 @@ void BalancedTreeNodeDFTUpdateValue(Vector* tree, int current_node, int offset)
     return;
 
 }
+
+
 
 void BalancedTreeNodePrintTreeOfStates(Vector* states, Vector* tree, int current_node, int indents)
 {

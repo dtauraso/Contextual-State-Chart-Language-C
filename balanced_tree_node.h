@@ -21,6 +21,28 @@ void BalancedTreeNodeInsert(Vector* states, Vector* tree, int current_node, int 
 void BalancedTreeNodeInsertIntoContainer(Vector* states, Vector* container, int value);
 void BalancedTreeNodeInsertTest(Vector* my_tree, int arg_count, ...);
 
+bool BalancedTreeNodeVectorIsGreaterThan2(Vector* states, Vector* search_name, int i);
+
+bool BalancedTreeNodeVectorIsEqual(Vector* states, Vector* search_name, int key);
+
+int BalancedTreeNodeFindMatch(  Vector* states,
+                                Vector* keys,
+                                Vector* search_key,
+                                bool (*comparator)( Vector* states,
+                                                    Vector* search_name,
+                                                    int key));
+
+int BalancedTreeNodeFindIntervalForSearch(  Vector* states,
+                                            Vector* keys,
+                                            Vector* search_key,
+                                            bool (*comparator)( Vector* states,
+                                                                Vector* search_name,
+                                                                int i));
+
+int BalancedTreeNodeSearchForVariableName(Vector* states, Vector* state_ids, Vector* parent_state_name, Vector* variable_state_name);
+
+int BalancedTreeNodeSearch(Vector* states, Vector* tree, int current_node, Vector* name);
+
 void BalancedTreeNodePrintTree(Vector* tree, int current_node, int indents);
 Vector* BalancedTreeNodeDFT(Vector* tree, int current_node, Vector* nodes);
 void BalancedTreeNodeDFTUpdateValue(Vector* tree, int current_node, int offset);

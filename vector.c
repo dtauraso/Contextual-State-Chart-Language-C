@@ -111,7 +111,7 @@ int VectorGetPopulation(Vector* container)
 {
 	if(container == NULL)
 	{
-		return -1;
+		return 0;
 	}
 	return container->population;
 }
@@ -176,26 +176,26 @@ void VectorAppend(Vector* container, void* element)
 
 }
 
-bool VectorPopItem(Vector* container)
-{
-	if(container == NULL)
-	{
-		return false;
-	}
-	//printf("here %i\n", container->population - 1);
-	//VectorPrint(container);
+// bool VectorPopItem(Vector* container)
+// {
+// 	if(container == NULL)
+// 	{
+// 		return false;
+// 	}
+// 	//printf("here %i\n", container->population - 1);
+// 	//VectorPrint(container);
 
-	int index = container->end - 1;
-	free(container->values[index]);
-	container->values[index] = NULL;
+// 	int index = container->end - 1;
+// 	free(container->values[index]);
+// 	container->values[index] = NULL;
 
-	container->population -= 1;
-	container->end--;
+// 	container->population -= 1;
+// 	container->end--;
 
-	//VectorPrint(container);
-	return true;
-;
-}
+// 	//VectorPrint(container);
+// 	return true;
+// ;
+// }
 bool VectorPopFirst(Vector* container)
 {
 	if(container == NULL)

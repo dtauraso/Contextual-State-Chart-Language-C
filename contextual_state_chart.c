@@ -156,7 +156,7 @@ ModificationFlags* ModificationFlagsInit()
 
 
 // }CollectionState;
-enum CollectionStateType{string, array, dictionary};
+enum CollectionStateType{string, array, set, dictionary};
 
 CollectionState* CollectionStateInit(int collection_type)
 {
@@ -164,6 +164,7 @@ CollectionState* CollectionStateInit(int collection_type)
 
 	my_collection_state->is_string = collection_type == string? true: false;
 	my_collection_state->is_array = collection_type == array? true: false;
+	my_collection_state->is_set = collection_type == set? true: false;
 	my_collection_state->is_dictionary = collection_type == dictionary? true: false;
 	return my_collection_state;
 }
@@ -366,6 +367,19 @@ ContextualStateChart* ContextualStateChartInit()
 	my_state_chart->root_state_id = 0;
 	return my_state_chart;
 }
+ContextualStateChart* ContextualStateChartInitSmaller(	Vector* states,
+														Vector* state_ids,
+														int root)
+{
+	ContextualStateChart* my_state_chart = (ContextualStateChart*) malloc(sizeof(ContextualStateChart));
+
+	my_state_chart->states = states;
+	my_state_chart->state_ids = state_ids;
+	my_state_chart->root_state_id = root;
+	return my_state_chart;
+
+}
+
 
 // add state
 void ContextualStateChartAddState(	ContextualStateChart* contextualStateChart,
@@ -1214,6 +1228,35 @@ ContextualStateChart* CSCMakeDict(int number_of_pairs, ...)
 	return my_chart_dict;
 }
 
+ContextualStateChart* get(ContextualStateChart* contextual_state_chart, char* key)
+{
+	Vector* my_key =  VectorMakeVectorOfChars(key);
+	BalancedTreeNodePrintTree(contextual_state_chart->state_ids, 0, 0);
+
+	int our_key = BalancedTreeNodeSearch(	contextual_state_chart->states,
+											contextual_state_chart->state_ids,
+											0,
+											my_key);
+	printf("id %i\n", our_key);
+	// works as of here
+	State* key_state = (State*) VectorGetItem(contextual_state_chart->states, our_key);
+	// printf("population %i\n", VectorGetPopulation(key_state->children));
+
+	int value_id = *((int*) VectorGetItem(key_state->next_states, 0));
+
+
+	State* value_state = (State*) VectorGetItem(contextual_state_chart->states, value_id);
+
+	// we need to update the root because the root is where we start in the machine
+	ContextualStateChart* smaller_chart = ContextualStateChartInitSmaller(
+													contextual_state_chart->states,
+													value_state->children,
+													value_id);
+	// make a smaller contextual state chart via the current list of states and the new key's children
+	// return the smaller chart
+	return smaller_chart;
+}
+
 // PRINT ContextualStateChart DICTIONARY
 void CSCPrintString(ContextualStateChart* contextual_state_chart, int current_state_id, int indents)
 {
@@ -1461,16 +1504,17 @@ void ContextualStateChartTest()
 	ContextualStateChart* contextual_state_chart = 
 
 		// a(2, s("start state"), s("another state"))
-		CSCNestArray(2,
 			CSCMakeDict(1,
 				p(	v("master key"),
 					d(	2,
 						p(v("next states"), a(2, s("start state"), s("another state"))),
-						p(v("another key"), s("value"))))),
-			d(1,
-				p(v("another key 2"), s("value")))
-			)
+						p(v("another key"), s("value")))))
+						// ,
+			// d(1,
+			// 	p(v("another key 2"), a(2, s("first value"), s("value")))
+			// )
 		;
+	// recognize this a^nb^nc^nd^n
 	/*
 	// [{"master key": {"next states": , }}]
 	*/
@@ -1513,10 +1557,30 @@ void ContextualStateChartTest()
 								contextual_state_chart->state_ids->start,
 								0);
 	// printf("root %i\n", contextual_state_chart->state_ids->start);
-	CSCPrintDict(	contextual_state_chart,
-					contextual_state_chart->state_ids->start,
-					0);
+	CSCPrintDict(contextual_state_chart, 0, 0);
+
 	printf("\n");
+	ContextualStateChart* smaller_chart = get(contextual_state_chart, "master key");
+
+	BalancedTreeNodePrintTree(	smaller_chart->state_ids,
+							smaller_chart->state_ids->start,
+							0);
+
+	CSCPrintDict(smaller_chart, smaller_chart->root_state_id, 0);
+	printf("\n");
+
+	// failed becuase the id of the next item isn't the array of strings, it's the start of the string
+	// need a systematic system of addressing what kind of state ids are stored in what containers so
+	// nested gets will work
+	// redo as a dictionary system
+	ContextualStateChart* smaller_chart2 = get(smaller_chart, "another key");
+	BalancedTreeNodePrintTree(	smaller_chart2->state_ids,
+							smaller_chart2->state_ids->start,
+							0);
+
+	CSCPrintDict(smaller_chart2, smaller_chart2->root_state_id, 0);
+	printf("\n");
+
 	// make sure the data structure flags are appropriately set for the data structure states
 
 	// printf("start %i\n", contextual_state_chart->root_state_id);
