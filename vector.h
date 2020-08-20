@@ -12,7 +12,7 @@ typedef struct Vector
 	// bool is_empty;
 
 	// special window variables for the recording user changes system
-	// [first, end)
+	// [start, end)
 	int start;
 	int end;
 
