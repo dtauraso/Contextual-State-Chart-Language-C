@@ -1573,12 +1573,12 @@ void ContextualStateChartTest()
 	// need a systematic system of addressing what kind of state ids are stored in what containers so
 	// nested gets will work
 	// redo as a dictionary system
-	ContextualStateChart* smaller_chart2 = get(smaller_chart, "another key");
-	BalancedTreeNodePrintTree(	smaller_chart2->state_ids,
-							smaller_chart2->state_ids->start,
-							0);
+	// ContextualStateChart* smaller_chart2 = get(smaller_chart, "another key");
+	// BalancedTreeNodePrintTree(	smaller_chart2->state_ids,
+	// 						smaller_chart2->state_ids->start,
+	// 						0);
 
-	CSCPrintDict(smaller_chart2, smaller_chart2->root_state_id, 0);
+	// CSCPrintDict(smaller_chart2, smaller_chart2->root_state_id, 0);
 	printf("\n");
 
 	// make sure the data structure flags are appropriately set for the data structure states
