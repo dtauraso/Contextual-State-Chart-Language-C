@@ -1,5 +1,146 @@
 #include "contextual_state_chart.h"
 #include "balanced_tree_node.h"
+
+/**
+
+func (t *Tree2) SortPoints(distance, levels int) {
+	points := t.planes[Distances{distance, 0}][Levels{levels, 0}]
+
+	sort.Slice(points, func(i, j int) bool {
+		return points[i].next.distanceId > points[j].next.distanceId
+	})
+}
+
+func (t *Tree2) MakeVariation(distances []int) {
+
+	for i := 0; i < len(distances); i++ {
+		distances = append(distances, distances[i]+1)
+	}
+
+	// make variation
+	// check variation in t for match
+	// increase visit count of parent of sequence the variation matches with
+
+}
+
+func InsertToMap(input, reward []int) {
+
+	planes := map[Distances]map[Levels][]*Point7{}
+	currentPoint := Edge4{lineId: -1, pointId: -1}
+	for i := 0; i < len(input); {
+		item := input[i]
+		if _, ok := lines[item]; !ok {
+			lines[item] = []*Point7{}
+			if currentPoint.lineId == -1 && currentPoint.pointId == -1 {
+				lines[item] = append(lines[item], &Point7{
+					next: Edge4{lineId: -1, pointId: -1},
+				})
+				currentPoint = Edge4{lineId: item, pointId: 0}
+			} else {
+				lines[item] = append(lines[item], &Point7{
+					next: Edge4{lineId: -1, pointId: -1},
+				})
+				lines[currentPoint.lineId][currentPoint.pointId].next = Edge4{
+					lineId:  item,
+					pointId: len(lines[item]) - 1,
+					weight:  reward[i]}
+				if reward[i] < 0 {
+					fmt.Printf("i: %v, negative reward\n", i)
+				}
+				currentPoint = Edge4{lineId: item, pointId: len(lines[item]) - 1}
+			}
+			i++
+		} else {
+			currentPoint = Edge4{lineId: item, pointId: -1}
+			isNegative := false
+			for _, point := range lines[item] {
+				if point.next.weight < 0 {
+					isNegative = true
+					break
+				}
+			}
+			if isNegative {
+				fmt.Printf("i: %v, skip over negative reward\n", i)
+				i += 2
+			} else {
+				nextItem := input[i+1]
+				prediction := false
+				for i, point := range lines[item] {
+					if point.next.lineId == nextItem {
+						lines[item][i].next.weight++
+						currentPoint.pointId = i
+						prediction = true
+					}
+				}
+				if !prediction {
+					currentPoint.pointId = 0
+				}
+			}
+			i++
+		}
+	}
+	for key, line := range lines {
+		fmt.Printf("Key: %d, Value: \n", key)
+		for _, value := range line {
+			fmt.Printf("Data: %v\n", value)
+		}
+		fmt.Printf("\n")
+	}
+}
+
+*/
+
+void merge(int arr[], int l, int m, int r) {
+    int i, j, k;
+    int n1 = m - l + 1;
+    int n2 = r - m;
+
+    int L[n1], R[n2];
+
+    for (i = 0; i < n1; i++)
+        L[i] = arr[l + i];
+    for (j = 0; j < n2; j++)
+        R[j] = arr[m + 1 + j];
+
+    i = 0;
+    j = 0;
+    k = l;
+
+    while (i < n1 && j < n2) {
+        if (L[i] <= R[j]) {
+            arr[k] = L[i];
+            i++;
+        } else {
+            arr[k] = R[j];
+            j++;
+        }
+        k++;
+    }
+
+    while (i < n1) {
+        arr[k] = L[i];
+        i++;
+        k++;
+    }
+
+    while (j < n2) {
+        arr[k] = R[j];
+        j++;
+        k++;
+    }
+}
+
+void mergeSort(int arr[], int l, int r) {
+    if (l < r) {
+        int m = l + (r - l) / 2;
+
+        mergeSort(arr, l, m);
+        mergeSort(arr, m + 1, r);
+
+        merge(arr, l, m, r);
+    }
+}
+
 /*
 init state
 init state async merge

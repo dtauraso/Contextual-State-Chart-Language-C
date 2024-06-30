@@ -3,6 +3,46 @@
 #include "standard_headers.h"
 #include "vector.h"
 
+
+typedef struct Edge {
+	int line_id;
+	int point_id;
+	int level_id;
+	int distance_id;
+	int weight;
+} Edge;
+
+typedef struct DistanceFromParentLevelPrev {
+	int distance;
+} DistanceFromParentLevelPrev;
+
+typedef struct DistancePoint {
+	Distance_from_parent_level_prev distance;
+	Edge point;
+} DistancePoint;
+
+typedef struct Point {
+	Edge next;
+	Edge child;
+	int visit_count;
+	DistancePoint parent_instances[];
+
+} Point;
+
+typedef struct Disances {
+	int dictance_id;
+	int visit_count;
+} Distances;
+
+typedef struct Levels {
+	int level_id;
+	int visit_count;
+}Levels;
+
+typedef struct Tree {
+	[][][]*Point planes;
+}Tree;
+
 // #include <stdbool.h>
 // #include "stdlib.h"
 // #include <stdio.h>
@@ -274,7 +314,7 @@ State* DynamicStateMakeVariable(
 
 // DynamicState* DynamicStateMakeVariable2(string variable_name,
 // 										Vector* parents,  // array of strings
-// 										Data* value);
+// 							 			Data* value);
 
 void DynamicMachineTest2();
 
