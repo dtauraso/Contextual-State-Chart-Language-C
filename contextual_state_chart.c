@@ -6,6 +6,7 @@
 const int smallChange = 10;
 void counters(int list1[], int list2[], int differenceWeights[]) {
 	
+	srand(time(0));
 	int counter1 = list1[0];
 	int counter2 = list2[0];
 	for (int i = 1; i < ARRAY_SIZE(list1); i++) {
@@ -17,6 +18,19 @@ void counters(int list1[], int list2[], int differenceWeights[]) {
 			int changeLength = counter1 - counter2;
 			if (changeLength <= (counter1/smallChange)) {
 				printf("small change\n");
+				int strictDifferenceDegree = differenceWeights[i];
+				if strictDifferenceDegree == 0 {
+					printf("no change\n");
+				}
+				else if strictDifferenceDegree > 10 {
+					int randomNum = rand() % 100
+					if randomNum > percentOverride {
+						printf("change 10 percent of the time\n");
+					}
+				}
+				else if strictDifferenceDegree == 100 {
+					printf("always change\n");
+				}
 			}
 			else if (changeLength > (counter1/smallChange)) {
 				printf("large change\n");
