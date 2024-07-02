@@ -470,7 +470,10 @@ int main(int argc, char** argv)
 	// TrieTreeTest();
 	// VectorTest();
 	// BalancedTreeNodeTest();
-	ContextualStateChartTest();
+	// ContextualStateChartTest();
+	int array1[2] = {1, 2};
+	int array2[2] = {3, 4};
+	counters(array1, array2);
 	// DynamicMachineTest();
 	// tests pass so far
 	// DynamicMachineTest2();

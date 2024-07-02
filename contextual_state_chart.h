@@ -17,7 +17,7 @@ typedef struct DistanceFromParentLevelPrev {
 } DistanceFromParentLevelPrev;
 
 typedef struct DistancePoint {
-	Distance_from_parent_level_prev distance;
+	DistanceFromParentLevelPrev distance;
 	Edge point;
 } DistancePoint;
 
@@ -39,9 +39,9 @@ typedef struct Levels {
 	int visit_count;
 }Levels;
 
-typedef struct Tree {
-	[][][]*Point planes;
-}Tree;
+Point* planes[];
+
+void counters(int list1[], int list2[]);
 
 // #include <stdbool.h>
 // #include "stdlib.h"
