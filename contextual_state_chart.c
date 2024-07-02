@@ -24,7 +24,7 @@ void counters(int list1[], int list2[], int differenceWeights[]) {
 				}
 				else if strictDifferenceDegree > 10 {
 					int randomNum = rand() % 100
-					if randomNum > percentOverride {
+					if randomNum > strictDifferenceDegree {
 						printf("change 10 percent of the time\n");
 					}
 				}
