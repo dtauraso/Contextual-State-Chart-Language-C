@@ -471,9 +471,10 @@ int main(int argc, char** argv)
 	// VectorTest();
 	// BalancedTreeNodeTest();
 	// ContextualStateChartTest();
-	int array1[2] = {1, 2};
-	int array2[2] = {3, 4};
-	counters(array1, array2);
+	int array1[2] = {10};
+	int array2[2] = {11};
+	int differenceWeights[2] = {0};
+	counters(array1, array2, differenceWeights);
 	// DynamicMachineTest();
 	// tests pass so far
 	// DynamicMachineTest2();

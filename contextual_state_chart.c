@@ -3,19 +3,26 @@
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 
-
-void counters(int list1[], int list2[]) {
+const int smallChange = 10;
+void counters(int list1[], int list2[], int differenceWeights[]) {
 	
 	int counter1 = list1[0];
 	int counter2 = list2[0];
 	for (int i = 1; i < ARRAY_SIZE(list1); i++) {
-		if(counter1 == 0 && counter2 == 0) {
+		if (counter1 == 0 && counter2 == 0) {
 			printf("aligned\n");
 		}
-		else if(counter1 != 0 || counter2 == 0) {
+		else if (counter1 != 0 || counter2 == 0) {
 			printf("counter1 is still running.\n");
+			int changeLength = counter1 - counter2;
+			if (changeLength <= (counter1/smallChange)) {
+				printf("small change\n");
+			}
+			else if (changeLength > (counter1/smallChange)) {
+				printf("large change\n");
+			}
 		}
-		else if(counter1 == 0 || counter2 != 0) {
+		else if (counter1 == 0 || counter2 != 0) {
 			printf("counter2 is still running.\n");
 		}
 		printf("%i %i\n", counter1, counter2);
