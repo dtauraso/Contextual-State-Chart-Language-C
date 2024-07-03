@@ -32,14 +32,16 @@ typedef struct Point {
 typedef struct Disances {
 	int dictance_id;
 	int visit_count;
+	Levels* levels
 } Distances;
 
 typedef struct Levels {
 	int level_id;
 	int visit_count;
+	Point* points[];
 }Levels;
 
-Point* planes[];
+Distances* distances[];
 
 void counters(int list1[], int list2[]);
 
