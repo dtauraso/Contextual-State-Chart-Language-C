@@ -24,18 +24,14 @@ typedef struct Point {
 	Edge next;
 	Edge child;
 	int visit_count;
-	DistancePoint parent_instances[];
+	DistancePoint* top_parent_instance
+	DistancePoint* right_angle_parent_instance;
 
 } Point;
 
-typedef struct Level {
-	int visit_count;
-	Point* points[];
-}Level;
-
 typedef struct Disance {
 	int visit_count;
-	Level* levels[];
+	Point* points;
 } Distance;
 
 
