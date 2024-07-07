@@ -5,7 +5,6 @@
 
 
 typedef struct Edge {
-	int line_id;
 	int point_id;
 	int level_id;
 	int distance_id;
@@ -29,21 +28,19 @@ typedef struct Point {
 
 } Point;
 
-typedef struct Disances {
-	int dictance_id;
-	int visit_count;
-	Levels* levels
-} Distances;
-
-typedef struct Levels {
-	int level_id;
+typedef struct Level {
 	int visit_count;
 	Point* points[];
-}Levels;
+}Level;
 
-Distances* distances[];
+typedef struct Disance {
+	int visit_count;
+	Level* levels[];
+} Distance;
 
-void counters(int list1[], int list2[]);
+
+void counters(int list1[], int list2[], int differenceWeights[]);
+void makeSequence(int list[]);
 
 // #include <stdbool.h>
 // #include "stdlib.h"

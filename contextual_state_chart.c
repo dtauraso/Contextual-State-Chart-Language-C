@@ -1,7 +1,9 @@
 #include "contextual_state_chart.h"
 #include "balanced_tree_node.h"
+#include "time.h"
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
+// #define ARRAY_LENGTH(typeName, length) (sizeof(typeName) / sizeof(arr[0]))
 
 const int smallChange = 10;
 void counters(int list1[], int list2[], int differenceWeights[]) {
@@ -19,16 +21,16 @@ void counters(int list1[], int list2[], int differenceWeights[]) {
 			if (changeLength <= (counter1/smallChange)) {
 				printf("small change\n");
 				int strictDifferenceDegree = differenceWeights[i];
-				if strictDifferenceDegree == 0 {
+				if (strictDifferenceDegree == 0) {
 					printf("no change\n");
 				}
-				else if strictDifferenceDegree > 10 {
-					int randomNum = rand() % 100
-					if randomNum > strictDifferenceDegree {
+				else if (strictDifferenceDegree > 10) {
+					int randomNum = rand() % 100;
+					if (randomNum > strictDifferenceDegree) {
 						printf("change 10 percent of the time\n");
 					}
 				}
-				else if strictDifferenceDegree == 100 {
+				else if (strictDifferenceDegree == 100) {
 					printf("always change\n");
 				}
 			}
@@ -44,6 +46,14 @@ void counters(int list1[], int list2[], int differenceWeights[]) {
 		counter1--;
 		counter2--;
 	}
+}
+
+void makeSequence(int list[]) {
+	Distance* distances = (struct Distances*)malloc(sizeof(struct Distances*) * 100);
+	// for (int i = 0; i < ARRAY_SIZE(list); i++) {
+	// 	distances[i] = Distances{list[i], 0};
+	// }
+	printf("made sequence\n");
 }
 /**
 
