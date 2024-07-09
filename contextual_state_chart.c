@@ -48,25 +48,44 @@ void counters(int list1[], int list2[], int differenceWeights[]) {
 	}
 }
 
-void makeSequence() {
-	int list1[] = {0, 0, 0, 1};
-	int list2[] = {0, 0, 0, 0, 1};
+Vector* fillVector(int array[], int length) {
+	Vector* vector = VectorInitVector();
+	for (int i = 0; i < length; i++) {
+		int* a = (int*) malloc(sizeof(int));
+		*a = array[i];
+		VectorAppend(vector, a);
+	}
+	return vector;
+}
 
-	Vector* distances = VectorInitVector();
-	int currentNumber = list1[0];
+void distances() {
+	int array1[4] = {2, 4, 10, 1};
+	int range = 2;
+	int number = array1[0];
+	for (int i = 0; i < ARRAY_SIZE(array1); i++) {
+		int distance = array1[i] - number;
+		if (distance > range) {
+			printf("distance is greater than range by %i\n", distance);
+		}
+		else {
+			printf("distance is inside range\n");
+		}
+	}
+}
+void makeSequence(Vector* distances, Vector* x) {
+
+	int* currentNumber = distances->values[0];
 	int streakCount = 0;
 
-	for (int i = 0; i < ARRAY_SIZE(list1); i++) {
-		if (currentNumber == list1[i]) {
+	for (int i = 0; i < distances->population; i++) {
+		if (currentNumber == distances->values[i]) {
 			streakCount++;
 		}
-		else if (currentNumber != list1[i]) {
-			int* a = (int*) malloc(sizeof(int));
-			*a = streakCount;
-			VectorAppend(distances, a);
+		else if (currentNumber != distances->values[i]) {
+			// VectorAppendInt(x->values[streakCount], x->values[streakCount].population);
 
 			streakCount = 1;
-			currentNumber = list1[i];
+			// currentNumber = list1[i];
 		}
 	}
 	if (streakCount > 0) {

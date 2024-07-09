@@ -476,7 +476,12 @@ int main(int argc, char** argv)
 	int differenceWeights[2] = {0};
 	// counters(array1, array2, differenceWeights);
 
-	makeSequence();
+	distances();
+	// int list1[] = {0, 0, 0, 1};
+	// int list2[] = {0, 0, 0, 0, 1};
+
+	// Vector* x = VectorInitVector();
+	// makeSequence(fillVector(list1, 4), fillVector(list2, 5), x);
 	// DynamicMachineTest();
 	// tests pass so far
 	// DynamicMachineTest2();

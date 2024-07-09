@@ -36,7 +36,8 @@ typedef struct Disance {
 
 
 void counters(int list1[], int list2[], int differenceWeights[]);
-void makeSequence();
+void distances();
+void makeSequence(Vector* distances1, Vector* x);
 
 // #include <stdbool.h>
 // #include "stdlib.h"
