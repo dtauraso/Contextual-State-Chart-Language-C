@@ -475,8 +475,8 @@ int main(int argc, char** argv)
 	int array2[2] = {11};
 	int differenceWeights[2] = {0};
 	// counters(array1, array2, differenceWeights);
-	int array3[8] = {0, 0, 0, 1, 0, 0, 0, 1};
-	makeSequence(array3);
+
+	makeSequence();
 	// DynamicMachineTest();
 	// tests pass so far
 	// DynamicMachineTest2();

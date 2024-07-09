@@ -48,11 +48,36 @@ void counters(int list1[], int list2[], int differenceWeights[]) {
 	}
 }
 
-void makeSequence(int list[]) {
-	Distance* distances = (struct Distances*)malloc(sizeof(struct Distances*) * 100);
-	// for (int i = 0; i < ARRAY_SIZE(list); i++) {
-	// 	distances[i] = Distances{list[i], 0};
-	// }
+void makeSequence() {
+	int list1[] = {0, 0, 0, 1};
+	int list2[] = {0, 0, 0, 0, 1};
+
+	Vector* distances = VectorInitVector();
+	int currentNumber = list1[0];
+	int streakCount = 0;
+
+	for (int i = 0; i < ARRAY_SIZE(list1); i++) {
+		if (currentNumber == list1[i]) {
+			streakCount++;
+		}
+		else if (currentNumber != list1[i]) {
+			int* a = (int*) malloc(sizeof(int));
+			*a = streakCount;
+			VectorAppend(distances, a);
+
+			streakCount = 1;
+			currentNumber = list1[i];
+		}
+	}
+	if (streakCount > 0) {
+		int* a = (int*) malloc(sizeof(int));
+		*a = streakCount;
+		VectorAppend(distances, a);
+		streakCount = 0;
+	}
+	
+	VectorPrint(distances);
+	
 	printf("made sequence\n");
 }
 /**

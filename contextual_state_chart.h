@@ -24,7 +24,7 @@ typedef struct Point {
 	Edge next;
 	Edge child;
 	int visit_count;
-	DistancePoint* top_parent_instance
+	DistancePoint* top_parent_instance;
 	DistancePoint* right_angle_parent_instance;
 
 } Point;
@@ -36,7 +36,7 @@ typedef struct Disance {
 
 
 void counters(int list1[], int list2[], int differenceWeights[]);
-void makeSequence(int list[]);
+void makeSequence();
 
 // #include <stdbool.h>
 // #include "stdlib.h"

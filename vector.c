@@ -512,7 +512,7 @@ void VectorPrint(Vector* container)
 			//printf("|%x|", container->values[i]);
 			void* a = container->values[i];
 			int* b = (int*) a;
-			printf("|%c|", *b);
+			printf("|%i|", *b);
 			
 			//printf("|item|");
 		}
