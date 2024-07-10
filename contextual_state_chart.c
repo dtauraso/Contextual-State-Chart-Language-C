@@ -72,6 +72,36 @@ void distances() {
 		}
 	}
 }
+
+void findPattern() {
+
+	int array1[8] = {0, 0, 0, 1, 0, 0, 0, 1};
+
+	int lineLength = 8
+	Point2** array2 = (Point2*) malloc(sizeof(Point2)*lineLength);
+	Point2** array3 = (Point2*) malloc(sizeof(Point2)*lineLength);
+	Point2** array4 = (Point2*) malloc(sizeof(Point2)*lineLength);
+
+	Point2** numbers = (Point2*) malloc(sizeof(Point2)*lineLength);
+
+	int indexLineId = 2;
+	numbers[0] = array2;
+	numbers[1] = array3;
+	numbers[2] = array4;
+
+	Point2* tracker = NULL;
+	for (int i = 0; i < lineLength; i++) {
+		int number = array1[i];
+		if (numbers[number][0] == NULL) {
+			numbers[number][0] = (Points2*) malloc(sizeof(Points2));
+			Points* point = numbers[number][0];
+			if (tracker == NULL) {
+				tracker = point
+			}
+		}
+	}
+
+}
 void makeSequence(Vector* distances, Vector* x) {
 
 	int* currentNumber = distances->values[0];

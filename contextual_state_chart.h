@@ -34,6 +34,14 @@ typedef struct Disance {
 	Point* points;
 } Distance;
 
+typedef struct Edge2 {
+	int point_id;
+	int lineId
+}Edge2;
+
+typedef struct Point2 {
+	Edge2* next;
+}Point2;
 
 void counters(int list1[], int list2[], int differenceWeights[]);
 void distances();
