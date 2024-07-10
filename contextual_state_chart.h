@@ -36,10 +36,12 @@ typedef struct Disance {
 
 typedef struct Edge2 {
 	int point_id;
-	int lineId
+	int line_id;
 }Edge2;
 
 typedef struct Point2 {
+	int point_id;
+	int line_id;
 	Edge2* next;
 }Point2;
 

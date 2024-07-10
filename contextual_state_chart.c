@@ -77,26 +77,32 @@ void findPattern() {
 
 	int array1[8] = {0, 0, 0, 1, 0, 0, 0, 1};
 
-	int lineLength = 8
-	Point2** array2 = (Point2*) malloc(sizeof(Point2)*lineLength);
-	Point2** array3 = (Point2*) malloc(sizeof(Point2)*lineLength);
-	Point2** array4 = (Point2*) malloc(sizeof(Point2)*lineLength);
+	int line_length = 8
+	Vector* zero = VectorInitVector();
+	Vector* one = VectorInitVector();
+	Vector* index = VectorInitVector();
 
-	Point2** numbers = (Point2*) malloc(sizeof(Point2)*lineLength);
+	Vector* numbers = VectorInitVector();
 
-	int indexLineId = 2;
-	numbers[0] = array2;
-	numbers[1] = array3;
-	numbers[2] = array4;
+	int index_line_id = 2;
+	VectorAppend(numbers, zero);
+	VectorAppend(numbers, one);
+	VectorAppend(numbers, index);
 
-	Point2* tracker = NULL;
-	for (int i = 0; i < lineLength; i++) {
+	for (int i = 0; i < line_length; i++) {
 		int number = array1[i];
-		if (numbers[number][0] == NULL) {
+		void* item = VectorGetItem(numbers, number);
+		void* number_void_pointer = VectorGetItem((Vector*)items, number);
+		if (number_void_pointer == NULL) {
 			numbers[number][0] = (Points2*) malloc(sizeof(Points2));
 			Points* point = numbers[number][0];
+			point->point_id = i;
 			if (tracker == NULL) {
 				tracker = point
+			}
+			else {
+				tracker->next = (Edge4*) malloc(sizeof(Edge4));
+				tracker->next->point_id
 			}
 		}
 	}
