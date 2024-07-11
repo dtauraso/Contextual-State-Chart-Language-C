@@ -98,20 +98,16 @@ void findPattern() {
 			Point2* point = (Point2*) malloc(sizeof(Point2));
 			point->line_id = streak_length;
 			point->point_id = 0;
+			point->next = NULL;
 			if (tracker == NULL) {
 				tracker = point;
 			}
 			else {
 				tracker->next = (Point2*) malloc(sizeof(Point2));
-				tracker->next->line_id = point->line_id;
-				tracker->next->point_id = point->point_id;
+				tracker->next = point;
 				tracker = tracker->next;
 			}
 			VectorAppend((Vector*)streak_length_line, (void*)point);
-			// printf("streak length %i\n", streak_length);
-			// printf("added %i %i\n", point->line_id, point->point_id);
-			// VectorPrintPoint2((Vector*)streak_length_line);
-
 		}
 	}
 

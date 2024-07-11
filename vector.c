@@ -559,7 +559,14 @@ void VectorPrintPoint2(Vector* container)
 			//printf("|%x|", container->values[i]);
 			void* a = container->values[i];
 			Point2* b = (Point2*) a;
-			printf("|%i|%i|\n", b->line_id, b->point_id);
+			printf("|%i|%i|", b->line_id, b->point_id);
+			Point2* b_next = b->next;
+			if (b_next == NULL) {
+				printf("next:|NULL|\n");
+			}
+			else {
+				printf("next:|%i|%i|\n", b_next->line_id, b_next->point_id);
+			}
 			
 			//printf("|item|");
 		}
