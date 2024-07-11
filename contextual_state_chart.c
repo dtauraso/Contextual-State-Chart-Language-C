@@ -88,10 +88,15 @@ void findPattern() {
 	VectorAppend(streak_lengths, one);
 	VectorAppend(streak_lengths, two);
 
-	int current_line_id = 0;
+	int current_line_id = array1[0];
+	bool change_current_line_id = false;
 	Point2* tracker = NULL;
 	for (int i = 0; i < line_length; i++) {
 		int streak_length = array1[i];
+
+		if (current_line_id != streak_length) {
+			change_current_line_id = true;							
+		}
 		void* streak_length_line = VectorGetItem(streak_lengths, streak_length-1);
 		void* point_void_pointer = VectorGetItem((Vector*)streak_length_line, 0);
 		if (point_void_pointer == NULL) {
@@ -108,6 +113,16 @@ void findPattern() {
 				tracker = tracker->next;
 			}
 			VectorAppend((Vector*)streak_length_line, (void*)point);
+		}
+		else {
+			if (change_current_line_id) {
+				printf("change line from %i to %i\n", current_line_id, streak_length);
+				printf("i: %i, streak length: %i\n", i, streak_length);
+			}
+		}
+		if(change_current_line_id) {
+			current_line_id = streak_length;
+			change_current_line_id = false;
 		}
 	}
 
