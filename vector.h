@@ -65,6 +65,7 @@ void VectorTest();
 
 
 void VectorPrint(Vector* container);
+void VectorPrintPoint2(Vector* container);
 void VectorPrintInts(Vector* container);
 void VectorPrintIntsAsChars(Vector* container);
 

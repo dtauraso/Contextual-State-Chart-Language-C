@@ -476,7 +476,8 @@ int main(int argc, char** argv)
 	int differenceWeights[2] = {0};
 	// counters(array1, array2, differenceWeights);
 
-	distances();
+	// distances();
+	findPattern();
 	// int list1[] = {0, 0, 0, 1};
 	// int list2[] = {0, 0, 0, 0, 1};
 

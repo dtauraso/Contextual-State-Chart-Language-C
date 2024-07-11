@@ -6,47 +6,47 @@
 // #define ARRAY_LENGTH(typeName, length) (sizeof(typeName) / sizeof(arr[0]))
 
 const int smallChange = 10;
-void counters(int list1[], int list2[], int differenceWeights[]) {
+// void counters(int list1[], int list2[], int differenceWeights[]) {
 	
-	srand(time(0));
-	int counter1 = list1[0];
-	int counter2 = list2[0];
-	for (int i = 1; i < ARRAY_SIZE(list1); i++) {
-		if (counter1 == 0 && counter2 == 0) {
-			printf("aligned\n");
-		}
-		else if (counter1 != 0 || counter2 == 0) {
-			printf("counter1 is still running.\n");
-			int changeLength = counter1 - counter2;
-			if (changeLength <= (counter1/smallChange)) {
-				printf("small change\n");
-				int strictDifferenceDegree = differenceWeights[i];
-				if (strictDifferenceDegree == 0) {
-					printf("no change\n");
-				}
-				else if (strictDifferenceDegree > 10) {
-					int randomNum = rand() % 100;
-					if (randomNum > strictDifferenceDegree) {
-						printf("change 10 percent of the time\n");
-					}
-				}
-				else if (strictDifferenceDegree == 100) {
-					printf("always change\n");
-				}
-			}
-			else if (changeLength > (counter1/smallChange)) {
-				printf("large change\n");
-			}
-		}
-		else if (counter1 == 0 || counter2 != 0) {
-			printf("counter2 is still running.\n");
-		}
-		printf("%i %i\n", counter1, counter2);
+// 	srand(time(0));
+// 	int counter1 = list1[0];
+// 	int counter2 = list2[0];
+// 	for (int i = 1; i < ARRAY_SIZE(list1); i++) {
+// 		if (counter1 == 0 && counter2 == 0) {
+// 			printf("aligned\n");
+// 		}
+// 		else if (counter1 != 0 || counter2 == 0) {
+// 			printf("counter1 is still running.\n");
+// 			int changeLength = counter1 - counter2;
+// 			if (changeLength <= (counter1/smallChange)) {
+// 				printf("small change\n");
+// 				int strictDifferenceDegree = differenceWeights[i];
+// 				if (strictDifferenceDegree == 0) {
+// 					printf("no change\n");
+// 				}
+// 				else if (strictDifferenceDegree > 10) {
+// 					int randomNum = rand() % 100;
+// 					if (randomNum > strictDifferenceDegree) {
+// 						printf("change 10 percent of the time\n");
+// 					}
+// 				}
+// 				else if (strictDifferenceDegree == 100) {
+// 					printf("always change\n");
+// 				}
+// 			}
+// 			else if (changeLength > (counter1/smallChange)) {
+// 				printf("large change\n");
+// 			}
+// 		}
+// 		else if (counter1 == 0 || counter2 != 0) {
+// 			printf("counter2 is still running.\n");
+// 		}
+// 		printf("%i %i\n", counter1, counter2);
 
-		counter1--;
-		counter2--;
-	}
-}
+// 		counter1--;
+// 		counter2--;
+// 	}
+// }
 
 Vector* fillVector(int array[], int length) {
 	Vector* vector = VectorInitVector();
@@ -58,54 +58,65 @@ Vector* fillVector(int array[], int length) {
 	return vector;
 }
 
-void distances() {
-	int array1[4] = {2, 4, 10, 1};
-	int range = 2;
-	int number = array1[0];
-	for (int i = 0; i < ARRAY_SIZE(array1); i++) {
-		int distance = array1[i] - number;
-		if (distance > range) {
-			printf("distance is greater than range by %i\n", distance);
-		}
-		else {
-			printf("distance is inside range\n");
-		}
-	}
-}
+// void distances() {
+// 	int array1[4] = {2, 4, 10, 1};
+// 	int range = 2;
+// 	int number = array1[0];
+// 	for (int i = 0; i < ARRAY_SIZE(array1); i++) {
+// 		int distance = array1[i] - number;
+// 		if (distance > range) {
+// 			printf("distance is greater than range by %i\n", distance);
+// 		}
+// 		else {
+// 			printf("distance is inside range\n");
+// 		}
+// 	}
+// }
 
 void findPattern() {
 
-	int array1[8] = {0, 0, 0, 1, 0, 0, 0, 1};
+	int array1[8] = {1, 1, 1, 2, 1, 1, 1, 2};
 
-	int line_length = 8
-	Vector* zero = VectorInitVector();
+	int line_length = 8;
+	
 	Vector* one = VectorInitVector();
-	Vector* index = VectorInitVector();
 
-	Vector* numbers = VectorInitVector();
+	Vector* two = VectorInitVector();
 
-	int index_line_id = 2;
-	VectorAppend(numbers, zero);
-	VectorAppend(numbers, one);
-	VectorAppend(numbers, index);
+	Vector* streak_lengths = VectorInitVector();
 
+	VectorAppend(streak_lengths, one);
+	VectorAppend(streak_lengths, two);
+
+	int current_line_id = 0;
+	Point2* tracker = NULL;
 	for (int i = 0; i < line_length; i++) {
-		int number = array1[i];
-		void* item = VectorGetItem(numbers, number);
-		void* number_void_pointer = VectorGetItem((Vector*)items, number);
-		if (number_void_pointer == NULL) {
-			numbers[number][0] = (Points2*) malloc(sizeof(Points2));
-			Points* point = numbers[number][0];
-			point->point_id = i;
+		int streak_length = array1[i];
+		void* streak_length_line = VectorGetItem(streak_lengths, streak_length-1);
+		void* point_void_pointer = VectorGetItem((Vector*)streak_length_line, 0);
+		if (point_void_pointer == NULL) {
+			Point2* point = (Point2*) malloc(sizeof(Point2));
+			point->line_id = streak_length;
+			point->point_id = 0;
 			if (tracker == NULL) {
-				tracker = point
+				tracker = point;
 			}
 			else {
-				tracker->next = (Edge4*) malloc(sizeof(Edge4));
-				tracker->next->point_id
+				tracker->next = (Point2*) malloc(sizeof(Point2));
+				tracker->next->line_id = point->line_id;
+				tracker->next->point_id = point->point_id;
+				tracker = tracker->next;
 			}
+			VectorAppend((Vector*)streak_length_line, (void*)point);
+			// printf("streak length %i\n", streak_length);
+			// printf("added %i %i\n", point->line_id, point->point_id);
+			// VectorPrintPoint2((Vector*)streak_length_line);
+
 		}
 	}
+
+	VectorPrintPoint2(one);
+	VectorPrintPoint2(two);
 
 }
 void makeSequence(Vector* distances, Vector* x) {

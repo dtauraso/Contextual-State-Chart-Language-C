@@ -42,11 +42,13 @@ typedef struct Edge2 {
 typedef struct Point2 {
 	int point_id;
 	int line_id;
-	Edge2* next;
+	Vector* parents;
+	struct Point2* next;
 }Point2;
 
 void counters(int list1[], int list2[], int differenceWeights[]);
 void distances();
+void findPattern();
 void makeSequence(Vector* distances1, Vector* x);
 
 // #include <stdbool.h>

@@ -1,4 +1,16 @@
 #include "vector.h"
+
+typedef struct Edge2 {
+	int point_id;
+	int line_id;
+}Edge2;
+
+typedef struct Point2 {
+	int point_id;
+	int line_id;
+	Vector* parents;
+	struct Point2* next;
+}Point2;
 /*
 typedef struct Vector
 {
@@ -513,6 +525,41 @@ void VectorPrint(Vector* container)
 			void* a = container->values[i];
 			int* b = (int*) a;
 			printf("|%i|", *b);
+			
+			//printf("|item|");
+		}
+	}
+	if(container->population == 0)
+	{
+		printf("none");
+	}
+	printf("\n\n");
+	
+
+}
+
+void VectorPrintPoint2(Vector* container)
+{
+	if(container == NULL)
+	{
+
+		printf("empty container\n");
+		return;
+	}
+	// printf("printing container pop %i, size %i\n", container->population, container->size);
+	for(int i = container->start; i < container->end; i++)
+	{
+		//printf("i %i\n", i);
+		if(container->values[i] == NULL)
+		{
+			printf("|NULL|\n");
+		}
+		else
+		{
+			//printf("|%x|", container->values[i]);
+			void* a = container->values[i];
+			Point2* b = (Point2*) a;
+			printf("|%i|%i|\n", b->line_id, b->point_id);
 			
 			//printf("|item|");
 		}
