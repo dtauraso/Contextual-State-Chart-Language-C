@@ -83,10 +83,13 @@ void findPattern() {
 
 	Vector* two = VectorInitVector();
 
+	Vector* three = VectorInitVector();
+
 	Vector* streak_lengths = VectorInitVector();
 
 	VectorAppend(streak_lengths, one);
 	VectorAppend(streak_lengths, two);
+	VectorAppend(streak_lengths, three);
 
 	int current_line_id = array1[0];
 	bool change_current_line_id = false;
@@ -94,35 +97,29 @@ void findPattern() {
 	for (int i = 0; i < line_length; i++) {
 		int streak_length = array1[i];
 
-		if (current_line_id != streak_length) {
-			change_current_line_id = true;							
-		}
 		void* streak_length_line = VectorGetItem(streak_lengths, streak_length-1);
-		void* point_void_pointer = VectorGetItem((Vector*)streak_length_line, 0);
-		if (point_void_pointer == NULL) {
-			Point2* point = (Point2*) malloc(sizeof(Point2));
-			point->line_id = streak_length;
-			point->point_id = 0;
-			point->next = NULL;
-			if (tracker == NULL) {
-				tracker = point;
-			}
-			else {
-				tracker->next = (Point2*) malloc(sizeof(Point2));
-				tracker->next = point;
-				tracker = tracker->next;
-			}
-			VectorAppend((Vector*)streak_length_line, (void*)point);
+		int streak_length_line_population = ((Vector*)streak_length_line)->population;
+		
+		Point2* point = (Point2*) malloc(sizeof(Point2));
+		point->line_id = streak_length;
+		point->point_id = streak_length_line_population;
+		point->next = NULL;
+		if (tracker == NULL) {
+			tracker = point;
 		}
 		else {
-			if (change_current_line_id) {
-				printf("change line from %i to %i\n", current_line_id, streak_length);
-				printf("i: %i, streak length: %i\n", i, streak_length);
-			}
+			tracker->next = (Point2*) malloc(sizeof(Point2));
+			tracker->next = point;
+			tracker = tracker->next;
 		}
-		if(change_current_line_id) {
+		VectorAppend((Vector*)streak_length_line, (void*)point);
+		if (current_line_id != streak_length) {
+			printf("change line from %i to %i\n", current_line_id, streak_length);
+			printf("i: %i, streak length: %i\n", i, streak_length);
+			if (streak_length_line_population > 0) {
+				printf("i: %i, line: %i population: %i\n", i, streak_length, streak_length_line_population);
+			}
 			current_line_id = streak_length;
-			change_current_line_id = false;
 		}
 	}
 
