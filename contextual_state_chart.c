@@ -120,11 +120,8 @@ void findPattern() {
 		else if (current_line_id != streak_length) {
 			printf("change line from %i to %i\n", current_line_id, streak_length);
 			printf("i: %i, streak length: %i\n", i, streak_length);
-			if (streak_length_line_population > 0) {
-				printf("i: %i, line: %i population: %i\n", i, streak_length, streak_length_line_population);
-				printf("i: %i, streak length: %i, copy streak: %i\n", i, streak_length, copy_streak);
-
-			}
+			printf("i: %i, line: %i population: %i\n", i, streak_length, streak_length_line_population);
+			printf("i: %i, streak length: %i, copy streak: %i\n", i, streak_length, copy_streak);
 			copy_streak = 1;
 			current_line_id = streak_length;
 		}
