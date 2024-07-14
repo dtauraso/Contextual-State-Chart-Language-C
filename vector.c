@@ -132,10 +132,7 @@ void* VectorGetPoint2WithNextId(Vector* container, int next_line_id)
 	{
 		printf("container is empty\n");
 		return NULL;
-	}
-	printf("VectorGetPoint2WithNextId start %i\n", container->start);
-	printf("VectorGetPoint2WithNextId end %i\n", container->end);
-	
+	}	
 	for (int i = container->start; i < container->end; i++) {
 		Point2* item = (Point2*) container->values[i];
 		if (item == NULL) {
@@ -148,16 +145,8 @@ void* VectorGetPoint2WithNextId(Vector* container, int next_line_id)
 			return item;
 		}
 	}
-	// else if(i < container->end && i >= container->start)
-	// {
-	// 	// printf("item |%i|\n", container->values[i]);
-	// 	return container->values[i];
-	// }
-	// else
-	// {
 	printf("out of bounds\n");
 	return NULL;
-	// }
 
 }
 int VectorGetPopulation(Vector* container)

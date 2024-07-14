@@ -138,10 +138,27 @@ void findPattern() {
 				if (copy_streak_tracker_current != NULL) {
 					printf("copy tracker current: line id: %i, point id: %i\n", copy_streak_tracker_current->line_id, copy_streak_tracker_current->point_id);
 				}
-				void* copy_streak_prev_line = VectorGetItem(streak_lengths, copy_streak_prev);
+				void* copy_streak_prev_line = VectorGetItem(streak_lengths, copy_streak_prev-1);
+				void* copy_streak_current_line = VectorGetItem(streak_lengths, copy_streak_current-1);
 				void* copy_streak_current_line_id = VectorGetPoint2WithNextId((Vector*)copy_streak_prev_line, copy_streak_current);
 				if (copy_streak_current_line_id == NULL) {
 					printf("copy streak current line id is NULL\n");
+					Point2* copy_streak_prev_point = (Point2*) malloc(sizeof(Point2));
+					copy_streak_prev_point->line_id = copy_streak_prev;
+					copy_streak_prev_point->point_id = ((Vector*)copy_streak_prev_line)->population;
+
+					Point2* copy_streak_current_point = (Point2*) malloc(sizeof(Point2));
+					copy_streak_current_point->line_id = copy_streak_current;
+					copy_streak_current_point->point_id = ((Vector*)copy_streak_current_line)->population;
+
+					copy_streak_prev_point->next = copy_streak_current_point;
+					copy_streak_prev_point->prev = NULL;
+
+					copy_streak_current_point->next = NULL;
+					copy_streak_current_point->prev = copy_streak_prev_point;
+
+					VectorAppend((Vector*)copy_streak_prev_line, (void*)copy_streak_prev_point);
+					VectorAppend((Vector*)copy_streak_current_line, (void*)copy_streak_current_point);
 				}
 				else {
 					printf("copy streak current line id is not NULL\n");
