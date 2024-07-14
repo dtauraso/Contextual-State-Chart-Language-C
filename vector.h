@@ -31,6 +31,7 @@ Vector* VectorCopyVector(Vector* my_vector);
 
 int VectorGetLastIndex(Vector* container);
 void* VectorGetItem(Vector* container, int i);
+void* VectorGetPoint2WithNextId(Vector* container, int next_id);
 
 int VectorGetPopulation(Vector* container);
 int VectorGetEnd(Vector* container);

@@ -75,9 +75,9 @@ Vector* fillVector(int array[], int length) {
 
 void findPattern() {
 
-	int array1[8] = {1, 1, 1, 2, 1, 1, 1, 2};
+	int array1[12] = {1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2};
 
-	int line_length = 8;
+	int line_length = 12;
 	
 	Vector* one = VectorInitVector();
 
@@ -93,8 +93,12 @@ void findPattern() {
 
 	int current_line_id = array1[0];
 	bool change_current_line_id = false;
-	int copy_streak = 0;
+	int copy_streak_prev = 0;
+	int copy_streak_current = 0;
+	Point2* copy_streak_tracker_prev = NULL;
+	Point2* copy_streak_tracker_current = NULL;
 	Point2* tracker = NULL;
+	Point2* start_of_sequence = NULL;
 	for (int i = 0; i < line_length; i++) {
 		int streak_length = array1[i];
 
@@ -106,23 +110,46 @@ void findPattern() {
 		point->point_id = streak_length_line_population;
 		point->next = NULL;
 		if (tracker == NULL) {
+			point->prev = NULL;
 			tracker = point;
+			start_of_sequence = point;
 		}
 		else {
 			tracker->next = (Point2*) malloc(sizeof(Point2));
 			tracker->next = point;
+			point->prev = tracker;
 			tracker = tracker->next;
 		}
 		VectorAppend((Vector*)streak_length_line, (void*)point);
 		if (current_line_id == streak_length) {
-			copy_streak++;
+			copy_streak_current++;
 		}
 		else if (current_line_id != streak_length) {
+			copy_streak_tracker_current = tracker->prev;
 			printf("change line from %i to %i\n", current_line_id, streak_length);
 			printf("i: %i, streak length: %i\n", i, streak_length);
 			printf("i: %i, line: %i population: %i\n", i, streak_length, streak_length_line_population);
-			printf("i: %i, streak length: %i, copy streak: %i\n", i, streak_length, copy_streak);
-			copy_streak = 1;
+			printf("i: %i, streak length: %i, copy streak prev: %i copy streak current: %i\n", i, streak_length, copy_streak_prev, copy_streak_current);
+			if (copy_streak_prev > 0 && copy_streak_current > 0) {
+				printf("tracker: line id: %i, point id: %i\n", tracker->line_id, tracker->point_id);
+				if (copy_streak_tracker_prev != NULL) {
+					printf("copy tracker prev: line id: %i, point id: %i\n", copy_streak_tracker_prev->line_id, copy_streak_tracker_prev->point_id);
+				}
+				if (copy_streak_tracker_current != NULL) {
+					printf("copy tracker current: line id: %i, point id: %i\n", copy_streak_tracker_current->line_id, copy_streak_tracker_current->point_id);
+				}
+				void* copy_streak_prev_line = VectorGetItem(streak_lengths, copy_streak_prev);
+				void* copy_streak_current_line_id = VectorGetPoint2WithNextId((Vector*)copy_streak_prev_line, copy_streak_current);
+				if (copy_streak_current_line_id == NULL) {
+					printf("copy streak current line id is NULL\n");
+				}
+				else {
+					printf("copy streak current line id is not NULL\n");
+				}
+			}
+			copy_streak_tracker_prev = copy_streak_tracker_current;
+			copy_streak_prev = copy_streak_current;
+			copy_streak_current = 1;
 			current_line_id = streak_length;
 		}
 	}

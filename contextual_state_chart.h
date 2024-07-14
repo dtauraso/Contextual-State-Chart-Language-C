@@ -43,6 +43,7 @@ typedef struct Point2 {
 	int point_id;
 	int line_id;
 	Vector* parents;
+	struct Point2* prev;
 	struct Point2* next;
 }Point2;
 

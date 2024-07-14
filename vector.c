@@ -9,6 +9,7 @@ typedef struct Point2 {
 	int point_id;
 	int line_id;
 	Vector* parents;
+	struct Point2* prev;
 	struct Point2* next;
 }Point2;
 /*
@@ -117,6 +118,46 @@ void* VectorGetItem(Vector* container, int i)
 		printf("out of bounds\n");
 		return NULL;
 	}
+
+}
+
+void* VectorGetPoint2WithNextId(Vector* container, int next_line_id)
+{
+	if(container == NULL)
+	{
+		return NULL;
+
+	}
+	if(container->population == 0)
+	{
+		printf("container is empty\n");
+		return NULL;
+	}
+	printf("VectorGetPoint2WithNextId start %i\n", container->start);
+	printf("VectorGetPoint2WithNextId end %i\n", container->end);
+	
+	for (int i = container->start; i < container->end; i++) {
+		Point2* item = (Point2*) container->values[i];
+		if (item == NULL) {
+			continue;
+		}
+		else if (item->next == NULL) {
+			continue;
+		}
+		if (item->next->line_id == next_line_id) {
+			return item;
+		}
+	}
+	// else if(i < container->end && i >= container->start)
+	// {
+	// 	// printf("item |%i|\n", container->values[i]);
+	// 	return container->values[i];
+	// }
+	// else
+	// {
+	printf("out of bounds\n");
+	return NULL;
+	// }
 
 }
 int VectorGetPopulation(Vector* container)
@@ -560,6 +601,13 @@ void VectorPrintPoint2(Vector* container)
 			void* a = container->values[i];
 			Point2* b = (Point2*) a;
 			printf("|%i|%i|", b->line_id, b->point_id);
+			Point2* b_prev = b->prev;
+			if (b_prev == NULL) {
+				printf("prev:|NULL|");
+			}
+			else {
+				printf("prev:|%i|%i|", b_prev->line_id, b_prev->point_id);
+			}
 			Point2* b_next = b->next;
 			if (b_next == NULL) {
 				printf("next:|NULL|\n");
@@ -567,7 +615,8 @@ void VectorPrintPoint2(Vector* container)
 			else {
 				printf("next:|%i|%i|\n", b_next->line_id, b_next->point_id);
 			}
-			
+
+
 			//printf("|item|");
 		}
 	}
