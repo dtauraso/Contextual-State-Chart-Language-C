@@ -97,6 +97,7 @@ void findPattern() {
 	int copy_streak_current = 0;
 	Point2* copy_streak_tracker_prev = NULL;
 	Point2* copy_streak_tracker_current = NULL;
+	bool reset_copy_streak_trackers = false;
 	Point2* tracker = NULL;
 	Point2* start_of_sequence = NULL;
 	for (int i = 0; i < line_length; i++) {
@@ -159,20 +160,31 @@ void findPattern() {
 
 					VectorAppend((Vector*)copy_streak_prev_line, (void*)copy_streak_prev_point);
 					VectorAppend((Vector*)copy_streak_current_line, (void*)copy_streak_current_point);
+					copy_streak_tracker_prev = NULL;
+					copy_streak_tracker_current = NULL;
+					copy_streak_prev = 0;
+					copy_streak_current = 1;
+					reset_copy_streak_trackers = true;
 				}
 				else {
 					printf("copy streak current line id is not NULL\n");
 				}
 			}
-			copy_streak_tracker_prev = copy_streak_tracker_current;
-			copy_streak_prev = copy_streak_current;
-			copy_streak_current = 1;
+			if (!reset_copy_streak_trackers) {
+				copy_streak_tracker_prev = copy_streak_tracker_current;
+				copy_streak_prev = copy_streak_current;
+				copy_streak_current = 1;
+			}
+			else {
+				reset_copy_streak_trackers = false;
+			}
 			current_line_id = streak_length;
 		}
 	}
 
 	VectorPrintPoint2(one);
 	VectorPrintPoint2(two);
+	VectorPrintPoint2(three);
 
 }
 void makeSequence(Vector* distances, Vector* x) {
